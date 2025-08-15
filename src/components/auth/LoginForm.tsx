@@ -35,39 +35,106 @@ export const LoginForm: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 p-4">
-      <div className="absolute inset-0 bg-black/20"></div>
-      <Card className="w-full max-w-md relative z-10 shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
-        <CardHeader className="text-center pb-8">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      padding: '1rem',
+      position: 'relative'
+    }}>
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.1)'
+      }}></div>
+      
+      <div style={{
+        width: '100%',
+        maxWidth: '400px',
+        position: 'relative',
+        zIndex: 10,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderRadius: '16px',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.2)'
+      }}>
+        <div style={{
+          padding: '2rem',
+          textAlign: 'center',
+          paddingBottom: '2rem'
+        }}>
+          <div style={{
+            margin: '0 auto',
+            width: '64px',
+            height: '64px',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '1rem',
+            boxShadow: '0 10px 25px rgba(102, 126, 234, 0.3)'
+          }}>
+            <svg style={{ width: '32px', height: '32px', color: 'white' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          
+          <h1 style={{
+            fontSize: '2rem',
+            fontWeight: 'bold',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: '0.5rem'
+          }}>
             Motorepuestos F.L.
-          </CardTitle>
-          <CardDescription className="text-gray-600 mt-2 text-base">
+          </h1>
+          
+          <p style={{
+            color: '#6b7280',
+            marginTop: '0.5rem',
+            fontSize: '1rem'
+          }}>
             Inicia sesión para acceder al sistema
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-8 pb-8">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Email</label>
-              <Input
+          </p>
+        </div>
+        
+        <div style={{
+          padding: '0 2rem 2rem 2rem'
+        }}>
+          <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Email</label>
+              <input
                 {...register('email')}
                 type="email"
                 placeholder="tu@email.com"
-                className={`h-12 px-4 text-base transition-all duration-200 ${
-                  errors.email 
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-                }`}
+                style={{
+                  height: '48px',
+                  padding: '0 1rem',
+                  fontSize: '1rem',
+                  border: errors.email ? '2px solid #ef4444' : '2px solid #d1d5db',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  backgroundColor: 'white'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = errors.email ? '#ef4444' : '#667eea';
+                  e.target.style.boxShadow = errors.email ? '0 0 0 3px rgba(239, 68, 68, 0.1)' : '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = errors.email ? '#ef4444' : '#d1d5db';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1 flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <p style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'flex', alignItems: 'center' }}>
+                  <svg style={{ width: '16px', height: '16px', marginRight: '0.25rem' }} fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   {errors.email.message}
@@ -75,21 +142,34 @@ export const LoginForm: React.FC = () => {
               )}
             </div>
             
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Contraseña</label>
-              <Input
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.875rem', fontWeight: '500', color: '#374151' }}>Contraseña</label>
+              <input
                 {...register('password')}
                 type="password"
                 placeholder="••••••••"
-                className={`h-12 px-4 text-base transition-all duration-200 ${
-                  errors.password 
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-                    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-                }`}
+                style={{
+                  height: '48px',
+                  padding: '0 1rem',
+                  fontSize: '1rem',
+                  border: errors.password ? '2px solid #ef4444' : '2px solid #d1d5db',
+                  borderRadius: '8px',
+                  outline: 'none',
+                  transition: 'all 0.2s',
+                  backgroundColor: 'white'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = errors.password ? '#ef4444' : '#667eea';
+                  e.target.style.boxShadow = errors.password ? '0 0 0 3px rgba(239, 68, 68, 0.1)' : '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = errors.password ? '#ef4444' : '#d1d5db';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1 flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <p style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', display: 'flex', alignItems: 'center' }}>
+                  <svg style={{ width: '16px', height: '16px', marginRight: '0.25rem' }} fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   {errors.password.message}
@@ -97,26 +177,68 @@ export const LoginForm: React.FC = () => {
               )}
             </div>
 
-            <Button
+            <button
               type="submit"
-              className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02]"
               disabled={authLoading}
+              style={{
+                width: '100%',
+                height: '48px',
+                fontSize: '1rem',
+                fontWeight: '600',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: authLoading ? 'not-allowed' : 'pointer',
+                boxShadow: '0 10px 25px rgba(102, 126, 234, 0.3)',
+                transition: 'all 0.2s',
+                opacity: authLoading ? 0.7 : 1,
+                transform: 'translateY(0)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              onMouseEnter={(e) => {
+                if (!authLoading) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 15px 35px rgba(102, 126, 234, 0.4)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!authLoading) {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 10px 25px rgba(102, 126, 234, 0.3)';
+                }
+              }}
             >
               {authLoading ? (
-                <div className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg style={{ 
+                    animation: 'spin 1s linear infinite',
+                    marginRight: '0.75rem',
+                    width: '20px',
+                    height: '20px',
+                    color: 'white'
+                  }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path style={{ opacity: 0.75 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Iniciando sesión...
                 </div>
               ) : (
                 'Iniciar Sesión'
               )}
-            </Button>
+            </button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+      
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }
