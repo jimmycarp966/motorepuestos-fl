@@ -81,6 +81,7 @@ export interface AppStore {
   ui: UIState
   setTheme: (theme: 'light' | 'dark') => void
   setSidebarOpen: (open: boolean) => void
+  setCurrentModule: (module: string) => void
 
   // Notifications
   notifications: NotificationsState
@@ -272,6 +273,7 @@ export interface CajaState {
 export interface UIState {
   theme: 'light' | 'dark'
   sidebarOpen: boolean
+  currentModule: string
 }
 
 export interface NotificationsState {

@@ -35,14 +35,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const logout = useAppStore((state) => state.logout)
   const sidebarOpen = useAppStore((state) => state.ui.sidebarOpen)
   const setSidebarOpen = useAppStore((state) => state.setSidebarOpen)
+  const currentModule = useAppStore((state) => state.ui.currentModule)
+  const setCurrentModule = useAppStore((state) => state.setCurrentModule)
 
   const handleLogout = async () => {
     await logout()
   }
 
   const handleMenuClick = (moduleId: string) => {
-    // Aquí se manejaría la navegación
-    console.log(`Navegando a: ${moduleId}`)
+    setCurrentModule(moduleId)
     if (window.innerWidth < 768) {
       setSidebarOpen(false)
     }
@@ -116,6 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
           <nav style={{ flex: 1, padding: '1rem' }}>
             {accessibleModules.map((item) => {
               const Icon = item.icon
+              const isActive = currentModule === item.id
               return (
                 <button
                   key={item.id}
@@ -127,21 +129,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                     gap: '0.75rem',
                     padding: '0.75rem',
                     textAlign: 'left',
-                    color: '#374151',
+                    color: isActive ? '#667eea' : '#374151',
                     borderRadius: '0.5rem',
                     border: 'none',
-                    background: 'none',
+                    background: isActive ? '#f0f4ff' : 'none',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
-                    marginBottom: '0.5rem'
+                    marginBottom: '0.5rem',
+                    fontWeight: isActive ? '600' : '400'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#f3f4f6'
-                    e.currentTarget.style.transform = 'translateX(4px)'
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6'
+                      e.currentTarget.style.transform = 'translateX(4px)'
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent'
-                    e.currentTarget.style.transform = 'translateX(0)'
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                      e.currentTarget.style.transform = 'translateX(0)'
+                    }
                   }}
                 >
                   <Icon size={20} />

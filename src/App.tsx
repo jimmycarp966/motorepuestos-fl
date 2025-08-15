@@ -4,6 +4,11 @@ import { LoginForm } from './components/auth/LoginForm'
 import { Sidebar } from './components/layout/Sidebar'
 import { Dashboard } from './components/dashboard/Dashboard'
 import { EmpleadosTable } from './components/empleados/EmpleadosTable'
+import { ProductosTable } from './components/productos/ProductosTable'
+import { ClientesTable } from './components/clientes/ClientesTable'
+import { VentasTable } from './components/ventas/VentasTable'
+import { CajaTable } from './components/caja/CajaTable'
+import { ReportesTable } from './components/reportes/ReportesTable'
 import { NotificationsContainer } from './components/ui/notifications'
 
 function App() {
@@ -12,14 +17,61 @@ function App() {
   const checkAuth = useAppStore((state) => state.checkAuth)
   const sidebarOpen = useAppStore((state) => state.ui.sidebarOpen)
   const setSidebarOpen = useAppStore((state) => state.setSidebarOpen)
+  const currentModule = useAppStore((state) => state.ui.currentModule)
   
-  const [currentModule] = useState('dashboard')
+  // Acciones para cargar datos
+  const fetchEmpleados = useAppStore((state) => state.fetchEmpleados)
+  const fetchProductos = useAppStore((state) => state.fetchProductos)
+  const fetchClientes = useAppStore((state) => state.fetchClientes)
+  const fetchVentas = useAppStore((state) => state.fetchVentas)
+  const fetchMovimientos = useAppStore((state) => state.fetchMovimientos)
 
   useEffect(() => {
     checkAuth()
   }, [checkAuth])
 
-  // Simular navegación por módulos
+  // Cargar datos según el módulo activo
+  useEffect(() => {
+    if (!user) return
+
+    const loadModuleData = async () => {
+      try {
+        switch (currentModule) {
+          case 'empleados':
+            await fetchEmpleados()
+            break
+          case 'productos':
+            await fetchProductos()
+            break
+          case 'clientes':
+            await fetchClientes()
+            break
+          case 'ventas':
+            await fetchVentas()
+            break
+          case 'caja':
+            await fetchMovimientos()
+            break
+          case 'reportes':
+            // Los reportes se calculan en tiempo real
+            break
+          default:
+            // Dashboard carga todos los datos necesarios
+            await Promise.all([
+              fetchVentas(),
+              fetchMovimientos(),
+              fetchProductos()
+            ])
+        }
+      } catch (error) {
+        console.error('Error cargando datos del módulo:', error)
+      }
+    }
+
+    loadModuleData()
+  }, [currentModule, user, fetchEmpleados, fetchProductos, fetchClientes, fetchVentas, fetchMovimientos])
+
+  // Renderizar módulo correspondiente
   const renderModule = () => {
     switch (currentModule) {
       case 'dashboard':
@@ -27,15 +79,15 @@ function App() {
       case 'empleados':
         return <EmpleadosTable />
       case 'productos':
-        return <div className="p-6">Módulo de Productos - En desarrollo</div>
+        return <ProductosTable />
       case 'clientes':
-        return <div className="p-6">Módulo de Clientes - En desarrollo</div>
+        return <ClientesTable />
       case 'ventas':
-        return <div className="p-6">Módulo de Ventas - En desarrollo</div>
+        return <VentasTable />
       case 'caja':
-        return <div className="p-6">Módulo de Caja - En desarrollo</div>
+        return <CajaTable />
       case 'reportes':
-        return <div className="p-6">Módulo de Reportes - En desarrollo</div>
+        return <ReportesTable />
       default:
         return <Dashboard />
     }
