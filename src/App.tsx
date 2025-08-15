@@ -43,10 +43,23 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando...</p>
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            animation: 'spin 1s linear infinite',
+            borderRadius: '50%',
+            height: '48px',
+            width: '48px',
+            borderBottom: '2px solid #2563eb',
+            margin: '0 auto'
+          }}></div>
+          <p style={{ marginTop: '1rem', color: '#6b7280' }}>Cargando...</p>
         </div>
       </div>
     )
@@ -57,21 +70,37 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#f9fafb',
+      fontFamily: 'Inter, system-ui, sans-serif'
+    }}>
       <NotificationsContainer />
       
-      <div className="flex">
+      <div style={{ display: 'flex' }}>
         <Sidebar 
           isOpen={sidebarOpen} 
           onToggle={() => setSidebarOpen(!sidebarOpen)} 
         />
         
-        <main className="flex-1 md:ml-64 min-h-screen">
-          <div className="p-6">
+        <main style={{
+          flex: 1,
+          marginLeft: sidebarOpen ? '256px' : '0',
+          minHeight: '100vh',
+          transition: 'margin-left 0.3s ease'
+        }}>
+          <div style={{ padding: '1.5rem' }}>
             {renderModule()}
           </div>
         </main>
       </div>
+      
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }

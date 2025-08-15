@@ -67,128 +67,225 @@ export const Dashboard: React.FC = () => {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <h1 style={{ 
+        fontSize: '1.875rem', 
+        fontWeight: 'bold', 
+        color: '#111827',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent'
+      }}>Dashboard</h1>
       
       {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ventas Hoy</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalVentasHoy.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">
-              {ventasHoy.length} ventas realizadas
-            </p>
-          </CardContent>
-        </Card>
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '1.5rem'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '0.75rem',
+          padding: '1.5rem',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #e5e7eb',
+          transition: 'all 0.2s'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '1rem'
+          }}>
+            <h3 style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280' }}>Ventas Hoy</h3>
+            <DollarSign size={20} color="#667eea" />
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827' }}>
+            ${totalVentasHoy.toFixed(2)}
+          </div>
+          <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
+            {ventasHoy.length} ventas realizadas
+          </p>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Saldo Caja</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${caja.saldo.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">
-              Balance actual
-            </p>
-          </CardContent>
-        </Card>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '0.75rem',
+          padding: '1.5rem',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #e5e7eb',
+          transition: 'all 0.2s'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '1rem'
+          }}>
+            <h3 style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280' }}>Saldo Caja</h3>
+            <TrendingUp size={20} color="#10b981" />
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827' }}>
+            ${caja.saldo.toFixed(2)}
+          </div>
+          <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
+            Balance actual
+          </p>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Productos Stock Bajo</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{productosStockBajo.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Menos de 10 unidades
-            </p>
-          </CardContent>
-        </Card>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '0.75rem',
+          padding: '1.5rem',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #e5e7eb',
+          transition: 'all 0.2s'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '1rem'
+          }}>
+            <h3 style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280' }}>Productos Stock Bajo</h3>
+            <Package size={20} color="#f59e0b" />
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827' }}>
+            {productosStockBajo.length}
+          </div>
+          <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
+            Menos de 10 unidades
+          </p>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Clientes Activos</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{clientesActivos.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Total de clientes
-            </p>
-          </CardContent>
-        </Card>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '0.75rem',
+          padding: '1.5rem',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #e5e7eb',
+          transition: 'all 0.2s'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '1rem'
+          }}>
+            <h3 style={{ fontSize: '0.875rem', fontWeight: '500', color: '#6b7280' }}>Clientes Activos</h3>
+            <Users size={20} color="#8b5cf6" />
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827' }}>
+            {clientesActivos.length}
+          </div>
+          <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.25rem' }}>
+            Total de clientes
+          </p>
+        </div>
       </div>
 
       {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Ventas de los Últimos 7 Días</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={ventasPorDia}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="fecha" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="total" fill="#3B82F6" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gap: '1.5rem'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '0.75rem',
+          padding: '1.5rem',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #e5e7eb'
+        }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>
+            Ventas de los Últimos 7 Días
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={ventasPorDia}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis dataKey="fecha" stroke="#6b7280" />
+              <YAxis stroke="#6b7280" />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0.5rem',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+              <Bar dataKey="total" fill="#667eea" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Productos por Categoría</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={datosCategoria}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                                     label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                                     {datosCategoria.map((_, index) => (
-                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                   ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '0.75rem',
+          padding: '1.5rem',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #e5e7eb'
+        }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>
+            Productos por Categoría
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={datosCategoria}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {datosCategoria.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0.5rem',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Productos con stock bajo */}
       {productosStockBajo.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Productos con Stock Bajo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {productosStockBajo.slice(0, 5).map((producto) => (
-                <div key={producto.id} className="flex justify-between items-center p-2 bg-red-50 rounded">
-                  <span className="font-medium">{producto.nombre}</span>
-                  <span className="text-red-600 font-bold">{producto.stock} unidades</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '0.75rem',
+          padding: '1.5rem',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #e5e7eb'
+        }}>
+          <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>
+            Productos con Stock Bajo
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {productosStockBajo.slice(0, 5).map((producto) => (
+              <div key={producto.id} style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '0.75rem',
+                backgroundColor: '#fef2f2',
+                borderRadius: '0.5rem',
+                border: '1px solid #fecaca'
+              }}>
+                <span style={{ fontWeight: '500', color: '#111827' }}>{producto.nombre}</span>
+                <span style={{ color: '#dc2626', fontWeight: 'bold' }}>{producto.stock} unidades</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   )

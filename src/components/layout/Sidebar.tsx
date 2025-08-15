@@ -59,47 +59,92 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       {/* Overlay para móviles */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 40
+          }}
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`
-        fixed top-0 left-0 h-full bg-white border-r border-gray-200 z-50
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        md:translate-x-0 md:static md:z-auto
-        w-64
-      `}>
-        <div className="flex flex-col h-full">
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        height: '100%',
+        backgroundColor: 'white',
+        borderRight: '1px solid #e5e7eb',
+        zIndex: 50,
+        transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform 0.3s ease-in-out',
+        width: '256px',
+        boxShadow: '2px 0 10px rgba(0, 0, 0, 0.1)'
+      }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '1rem',
+            borderBottom: '1px solid #e5e7eb',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'white'
+          }}>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Motorepuestos F.L.</h1>
-              <p className="text-sm text-gray-500">{user.nombre}</p>
+              <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Motorepuestos F.L.</h1>
+              <p style={{ fontSize: '0.875rem', opacity: 0.9 }}>{user.nombre}</p>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={() => setSidebarOpen(false)}
-              className="md:hidden"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'white',
+                cursor: 'pointer',
+                padding: '0.5rem'
+              }}
             >
-              <X className="w-4 h-4" />
-            </Button>
+              <X size={16} />
+            </button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
+          <nav style={{ flex: 1, padding: '1rem' }}>
             {accessibleModules.map((item) => {
               const Icon = item.icon
               return (
                 <button
                   key={item.id}
                   onClick={() => handleMenuClick(item.id)}
-                  className="w-full flex items-center space-x-3 px-3 py-2 text-left text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    padding: '0.75rem',
+                    textAlign: 'left',
+                    color: '#374151',
+                    borderRadius: '0.5rem',
+                    border: 'none',
+                    background: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    marginBottom: '0.5rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f3f4f6'
+                    e.currentTarget.style.transform = 'translateX(4px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.transform = 'translateX(0)'
+                  }}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon size={20} />
                   <span>{item.label}</span>
                 </button>
               )
@@ -107,33 +152,73 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="mb-2">
-              <span className="text-xs text-gray-500">Rol:</span>
-              <span className="ml-1 text-sm font-medium capitalize">{user.rol}</span>
+          <div style={{
+            padding: '1rem',
+            borderTop: '1px solid #e5e7eb',
+            backgroundColor: '#f9fafb'
+          }}>
+            <div style={{ marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>Rol:</span>
+              <span style={{ 
+                marginLeft: '0.25rem', 
+                fontSize: '0.875rem', 
+                fontWeight: '500',
+                textTransform: 'capitalize',
+                color: '#667eea'
+              }}>{user.rol}</span>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
+            <button
               onClick={handleLogout}
-              className="w-full"
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                padding: '0.5rem 1rem',
+                border: '1px solid #d1d5db',
+                borderRadius: '0.375rem',
+                backgroundColor: 'white',
+                color: '#374151',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                fontSize: '0.875rem'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#f3f4f6'
+                e.currentTarget.style.borderColor = '#9ca3af'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'white'
+                e.currentTarget.style.borderColor = '#d1d5db'
+              }}
             >
-              <LogOut className="w-4 h-4 mr-2" />
+              <LogOut size={16} />
               Cerrar Sesión
-            </Button>
+            </button>
           </div>
         </div>
       </div>
 
       {/* Mobile menu button */}
-      <Button
-        variant="ghost"
-        size="sm"
+      <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="fixed top-4 left-4 z-50 md:hidden"
+        style={{
+          position: 'fixed',
+          top: '1rem',
+          left: '1rem',
+          zIndex: 50,
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          border: 'none',
+          borderRadius: '0.375rem',
+          padding: '0.5rem',
+          color: 'white',
+          cursor: 'pointer',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}
       >
-        <Menu className="w-5 h-5" />
-      </Button>
+        <Menu size={20} />
+      </button>
     </>
   )
 }
