@@ -214,10 +214,16 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
     }))
 
     try {
+      console.log('🔍 Auth: Verificando sesión...')
       const { data: { session }, error } = await supabase.auth.getSession()
-      if (error) throw error
+      
+      if (error) {
+        console.error('❌ Auth: Error obteniendo sesión:', error)
+        throw error
+      }
 
       if (session?.user) {
+        console.log('✅ Auth: Sesión encontrada, obteniendo datos del empleado...')
         // Obtener datos del empleado
         const { data: empleadoData, error: empleadoError } = await supabase
           .from('empleados')
@@ -226,8 +232,12 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
           .eq('activo', true)
           .single()
 
-        if (empleadoError) throw empleadoError
+        if (empleadoError) {
+          console.error('❌ Auth: Error obteniendo empleado:', empleadoError)
+          throw empleadoError
+        }
 
+        console.log('✅ Auth: Empleado encontrado:', empleadoData)
         set(() => ({
           auth: {
             session,
@@ -236,6 +246,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
           }
         }))
       } else {
+        console.log('ℹ️ Auth: No hay sesión activa')
         set(() => ({
           auth: {
             session: null,
@@ -245,7 +256,8 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
         }))
       }
 
-    } catch {
+    } catch (error) {
+      console.error('❌ Auth: Error en checkAuth:', error)
       set(() => ({
         auth: {
           session: null,
@@ -253,6 +265,16 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
           loading: false,
         }
       }))
+      
+      // Notificar error solo si no es un error de "no hay sesión"
+      if (error instanceof Error && !error.message.includes('No session')) {
+        get().addNotification({
+          id: Date.now().toString(),
+          type: 'error',
+          title: 'Error de conexión',
+          message: 'No se pudo verificar la autenticación. Verificando conexión...',
+        })
+      }
     }
   },
 })

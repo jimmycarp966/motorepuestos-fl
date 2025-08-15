@@ -1,4 +1,4 @@
-import { supabase } from '../../supabase'
+import { supabase } from '../../lib/supabase'
 
 export const createEmpleadosSlice = (set, get) => ({
   empleados: {
@@ -145,3 +145,26 @@ export const createEmpleadosSlice = (set, get) => ({
     )
   }
 })
+
+// Funciones de permisos
+export const canAccessModule = (userRole, module) => {
+  const rolePermissions = {
+    'admin': ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'reportes'],
+    'cajero': ['dashboard', 'ventas', 'caja'],
+    'vendedor': ['dashboard', 'productos', 'clientes', 'ventas'],
+    'consulta': ['dashboard', 'reportes']
+  }
+  
+  return rolePermissions[userRole]?.includes(module) || false
+}
+
+export const canManageModule = (userRole, module) => {
+  const managementPermissions = {
+    'admin': ['empleados', 'productos', 'clientes', 'ventas', 'caja', 'reportes'],
+    'cajero': ['ventas', 'caja'],
+    'vendedor': ['productos', 'clientes', 'ventas'],
+    'consulta': []
+  }
+  
+  return managementPermissions[userRole]?.includes(module) || false
+}
