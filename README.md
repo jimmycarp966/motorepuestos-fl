@@ -1,227 +1,259 @@
-# Motorepuestos F.L. - Sistema de Gestión 🏍️
+# 🏍️ Sistema de Gestión para Motorepuestos FL
 
-Sistema completo de gestión para tienda de motorepuestos y lubricantes, desarrollado con React, TypeScript, Zustand y Supabase.
+Sistema completo de gestión empresarial adaptado específicamente para tiendas de motorepuestos, con interfaz moderna y funcionalidades avanzadas.
 
-> **¡Desplegado en Vercel!** 🚀
+## ✨ Características Principales
 
-## 🚀 Características
+### 🎯 **Gestión Completa del Negocio**
+- **Dashboard Inteligente** - KPIs y métricas en tiempo real
+- **Gestión de Productos** - Catálogo completo con categorías específicas de motorepuestos
+- **Sistema de Ventas** - Registro de ventas con múltiples productos
+- **Control de Caja** - Movimientos de ingresos y egresos
+- **Gestión de Clientes** - Base de datos de clientes con historial
+- **Gestión de Empleados** - Control de personal y roles
+- **Reportes Avanzados** - Análisis y estadísticas del negocio
 
-- **Autenticación y Autorización**: Sistema de roles (admin, cajero, vendedor, consulta)
-- **Gestión de Empleados**: CRUD completo con control de acceso por roles
-- **Dashboard Interactivo**: KPIs y gráficos en tiempo real
-- **Gestión de Productos**: Inventario con control de stock
-- **Gestión de Clientes**: Base de datos de clientes
-- **Sistema de Ventas**: Registro de ventas con descuento automático de inventario
-- **Control de Caja**: Movimientos de ingresos y egresos
-- **Notificaciones**: Sistema centralizado de notificaciones
-- **UI Moderna**: Diseño responsive con Tailwind CSS
+### 🎨 **Diseño Moderno**
+- **Colores Azul Claro** - Paleta adaptada para motorepuestos
+- **Degradados Elegantes** - Diseño visual atractivo
+- **Interfaz Responsive** - Funciona en desktop, tablet y móvil
+- **Animaciones Suaves** - Experiencia de usuario fluida
 
-## 🛠️ Stack Tecnológico
+### 🔧 **Tecnologías Modernas**
+- **React 18** - Framework de frontend
+- **Supabase** - Backend como servicio (PostgreSQL + Auth)
+- **Zustand** - Gestión de estado global
+- **Tailwind CSS** - Framework de estilos
+- **React Hook Form + Zod** - Validación de formularios
+- **Recharts** - Gráficos y visualizaciones
 
-- **Frontend**: React 18 + TypeScript + Vite
-- **Estado**: Zustand (Single Source of Truth)
-- **UI**: Tailwind CSS + shadcn/ui
-- **Formularios**: React Hook Form + Zod
-- **Backend**: Supabase (PostgreSQL + Auth)
-- **Gráficos**: Recharts
-- **Iconos**: Lucide React
+## 🚀 Instalación y Configuración
 
-## 📋 Prerrequisitos
-
-- Node.js 18+ 
+### **Prerrequisitos**
+- Node.js 18+
 - npm o yarn
 - Cuenta de Supabase
 
-## 🔧 Instalación
-
-### 1. Clonar el repositorio
+### **1. Clonar el Repositorio**
 ```bash
-git clone <url-del-repositorio>
-cd motorepuestos-fl
+git clone https://github.com/tu-usuario/motorepuestos-fl.git
+cd motorepuestos-fl/client
 ```
 
-### 2. Instalar dependencias
+### **2. Instalar Dependencias**
 ```bash
 npm install
 ```
 
-### 3. Configurar Supabase
+### **3. Configurar Supabase**
+1. Crear proyecto en [Supabase](https://supabase.com)
+2. Configurar las tablas de la base de datos
+3. Copiar URL y API Key
 
-#### 3.1 Crear proyecto en Supabase
-1. Ve a [supabase.com](https://supabase.com)
-2. Crea un nuevo proyecto
-3. Guarda la URL y las claves API
-
-#### 3.2 Configurar base de datos
-1. Ve al SQL Editor en tu proyecto de Supabase
-2. Ejecuta el contenido del archivo `supabase-setup.sql`
-3. Esto creará todas las tablas, funciones y políticas necesarias
-
-#### 3.3 Configurar autenticación
-1. Ve a Authentication > Settings
-2. Habilita Email auth
-3. Configura las URLs de redirección según tu dominio
-
-### 4. Configurar variables de entorno
-Crea un archivo `.env.local` en la raíz del proyecto:
-
+### **4. Variables de Entorno**
+Crear archivo `.env` en la carpeta `client`:
 ```env
-VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
-VITE_SUPABASE_ANON_KEY=tu-anon-key
+REACT_APP_SUPABASE_URL=tu_supabase_url
+REACT_APP_SUPABASE_ANON_KEY=tu_supabase_anon_key
+REACT_APP_APP_NAME=Motorepuestos FL
+REACT_APP_APP_VERSION=1.0.0
 ```
 
-### 5. Ejecutar el proyecto
+### **5. Ejecutar en Desarrollo**
 ```bash
-npm run dev
+npm start
 ```
-
-## 👥 Roles y Permisos
-
-### Administrador
-- Acceso completo a todos los módulos
-- Gestión de empleados
-- Configuración del sistema
-
-### Cajero
-- Dashboard
-- Ventas
-- Caja
-- Clientes (solo lectura)
-
-### Vendedor
-- Dashboard
-- Ventas
-- Clientes
-
-### Consulta
-- Dashboard
-- Productos (solo lectura)
-- Clientes (solo lectura)
 
 ## 📊 Módulos del Sistema
 
-### Dashboard
-- KPIs en tiempo real
-- Gráficos de ventas
-- Productos con stock bajo
-- Resumen de caja
+### **🏠 Dashboard**
+- Resumen ejecutivo de ventas
+- KPIs principales del negocio
+- Gráficos de tendencias
+- Alertas y notificaciones
 
-### Empleados
-- Lista de empleados
-- Crear/editar/eliminar empleados
-- Asignación de roles
-- Control de estado activo/inactivo
+### **📦 Productos**
+- Catálogo de repuestos
+- Categorías específicas (Motores, Frenos, Suspensión, etc.)
+- Control de precios y stock
+- Imágenes y descripciones
+- Códigos de barras
 
-### Productos
-- Gestión de inventario
-- Control de stock
-- Categorización
-- Precios y descripciones
+### **🛒 Ventas**
+- Interfaz de ventas intuitiva
+- Múltiples productos por venta
+- Selección de clientes
+- Cálculo automático de totales
+- Registro de transacciones
 
-### Clientes
+### **💰 Caja**
+- Control de ingresos y egresos
+- Saldo en tiempo real
+- Arqueo de caja
+- Historial de movimientos
+- Reportes financieros
+
+### **👥 Clientes**
 - Base de datos de clientes
 - Información de contacto
 - Historial de compras
+- Segmentación
+- Gestión de cuentas
 
-### Ventas
-- Registro de ventas
-- Selección de productos
-- Cálculo automático de totales
-- Descuento automático de inventario
+### **👨‍💼 Empleados**
+- Control de personal
+- Permisos granulares
+- Roles específicos
+- Actividades registradas
 
-### Caja
-- Movimientos de ingresos/egresos
-- Balance en tiempo real
-- Historial de transacciones
+### **📈 Reportes**
+- Reportes de ventas
+- Análisis de rentabilidad
+- Reportes de inventario
+- KPIs del negocio
+- Exportación de datos
 
-## 🔐 Seguridad
+## 🎨 Categorías de Productos
 
-- **Row Level Security (RLS)**: Políticas de acceso a nivel de fila
-- **Autenticación**: Sistema de login seguro
-- **Autorización**: Control de acceso basado en roles
-- **Validación**: Validación de datos en cliente y servidor
+El sistema incluye categorías específicas para motorepuestos:
 
-## 📱 Responsive Design
+- **Motores** - Partes del motor
+- **Frenos** - Sistema de frenado
+- **Suspensión** - Componentes de suspensión
+- **Eléctrico** - Sistema eléctrico
+- **Combustible** - Sistema de combustible
+- **Transmisión** - Transmisión y embrague
+- **Carrocería** - Partes externas
+- **Accesorios** - Accesorios varios
+- **Lubricantes** - Aceites y lubricantes
+- **Herramientas** - Herramientas especializadas
+- **Neumáticos** - Llantas y neumáticos
+- **Iluminación** - Sistema de luces
+- **Audio** - Sistema de audio
+- **Seguridad** - Elementos de seguridad
+- **Otros** - Categoría general
 
-La aplicación está optimizada para:
-- Desktop (1024px+)
-- Tablet (768px - 1023px)
-- Mobile (320px - 767px)
+## 🔐 Seguridad y Permisos
+
+### **Niveles de Acceso**
+- **Administrador** - Acceso completo al sistema
+- **Gerente** - Gestión de ventas, inventario y reportes
+- **Vendedor** - Operaciones de venta
+- **Técnico** - Gestión de productos e inventario
+- **Cajero** - Operaciones de caja
+- **Auxiliar** - Operaciones básicas
+
+### **Características de Seguridad**
+- Autenticación obligatoria
+- Validación de permisos por módulo
+- Auditoría de acciones críticas
+- Backup automático de datos
+
+## 📱 Características Móviles
+
+### **Optimizaciones Mobile**
+- Interfaz táctil optimizada
+- Botones de tamaño adecuado
+- Navegación simplificada
+- Carga rápida en conexiones lentas
+- Modo offline básico
 
 ## 🚀 Despliegue
 
-### Vercel (Recomendado)
-1. Conecta tu repositorio a Vercel
-2. Configura las variables de entorno
-3. Deploy automático
-
-### Netlify
-1. Conecta tu repositorio a Netlify
-2. Configura las variables de entorno
-3. Build command: `npm run build`
-
-## 🧪 Testing
-
+### **Vercel (Recomendado)**
 ```bash
-# Ejecutar tests
-npm run test
-
-# Ejecutar tests en modo watch
-npm run test:watch
-```
-
-## 📝 Scripts Disponibles
-
-```bash
-# Desarrollo
-npm run dev
-
-# Build para producción
 npm run build
-
-# Preview del build
-npm run preview
-
-# Linting
-npm run lint
-
-# Formateo de código
-npm run format
+# Conectar repositorio a Vercel
+# Configurar variables de entorno
+# Despliegue automático en cada push
 ```
+
+### **Netlify**
+```bash
+npm run build
+# Conectar repositorio a Netlify
+# Configurar build settings
+# Desplegar automáticamente
+```
+
+## 🔧 Configuración Avanzada
+
+### **Personalización**
+- Colores personalizables
+- Logo de la empresa
+- Configuración de impresoras
+- Formatos de tickets
+
+### **Integraciones**
+- APIs de proveedores
+- Sistemas de pago
+- Servicios de delivery
+- Herramientas de contabilidad
+
+## 📈 Métricas y KPIs
+
+### **Ventas**
+- Ventas diarias/mensuales/anuales
+- Productos más vendidos
+- Horarios pico de ventas
+- Tasa de conversión
+
+### **Inventario**
+- Rotación de stock
+- Productos con bajo movimiento
+- Valor del inventario
+- Alertas de stock bajo
+
+### **Clientes**
+- Clientes nuevos vs recurrentes
+- Valor promedio por cliente
+- Frecuencia de compra
+- Satisfacción del cliente
+
+## 🐛 Solución de Problemas
+
+### **Problemas Comunes**
+1. **Error de conexión a Supabase**
+   - Verificar configuración
+   - Revisar variables de entorno
+   - Comprobar credenciales
+
+2. **Problemas de sincronización**
+   - Verificar conexión a internet
+   - Revisar logs de Supabase
+   - Forzar recarga de datos
+
+3. **Errores de permisos**
+   - Verificar rol del usuario
+   - Revisar configuración de permisos
+   - Contactar administrador
 
 ## 🤝 Contribución
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+### **Cómo Contribuir**
+1. Fork del repositorio
+2. Crear rama para feature
+3. Implementar cambios
+4. Ejecutar tests
+5. Crear Pull Request
+
+### **Estándares de Código**
+- ESLint configuration
+- Prettier formatting
+- Conventional commits
+- Code review obligatorio
 
 ## 📄 Licencia
 
 Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
-## 🆘 Soporte
+## 📞 Soporte
 
-Para soporte técnico:
-- Email: soporte@motorepuestos.com
-- Documentación: [docs.motorepuestos.com](https://docs.motorepuestos.com)
-
-## 🔄 Actualizaciones
-
-Para mantener el sistema actualizado:
-
-```bash
-# Actualizar dependencias
-npm update
-
-# Verificar vulnerabilidades
-npm audit
-
-# Corregir vulnerabilidades automáticamente
-npm audit fix
-```
+### **Canales de Soporte**
+- **Email**: soporte@motorepuestos-fl.com
+- **Documentación**: docs.motorepuestos-fl.com
+- **Issues**: GitHub Issues
 
 ---
 
-**Desarrollado con ❤️ para Motorepuestos F.L.**
+**🏍️ Desarrollado con ❤️ para motorepuestos de todo el mundo**
