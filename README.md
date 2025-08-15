@@ -1,6 +1,8 @@
-# Motorepuestos F.L. - Sistema de Gestión
+# Motorepuestos F.L. - Sistema de Gestión 🏍️
 
 Sistema completo de gestión para tienda de motorepuestos y lubricantes, desarrollado con React, TypeScript, Zustand y Supabase.
+
+> **¡Desplegado en Vercel!** 🚀
 
 ## 🚀 Características
 
