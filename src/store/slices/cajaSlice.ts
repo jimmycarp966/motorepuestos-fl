@@ -9,7 +9,7 @@ const initialState: CajaState = {
   error: null,
 }
 
-export const cajaSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) => ({
+export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | 'fetchMovimientos' | 'registrarIngreso' | 'registrarEgreso'>> = (set, get) => ({
   caja: initialState,
 
   fetchMovimientos: async () => {

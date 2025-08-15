@@ -13,7 +13,7 @@ function App() {
   const sidebarOpen = useAppStore((state) => state.ui.sidebarOpen)
   const setSidebarOpen = useAppStore((state) => state.setSidebarOpen)
   
-  const [currentModule, setCurrentModule] = useState('dashboard')
+  const [currentModule] = useState('dashboard')
 
   useEffect(() => {
     checkAuth()

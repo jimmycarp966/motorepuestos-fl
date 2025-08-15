@@ -8,7 +8,7 @@ const initialState: ProductosState = {
   error: null,
 }
 
-export const productosSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) => ({
+export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'productos' | 'fetchProductos' | 'createProducto' | 'updateProducto' | 'deleteProducto'>> = (set, get) => ({
   productos: initialState,
 
   fetchProductos: async () => {

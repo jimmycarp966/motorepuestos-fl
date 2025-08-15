@@ -6,7 +6,7 @@ const initialState: UIState = {
   sidebarOpen: false,
 }
 
-export const uiSlice: StateCreator<AppStore, [], [], AppStore> = (set) => ({
+export const uiSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ui' | 'setTheme' | 'setSidebarOpen'>> = (set) => ({
   ui: initialState,
 
   setTheme: (theme: 'light' | 'dark') => {

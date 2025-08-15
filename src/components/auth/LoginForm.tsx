@@ -29,7 +29,7 @@ export const LoginForm: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data.email, data.password)
-    } catch (error) {
+    } catch {
       // Error ya manejado en el store
     }
   }

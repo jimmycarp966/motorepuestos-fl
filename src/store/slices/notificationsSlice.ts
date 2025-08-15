@@ -5,7 +5,7 @@ const initialState: NotificationsState = {
   notifications: [],
 }
 
-export const notificationsSlice: StateCreator<AppStore, [], [], AppStore> = (set) => ({
+export const notificationsSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'notifications' | 'addNotification' | 'removeNotification' | 'clearNotifications'>> = (set) => ({
   notifications: initialState,
 
   addNotification: (notification: Notification) => {
@@ -36,7 +36,7 @@ export const notificationsSlice: StateCreator<AppStore, [], [], AppStore> = (set
   },
 
   clearNotifications: () => {
-    set((state) => ({
+    set(() => ({
       notifications: { notifications: [] }
     }))
   },

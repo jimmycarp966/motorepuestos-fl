@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAppStore } from '../../store'
+import type { AuthenticatedUser } from '../../store'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
@@ -17,7 +18,7 @@ const empleadoSchema = z.object({
 type EmpleadoFormData = z.infer<typeof empleadoSchema>
 
 interface EmpleadoFormProps {
-  empleado?: any
+  empleado?: AuthenticatedUser | null
   onClose: () => void
 }
 
@@ -47,7 +48,7 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
         await createEmpleado(data)
       }
       onClose()
-    } catch (error) {
+    } catch {
       // Error ya manejado en el store
     }
   }

@@ -220,10 +220,21 @@ export interface Notification {
   duration?: number
 }
 
+// Tipos para el usuario autenticado
+export interface AuthenticatedUser {
+  id: string
+  nombre: string
+  email: string
+  rol: 'admin' | 'cajero' | 'vendedor' | 'consulta'
+  activo: boolean
+  created_at: string
+  updated_at: string
+}
+
 // Estados de los slices
 export interface AuthState {
-  session: any | null
-  user: any | null
+  session: unknown | null
+  user: AuthenticatedUser | null
   loading: boolean
 }
 

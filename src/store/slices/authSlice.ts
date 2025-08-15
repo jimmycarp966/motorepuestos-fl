@@ -8,7 +8,7 @@ const initialState: AuthState = {
   loading: false,
 }
 
-export const authSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) => ({
+export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | 'login' | 'logout' | 'checkAuth'>> = (set, get) => ({
   auth: initialState,
 
   // Iniciar sesión
@@ -36,7 +36,7 @@ export const authSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) =>
 
         if (empleadoError) throw empleadoError
 
-        set((state) => ({
+        set(() => ({
           auth: {
             session: data.session,
             user: empleadoData,
@@ -53,10 +53,11 @@ export const authSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) =>
         })
       }
 
-    } catch (error: any) {
-      set((state) => ({
+    } catch (error: unknown) {
+      set(() => ({
         auth: {
-          ...state.auth,
+          session: null,
+          user: null,
           loading: false,
         }
       }))
@@ -66,7 +67,7 @@ export const authSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) =>
         id: Date.now().toString(),
         type: 'error',
         title: 'Error de autenticación',
-        message: error.message,
+        message: error instanceof Error ? error.message : 'Error desconocido',
       })
 
       throw error
@@ -79,7 +80,7 @@ export const authSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) =>
       const { error } = await supabase.auth.signOut()
       if (error) throw error
 
-      set((state) => ({
+      set(() => ({
         auth: {
           session: null,
           user: null,
@@ -95,21 +96,21 @@ export const authSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) =>
         message: 'Has cerrado sesión exitosamente',
       })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Notificar error
       get().addNotification({
         id: Date.now().toString(),
         type: 'error',
         title: 'Error al cerrar sesión',
-        message: error.message,
+        message: error instanceof Error ? error.message : 'Error desconocido',
       })
     }
   },
 
   // Verificar autenticación
   checkAuth: async () => {
-    set((state) => ({
-      auth: { ...state.auth, loading: true }
+    set(() => ({
+      auth: { session: null, user: null, loading: true }
     }))
 
     try {
@@ -127,7 +128,7 @@ export const authSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) =>
 
         if (empleadoError) throw empleadoError
 
-        set((state) => ({
+        set(() => ({
           auth: {
             session,
             user: empleadoData,
@@ -135,7 +136,7 @@ export const authSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) =>
           }
         }))
       } else {
-        set((state) => ({
+        set(() => ({
           auth: {
             session: null,
             user: null,
@@ -144,8 +145,8 @@ export const authSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) =>
         }))
       }
 
-    } catch (error: any) {
-      set((state) => ({
+    } catch {
+      set(() => ({
         auth: {
           session: null,
           user: null,

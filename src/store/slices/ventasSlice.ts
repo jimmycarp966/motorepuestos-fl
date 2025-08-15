@@ -8,7 +8,7 @@ const initialState: VentasState = {
   error: null,
 }
 
-export const ventasSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) => ({
+export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas' | 'fetchVentas' | 'registrarVenta'>> = (set, get) => ({
   ventas: initialState,
 
   fetchVentas: async () => {

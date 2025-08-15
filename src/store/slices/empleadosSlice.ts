@@ -29,7 +29,7 @@ export const ROLES_PERMISSIONS = {
   },
 } as const
 
-export const empleadosSlice: StateCreator<AppStore, [], [], AppStore> = (set, get) => ({
+export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empleados' | 'fetchEmpleados' | 'createEmpleado' | 'updateEmpleado' | 'deleteEmpleado'>> = (set, get) => ({
   empleados: initialState,
 
   // Obtener todos los empleados
@@ -278,20 +278,20 @@ export const hasPermission = (userRole: string, action: string): boolean => {
   const permissions = ROLES_PERMISSIONS[userRole as keyof typeof ROLES_PERMISSIONS]
   if (!permissions) return false
   
-  return permissions.canManage.includes(action as any) || 
-         permissions.canAccess.includes(action as any)
+  return permissions.canManage.includes(action as never) || 
+         permissions.canAccess.includes(action as never)
 }
 
 export const canAccessModule = (userRole: string, module: string): boolean => {
   const permissions = ROLES_PERMISSIONS[userRole as keyof typeof ROLES_PERMISSIONS]
   if (!permissions) return false
   
-  return permissions.canAccess.includes(module as any)
+  return permissions.canAccess.includes(module as never)
 }
 
 export const canManageModule = (userRole: string, module: string): boolean => {
   const permissions = ROLES_PERMISSIONS[userRole as keyof typeof ROLES_PERMISSIONS]
   if (!permissions) return false
   
-  return permissions.canManage.includes(module as any)
+  return permissions.canManage.includes(module as never)
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAppStore } from '../../store'
+import type { AuthenticatedUser } from '../../store'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Input } from '../ui/input'
@@ -16,13 +17,13 @@ export const EmpleadosTable: React.FC = () => {
   
   const [searchTerm, setSearchTerm] = useState('')
   const [showForm, setShowForm] = useState(false)
-  const [editingEmpleado, setEditingEmpleado] = useState<any>(null)
+  const [editingEmpleado, setEditingEmpleado] = useState<AuthenticatedUser | null>(null)
 
   useEffect(() => {
     fetchEmpleados()
   }, [fetchEmpleados])
 
-  const canManage = user && canManageModule(user.rol, 'empleados')
+  const canManage = Boolean(user && canManageModule(user.rol, 'empleados'))
 
   const filteredEmpleados = empleados.filter(empleado =>
     empleado.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -30,7 +31,7 @@ export const EmpleadosTable: React.FC = () => {
     empleado.rol.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const handleEdit = (empleado: any) => {
+  const handleEdit = (empleado: AuthenticatedUser) => {
     setEditingEmpleado(empleado)
     setShowForm(true)
   }
