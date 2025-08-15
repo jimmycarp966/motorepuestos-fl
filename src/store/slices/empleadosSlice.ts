@@ -1,6 +1,6 @@
-import { StateCreator } from 'zustand'
+import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
-import { AppStore, EmpleadosState, CreateEmpleadoData, UpdateEmpleadoData, Empleado } from '../index'
+import type { AppStore, EmpleadosState, CreateEmpleadoData, UpdateEmpleadoData } from '../index'
 
 // Estados iniciales
 const initialState: EmpleadosState = {

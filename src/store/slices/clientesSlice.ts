@@ -1,6 +1,6 @@
-import { StateCreator } from 'zustand'
+import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
-import { AppStore, ClientesState, CreateClienteData, UpdateClienteData } from '../index'
+import type { AppStore, ClientesState, CreateClienteData, UpdateClienteData } from '../index'
 
 const initialState: ClientesState = {
   clientes: [],

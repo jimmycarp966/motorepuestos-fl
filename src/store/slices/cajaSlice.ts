@@ -1,6 +1,6 @@
-import { StateCreator } from 'zustand'
+import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
-import { AppStore, CajaState } from '../index'
+import type { AppStore, CajaState } from '../index'
 
 const initialState: CajaState = {
   movimientos: [],

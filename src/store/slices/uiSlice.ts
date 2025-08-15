@@ -1,5 +1,5 @@
-import { StateCreator } from 'zustand'
-import { AppStore, UIState } from '../index'
+import type { StateCreator } from 'zustand'
+import type { AppStore, UIState } from '../index'
 
 const initialState: UIState = {
   theme: 'light',

@@ -1,6 +1,6 @@
-import { StateCreator } from 'zustand'
+import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
-import { AppStore, AuthState } from '../index'
+import type { AppStore, AuthState } from '../index'
 
 const initialState: AuthState = {
   session: null,

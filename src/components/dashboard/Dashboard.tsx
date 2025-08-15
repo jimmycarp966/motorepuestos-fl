@@ -9,19 +9,15 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell
 } from 'recharts'
 import { 
   DollarSign, 
-  ShoppingCart, 
   Users, 
   Package,
-  TrendingUp,
-  TrendingDown
+  TrendingUp
 } from 'lucide-react'
 
 export const Dashboard: React.FC = () => {
@@ -160,14 +156,14 @@ export const Dashboard: React.FC = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                     label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {datosCategoria.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
+                                     {datosCategoria.map((_, index) => (
+                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                   ))}
                 </Pie>
                 <Tooltip />
               </PieChart>

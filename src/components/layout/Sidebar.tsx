@@ -30,7 +30,7 @@ interface SidebarProps {
   onToggle: () => void
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const user = useAppStore((state) => state.auth.user)
   const logout = useAppStore((state) => state.logout)
   const sidebarOpen = useAppStore((state) => state.ui.sidebarOpen)
