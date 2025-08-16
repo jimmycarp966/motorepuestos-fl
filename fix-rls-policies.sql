@@ -1,0 +1,215 @@
+-- Script de limpieza y reparación para Motorepuestos FL
+-- Ejecutar este script si hay problemas con las políticas RLS
+
+-- Verificar y eliminar políticas solo si las tablas existen
+DO $$
+BEGIN
+    -- Eliminar políticas de productos si la tabla existe
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'productos') THEN
+        DROP POLICY IF EXISTS "Productos visibles para todos los usuarios autenticados" ON productos;
+        DROP POLICY IF EXISTS "Productos editables para usuarios autenticados" ON productos;
+        DROP POLICY IF EXISTS "Enable all for authenticated users" ON productos;
+    END IF;
+
+    -- Eliminar políticas de clientes si la tabla existe
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'clientes') THEN
+        DROP POLICY IF EXISTS "Clientes visibles para todos los usuarios autenticados" ON clientes;
+        DROP POLICY IF EXISTS "Clientes editables para usuarios autenticados" ON clientes;
+        DROP POLICY IF EXISTS "Enable all for authenticated users" ON clientes;
+    END IF;
+
+    -- Eliminar políticas de empleados si la tabla existe
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'empleados') THEN
+        DROP POLICY IF EXISTS "Empleados visibles para todos los usuarios autenticados" ON empleados;
+        DROP POLICY IF EXISTS "Empleados editables para usuarios autenticados" ON empleados;
+        DROP POLICY IF EXISTS "Enable all for authenticated users" ON empleados;
+    END IF;
+
+    -- Eliminar políticas de ventas si la tabla existe
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'ventas') THEN
+        DROP POLICY IF EXISTS "Ventas visibles para todos los usuarios autenticados" ON ventas;
+        DROP POLICY IF EXISTS "Ventas editables para usuarios autenticados" ON ventas;
+        DROP POLICY IF EXISTS "Enable all for authenticated users" ON ventas;
+    END IF;
+
+    -- Eliminar políticas de venta_items si la tabla existe
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'venta_items') THEN
+        DROP POLICY IF EXISTS "Items de venta visibles para todos los usuarios autenticados" ON venta_items;
+        DROP POLICY IF EXISTS "Items de venta editables para usuarios autenticados" ON venta_items;
+        DROP POLICY IF EXISTS "Enable all for authenticated users" ON venta_items;
+    END IF;
+
+    -- Eliminar políticas de movimientos_caja si la tabla existe
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'movimientos_caja') THEN
+        DROP POLICY IF EXISTS "Movimientos de caja visibles para todos los usuarios autenticados" ON movimientos_caja;
+        DROP POLICY IF EXISTS "Movimientos de caja editables para usuarios autenticados" ON movimientos_caja;
+        DROP POLICY IF EXISTS "Enable all for authenticated users" ON movimientos_caja;
+    END IF;
+END $$;
+
+-- Eliminar triggers existentes solo si las tablas existen
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'productos') THEN
+        DROP TRIGGER IF EXISTS update_productos_updated_at ON productos;
+    END IF;
+
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'clientes') THEN
+        DROP TRIGGER IF EXISTS update_clientes_updated_at ON clientes;
+    END IF;
+
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'empleados') THEN
+        DROP TRIGGER IF EXISTS update_empleados_updated_at ON empleados;
+    END IF;
+
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'ventas') THEN
+        DROP TRIGGER IF EXISTS update_ventas_updated_at ON ventas;
+    END IF;
+END $$;
+
+-- Crear tablas si no existen
+CREATE TABLE IF NOT EXISTS productos (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    descripcion TEXT,
+    categoria VARCHAR(100) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL DEFAULT 0,
+    stock INTEGER NOT NULL DEFAULT 0,
+    stock_minimo INTEGER DEFAULT 10,
+    unidad_medida VARCHAR(20) DEFAULT 'pcs',
+    codigo_barras VARCHAR(100),
+    imagen_url TEXT,
+    activo BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS clientes (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    telefono VARCHAR(50),
+    direccion TEXT,
+    documento VARCHAR(50),
+    activo BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS empleados (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    telefono VARCHAR(50),
+    rol VARCHAR(50) NOT NULL DEFAULT 'Vendedor',
+    activo BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS ventas (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    cliente_id UUID REFERENCES clientes(id),
+    empleado_id UUID REFERENCES empleados(id),
+    total DECIMAL(10,2) NOT NULL DEFAULT 0,
+    metodo_pago VARCHAR(50) DEFAULT 'efectivo',
+    estado VARCHAR(50) DEFAULT 'completada',
+    fecha TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS venta_items (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    venta_id UUID REFERENCES ventas(id) ON DELETE CASCADE,
+    producto_id UUID REFERENCES productos(id),
+    cantidad INTEGER NOT NULL,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS movimientos_caja (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('ingreso', 'egreso')),
+    monto DECIMAL(10,2) NOT NULL,
+    concepto TEXT NOT NULL,
+    empleado_id UUID REFERENCES empleados(id),
+    fecha TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Habilitar RLS en todas las tablas
+ALTER TABLE productos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE clientes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE empleados ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ventas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE venta_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE movimientos_caja ENABLE ROW LEVEL SECURITY;
+
+-- Crear políticas simples para desarrollo
+CREATE POLICY "Enable all for authenticated users" ON productos
+    FOR ALL USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable all for authenticated users" ON clientes
+    FOR ALL USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable all for authenticated users" ON empleados
+    FOR ALL USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable all for authenticated users" ON ventas
+    FOR ALL USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable all for authenticated users" ON venta_items
+    FOR ALL USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable all for authenticated users" ON movimientos_caja
+    FOR ALL USING (auth.role() = 'authenticated');
+
+-- Crear función para triggers si no existe
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Recrear triggers
+CREATE TRIGGER update_productos_updated_at BEFORE UPDATE ON productos
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_clientes_updated_at BEFORE UPDATE ON clientes
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_empleados_updated_at BEFORE UPDATE ON empleados
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_ventas_updated_at BEFORE UPDATE ON ventas
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Insertar datos de ejemplo si no existen
+INSERT INTO empleados (nombre, email, rol) VALUES 
+('Administrador', 'admin@motorepuestos.com', 'Administrador')
+ON CONFLICT (email) DO NOTHING;
+
+INSERT INTO productos (nombre, descripcion, categoria, precio, stock, unidad_medida) VALUES 
+('Aceite de Motor 4T', 'Aceite sintético para motos 4 tiempos', 'Lubricantes', 15.99, 50, 'lt'),
+('Freno de Disco Delantero', 'Disco de freno para moto deportiva', 'Frenos', 45.50, 20, 'pcs'),
+('Bujía NGK', 'Bujía de encendido estándar', 'Motores', 8.99, 100, 'pcs'),
+('Filtro de Aire', 'Filtro de aire de alto rendimiento', 'Motores', 12.75, 30, 'pcs'),
+('Aceite de Transmisión', 'Aceite específico para transmisión', 'Lubricantes', 18.50, 25, 'lt')
+ON CONFLICT DO NOTHING;
+
+-- Verificar que todo está funcionando
+SELECT 'Productos' as tabla, count(*) as registros FROM productos
+UNION ALL
+SELECT 'Clientes' as tabla, count(*) as registros FROM clientes
+UNION ALL
+SELECT 'Empleados' as tabla, count(*) as registros FROM empleados
+UNION ALL
+SELECT 'Ventas' as tabla, count(*) as registros FROM ventas
+UNION ALL
+SELECT 'Venta Items' as tabla, count(*) as registros FROM venta_items
+UNION ALL
+SELECT 'Movimientos Caja' as tabla, count(*) as registros FROM movimientos_caja;
