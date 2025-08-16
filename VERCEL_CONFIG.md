@@ -24,7 +24,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 
 # App Configuration
 VITE_APP_NAME=Motorepuestos F.L.
-VITE_APP_VERSION=1.0.0
+VITE_APP_VERSION=1.0.1
 
 # Environment
 NODE_ENV=production
