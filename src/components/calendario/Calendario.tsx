@@ -3,7 +3,7 @@ import { useAppStore } from '../../store'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { X, Plus, Calendar, Clock, User, Edit, Trash2 } from 'lucide-react'
-import { EventoCalendario, CreateEventoData } from '../../store/types'
+import { EventoCalendario, CreateEventoData } from '../../store'
 
 interface EventoFormProps {
   evento?: EventoCalendario

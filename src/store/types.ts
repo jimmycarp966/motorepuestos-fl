@@ -271,6 +271,7 @@ export interface CajaState {
   arqueos: ArqueoCaja[]
   cajasDiarias: CajaDiaria[]
   cajaActual: CajaDiaria | null
+  cajaAbierta: boolean
   saldo: number
   loading: boolean
   error: string | null

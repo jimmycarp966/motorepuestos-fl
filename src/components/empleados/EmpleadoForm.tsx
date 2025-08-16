@@ -32,7 +32,7 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
   
   const [showPassword, setShowPassword] = useState(false)
   const [selectedModulos, setSelectedModulos] = useState<string[]>([])
-  const [availableModulos, setAvailableModulos] = useState<ModuloPermitido[]>([])
+  const [availableModulos, setAvailableModulos] = useState<string[]>([])
 
   // Módulos disponibles con descripciones
   const modulosInfo = [
@@ -274,7 +274,7 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {modulosInfo.map((modulo) => {
                   const isSelected = selectedModulos.includes(modulo.id)
-                  const isAvailable = availableModulos.includes(modulo.id as ModuloPermitido)
+                                     const isAvailable = availableModulos.includes(modulo.id)
                   
                   return (
                     <div

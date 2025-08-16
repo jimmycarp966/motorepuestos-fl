@@ -2,15 +2,18 @@ import React, { useState } from 'react'
 import { useAppStore } from '../../store'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
-import { Plus, DollarSign, TrendingUp, TrendingDown, Calendar, User } from 'lucide-react'
+import { Plus, DollarSign, TrendingUp, TrendingDown, Calendar, User, Lock, Unlock } from 'lucide-react'
 import { MovimientoForm } from './MovimientoForm'
+import { AbrirCajaForm } from './AbrirCajaForm'
 
 export const CajaTable: React.FC = () => {
   const movimientos = useAppStore((state) => state.caja.movimientos)
   const saldo = useAppStore((state) => state.caja.saldo)
   const loading = useAppStore((state) => state.caja.loading)
+  const cajaAbierta = useAppStore((state) => state.caja.cajaAbierta)
   const addNotification = useAppStore((state) => state.addNotification)
   const [showForm, setShowForm] = useState(false)
+  const [showAbrirCaja, setShowAbrirCaja] = useState(false)
   const [tipoMovimiento, setTipoMovimiento] = useState<'ingreso' | 'egreso'>('ingreso')
 
   const handleFormClose = () => {
@@ -25,6 +28,14 @@ export const CajaTable: React.FC = () => {
   const handleNuevoEgreso = () => {
     setTipoMovimiento('egreso')
     setShowForm(true)
+  }
+
+  const handleAbrirCaja = () => {
+    setShowAbrirCaja(true)
+  }
+
+  const handleCerrarAbrirCaja = () => {
+    setShowAbrirCaja(false)
   }
 
   if (loading) {
@@ -43,20 +54,32 @@ export const CajaTable: React.FC = () => {
           <p className="text-gray-600">Gestiona los movimientos de caja</p>
         </div>
         <div className="flex space-x-3">
-          <Button
-            onClick={handleNuevoIngreso}
-            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nuevo Ingreso
-          </Button>
-          <Button
-            onClick={handleNuevoEgreso}
-            className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nuevo Egreso
-          </Button>
+          {!cajaAbierta ? (
+            <Button
+              onClick={handleAbrirCaja}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+            >
+              <Unlock className="w-4 h-4 mr-2" />
+              Abrir Caja
+            </Button>
+          ) : (
+            <>
+              <Button
+                onClick={handleNuevoIngreso}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Nuevo Ingreso
+              </Button>
+              <Button
+                onClick={handleNuevoEgreso}
+                className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Nuevo Egreso
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -190,6 +213,12 @@ export const CajaTable: React.FC = () => {
         <MovimientoForm
           tipo={tipoMovimiento}
           onClose={handleFormClose}
+        />
+      )}
+
+      {showAbrirCaja && (
+        <AbrirCajaForm
+          onClose={handleCerrarAbrirCaja}
         />
       )}
     </div>

@@ -32,6 +32,7 @@ import type {
   CajaState,
   CalendarioState,
   CreateEventoData,
+  EventoCalendario,
   UIState,
   NotificationsState
 } from './types'
@@ -216,6 +217,9 @@ export type {
   ClientesState,
   VentasState,
   CajaState,
+  CalendarioState,
+  CreateEventoData,
+  EventoCalendario,
   UIState,
   NotificationsState
 } from './types'

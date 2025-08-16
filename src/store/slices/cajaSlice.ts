@@ -8,6 +8,7 @@ const initialState: CajaState = {
   arqueos: [],
   cajasDiarias: [],
   cajaActual: null,
+  cajaAbierta: false,
   saldo: 0,
   loading: false,
   error: null,
@@ -41,6 +42,9 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
           loading: false 
         } 
       }))
+
+      // Cargar también las cajas diarias para verificar si hay una abierta
+      await get().fetchCajasDiarias()
     } catch (error: any) {
       set((state) => ({ caja: { ...state.caja, loading: false, error: error.message } }))
     }
@@ -191,6 +195,7 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
           ...state.caja, 
           cajaActual: data,
           cajasDiarias: [data, ...state.caja.cajasDiarias],
+          cajaAbierta: true,
           saldo: saldoInicial,
         } 
       }))
@@ -243,6 +248,7 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
         caja: { 
           ...state.caja, 
           cajaActual: null,
+          cajaAbierta: false,
           cajasDiarias: state.caja.cajasDiarias.map(c => c.id === cajaActual.id ? data : c),
         } 
       }))
@@ -392,7 +398,16 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
         set((state) => ({ 
           caja: { 
             ...state.caja, 
-            cajaActual 
+            cajaActual,
+            cajaAbierta: true
+          } 
+        }))
+      } else {
+        set((state) => ({ 
+          caja: { 
+            ...state.caja, 
+            cajaActual: null,
+            cajaAbierta: false
           } 
         }))
       }
