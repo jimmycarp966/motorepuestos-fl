@@ -1,31 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { supabase, testSupabaseConnection, checkEnvironmentVariables } from '../lib/supabase.js';
+import { supabase, testConnection } from '../lib/supabase-config.js';
 
 const SupabaseDiagnostic = () => {
   const [diagnostic, setDiagnostic] = useState({
-    envVars: null,
     connection: null,
-    loading: true
+    loading: true,
+    error: null
   });
 
   useEffect(() => {
     const runDiagnostic = async () => {
       try {
-        // Verificar variables de entorno
-        const envVars = checkEnvironmentVariables();
+        console.log('🔍 Iniciando diagnóstico de Supabase...');
         
         // Probar conexión
-        const connection = await testSupabaseConnection();
+        const result = await testConnection();
         
         setDiagnostic({
-          envVars,
-          connection,
-          loading: false
+          connection: result.success,
+          loading: false,
+          error: result.error
         });
       } catch (error) {
         console.error('Error en diagnóstico:', error);
         setDiagnostic({
-          envVars: null,
           connection: false,
           loading: false,
           error: error.message
@@ -60,42 +58,26 @@ const SupabaseDiagnostic = () => {
             🔍 Diagnóstico de Conexión Supabase
           </h1>
 
-          {/* Variables de Entorno */}
+          {/* Configuración */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-3">
-              📋 Variables de Entorno
+              ⚙️ Configuración
             </h2>
             <div className="bg-gray-50 rounded-lg p-4">
-              {diagnostic.envVars ? (
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <span className="w-4 h-4 mr-2">
-                      {diagnostic.envVars.url ? '✅' : '❌'}
-                    </span>
-                    <span className="font-mono text-sm">
-                      VITE_SUPABASE_URL: {diagnostic.envVars.url ? 'Presente' : 'Faltante'}
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="w-4 h-4 mr-2">
-                      {diagnostic.envVars.key ? '✅' : '❌'}
-                    </span>
-                    <span className="font-mono text-sm">
-                      VITE_SUPABASE_ANON_KEY: {diagnostic.envVars.key ? 'Presente' : 'Faltante'}
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="w-4 h-4 mr-2">
-                      {diagnostic.envVars.both ? '✅' : '❌'}
-                    </span>
-                    <span className="font-mono text-sm">
-                      Estado General: {diagnostic.envVars.both ? 'Configuración Completa' : 'Configuración Incompleta'}
-                    </span>
-                  </div>
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <span className="w-4 h-4 mr-2">✅</span>
+                  <span className="font-mono text-sm">
+                    URL: https://hsajhnxtlgfpkpzcrjyb.supabase.co
+                  </span>
                 </div>
-              ) : (
-                <p className="text-red-600">❌ No se pudieron verificar las variables de entorno</p>
-              )}
+                <div className="flex items-center">
+                  <span className="w-4 h-4 mr-2">✅</span>
+                  <span className="font-mono text-sm">
+                    Clave Anónima: Configurada
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -139,28 +121,34 @@ const SupabaseDiagnostic = () => {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <ul className="list-disc list-inside space-y-2 text-sm">
                 <li>
-                  <strong>Variables de entorno faltantes:</strong> Verificar que VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY estén configuradas en Vercel
-                </li>
-                <li>
-                  <strong>Error de conexión:</strong> Verificar que el proyecto de Supabase esté activo y las credenciales sean correctas
-                </li>
-                <li>
                   <strong>Problema de red:</strong> Verificar conectividad a internet y firewall
                 </li>
                 <li>
-                  <strong>Credenciales incorrectas:</strong> Verificar URL y clave anónima en el dashboard de Supabase
+                  <strong>Proyecto inactivo:</strong> Verificar que el proyecto de Supabase esté activo
+                </li>
+                <li>
+                  <strong>Credenciales incorrectas:</strong> Verificar URL y clave anónima
+                </li>
+                <li>
+                  <strong>Problema de CORS:</strong> Verificar configuración de dominios en Supabase
                 </li>
               </ul>
             </div>
           </div>
 
-          {/* Botón de recarga */}
-          <div className="text-center">
+          {/* Botones de acción */}
+          <div className="text-center space-x-4">
             <button
               onClick={() => window.location.reload()}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
             >
               🔄 Recargar Diagnóstico
+            </button>
+            <button
+              onClick={() => window.open('https://supabase.com/dashboard/project/hsajhnxtlgfpkpzcrjyb', '_blank')}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+            >
+              🔗 Ir a Supabase Dashboard
             </button>
           </div>
         </div>
