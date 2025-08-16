@@ -13,7 +13,7 @@ import { PermissionsProvider } from './context/PermissionsContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
 import OfflineIndicator from './components/OfflineIndicator';
-import SupabaseDiagnostic from './components/SupabaseDiagnostic';
+import SimpleErrorDisplay from './components/SimpleErrorDisplay';
 
 // Componentes de autenticación
 import SupabaseAuth from './components/SupabaseAuth';
@@ -89,9 +89,9 @@ function App() {
     };
   }, [addNotification]);
 
-  // Mostrar diagnóstico si hay error de Supabase
+  // Mostrar error simple si hay error de Supabase
   if (supabaseError) {
-    return <SupabaseDiagnostic />;
+    return <SimpleErrorDisplay />;
   }
 
   // Componente de carga

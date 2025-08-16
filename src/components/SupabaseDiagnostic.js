@@ -5,7 +5,8 @@ const SupabaseDiagnostic = () => {
   const [diagnostic, setDiagnostic] = useState({
     connection: null,
     loading: true,
-    error: null
+    error: null,
+    details: null
   });
 
   useEffect(() => {
@@ -16,17 +17,33 @@ const SupabaseDiagnostic = () => {
         // Probar conexión
         const result = await testConnection();
         
+        // Obtener detalles adicionales
+        let details = null;
+        if (result.success) {
+          try {
+            const { data: empleados } = await supabase
+              .from('empleados')
+              .select('count')
+              .limit(1);
+            details = `Empleados en BD: ${empleados?.length || 0}`;
+          } catch (detailError) {
+            details = `Error obteniendo detalles: ${detailError.message}`;
+          }
+        }
+        
         setDiagnostic({
           connection: result.success,
           loading: false,
-          error: result.error
+          error: result.error,
+          details
         });
       } catch (error) {
         console.error('Error en diagnóstico:', error);
         setDiagnostic({
           connection: false,
           loading: false,
-          error: error.message
+          error: error.message,
+          details: null
         });
       }
     };
@@ -34,11 +51,18 @@ const SupabaseDiagnostic = () => {
     runDiagnostic();
   }, []);
 
+  const handleRetry = () => {
+    setDiagnostic({ connection: null, loading: true, error: null, details: null });
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
+  };
+
   if (diagnostic.loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="loading-spinner-lg mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-700 mb-2">
             Diagnóstico de Supabase
           </h2>
@@ -51,105 +75,83 @@ const SupabaseDiagnostic = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">
-            🔍 Diagnóstico de Conexión Supabase
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 text-center">
+          {/* Icono */}
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Título */}
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Error de Conexión
           </h1>
 
-          {/* Configuración */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">
-              ⚙️ Configuración
-            </h2>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <span className="w-4 h-4 mr-2">✅</span>
-                  <span className="font-mono text-sm">
-                    URL: https://hsajhnxtlgfpkpzcrjyb.supabase.co
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <span className="w-4 h-4 mr-2">✅</span>
-                  <span className="font-mono text-sm">
-                    Clave Anónima: Configurada
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Mensaje */}
+          <p className="text-gray-600 mb-6">
+            Conexión: No se pudo conectar con Supabase
+          </p>
 
-          {/* Conexión */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">
-              🔌 Conexión con Supabase
-            </h2>
-            <div className="bg-gray-50 rounded-lg p-4">
-              {diagnostic.connection ? (
-                <div className="flex items-center text-green-600">
-                  <span className="w-4 h-4 mr-2">✅</span>
-                  <span>Conexión exitosa con Supabase</span>
-                </div>
-              ) : (
-                <div className="flex items-center text-red-600">
-                  <span className="w-4 h-4 mr-2">❌</span>
-                  <span>Error de conexión con Supabase</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Error */}
+          {/* Detalles del error */}
           {diagnostic.error && (
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold text-gray-800 mb-3">
-                🚨 Error Detallado
-              </h2>
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <p className="text-red-800 font-mono text-sm">{diagnostic.error}</p>
-              </div>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-left">
+              <p className="text-red-800 text-sm font-mono">
+                <strong>Error:</strong> {diagnostic.error}
+              </p>
+              {diagnostic.details && (
+                <p className="text-red-700 text-sm mt-2">
+                  <strong>Detalles:</strong> {diagnostic.details}
+                </p>
+              )}
             </div>
           )}
 
-          {/* Soluciones */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">
-              🛠️ Soluciones
-            </h2>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <ul className="list-disc list-inside space-y-2 text-sm">
-                <li>
-                  <strong>Problema de red:</strong> Verificar conectividad a internet y firewall
-                </li>
-                <li>
-                  <strong>Proyecto inactivo:</strong> Verificar que el proyecto de Supabase esté activo
-                </li>
-                <li>
-                  <strong>Credenciales incorrectas:</strong> Verificar URL y clave anónima
-                </li>
-                <li>
-                  <strong>Problema de CORS:</strong> Verificar configuración de dominios en Supabase
-                </li>
-              </ul>
+          {/* Información de configuración */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
+            <h3 className="font-semibold text-blue-800 mb-2">Configuración:</h3>
+            <div className="text-sm text-blue-700 space-y-1">
+              <p>URL: https://hsajhnxtlgfpkpzcrjyb.supabase.co</p>
+              <p>Clave: Configurada</p>
+              <p>Estado: {diagnostic.connection ? '✅ Conectado' : '❌ Error'}</p>
             </div>
           </div>
 
-          {/* Botones de acción */}
-          <div className="text-center space-x-4">
+          {/* Botones */}
+          <div className="space-y-3">
+            <button
+              onClick={handleRetry}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Reintentar
+            </button>
+            
             <button
               onClick={() => window.location.reload()}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+              className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
             >
-              🔄 Recargar Diagnóstico
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Recargar página
             </button>
-            <button
-              onClick={() => window.open('https://supabase.com/dashboard/project/hsajhnxtlgfpkpzcrjyb', '_blank')}
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-            >
-              🔗 Ir a Supabase Dashboard
-            </button>
+          </div>
+
+          {/* Información adicional */}
+          <div className="mt-6 text-xs text-gray-500">
+            <p>Si el problema persiste, verifica:</p>
+            <ul className="list-disc list-inside mt-2 space-y-1">
+              <li>Tu conexión a internet</li>
+              <li>Que el proyecto de Supabase esté activo</li>
+              <li>Las credenciales en la configuración</li>
+            </ul>
           </div>
         </div>
       </div>
