@@ -16,7 +16,7 @@ import { performSimpleHealthCheck } from './utils/simpleHealthCheck'
 function App() {
   const user = useAppStore((state) => state.auth.user)
   const loading = useAppStore((state) => state.auth.loading)
-  const checkAuth = useAppStore((state) => state.checkAuth)
+  const checkSession = useAppStore((state) => state.checkSession)
   const sidebarOpen = useAppStore((state) => state.ui.sidebarOpen)
   const setSidebarOpen = useAppStore((state) => state.setSidebarOpen)
   const currentModule = useAppStore((state) => state.ui.currentModule)
@@ -57,7 +57,7 @@ function App() {
         console.log('🔍 App: Iniciando verificación de autenticación...')
         console.log('🔍 App: Estado inicial - loading:', loading, 'user:', user)
         
-        await checkAuth()
+        await checkSession()
         setDebugInfo(prev => ({ ...prev, authChecked: true }))
         console.log('✅ App: Verificación de autenticación completada')
         
@@ -74,7 +74,7 @@ function App() {
     }
     
     performSystemCheck()
-  }, [checkAuth])
+  }, [checkSession])
 
   // Log del estado actual
   useEffect(() => {

@@ -15,7 +15,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>
 
 export const LoginForm: React.FC = () => {
-  const login = useAppStore((state) => state.login)
+  const signIn = useAppStore((state) => state.signIn)
   const authLoading = useAppStore((state) => state.auth.loading)
 
   const {
@@ -28,8 +28,11 @@ export const LoginForm: React.FC = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data.email, data.password)
-    } catch {
+      console.log('🔄 LoginForm: Intentando login con:', data.email)
+      const result = await signIn(data.email, data.password)
+      console.log('✅ LoginForm: Resultado del login:', result)
+    } catch (error) {
+      console.error('❌ LoginForm: Error en login:', error)
       // Error ya manejado en el store
     }
   }
