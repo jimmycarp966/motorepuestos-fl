@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "motorepuestos-fl",
   "builds": [
     {
       "src": "package.json",
@@ -23,14 +22,8 @@
     }
   ],
   "env": {
-    "VITE_APP_NAME": "Motorepuestos FL",
-    "VITE_APP_VERSION": "1.0.0"
+    "VITE_APP_NAME": "Motorepuestos F.L.",
+    "VITE_APP_VERSION": "1.0.1"
   },
-  "functions": {
-    "src/api/**/*.ts": {
-      "runtime": "nodejs18.x"
-    }
-  },
-  "regions": ["iad1"],
-  "public": true
+  "regions": ["iad1"]
 }
