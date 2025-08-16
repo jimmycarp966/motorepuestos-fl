@@ -78,36 +78,48 @@ const MainLayout = ({ children }) => {
   // Navegación principal
   const navigation = useMemo(() => {
     const base = [
-      { icon: Home, label: 'Dashboard', to: '/dashboard', badge: null },
-      { icon: DollarSign, label: 'Caja', to: '/caja', badge: null },
-      { icon: Package, label: 'Productos', to: '/productos', badge: null },
-      { icon: ShoppingCart, label: 'Ventas', to: '/ventas', badge: null },
-      { icon: Store, label: 'Inventario', to: '/inventario', badge: null },
-      { icon: Users, label: 'Clientes', to: '/clientes', badge: null },
-      { icon: UserCheck, label: 'Empleados', to: '/empleados', badge: null },
-      { icon: Truck, label: 'Proveedores', to: '/proveedores', badge: null },
-      { icon: Tag, label: 'Categorías', to: '/categorias', badge: null },
-      { icon: BarChart3, label: 'Reportes', to: '/reportes', badge: null },
+      { icon: Home, label: 'Dashboard', to: '/dashboard', badge: null, permission: 'dashboard' },
+      { icon: DollarSign, label: 'Caja', to: '/caja', badge: null, permission: 'caja' },
+      { icon: Package, label: 'Productos', to: '/productos', badge: null, permission: 'productos' },
+      { icon: ShoppingCart, label: 'Ventas', to: '/ventas', badge: null, permission: 'ventas' },
+      { icon: Store, label: 'Inventario', to: '/inventario', badge: null, permission: 'inventario' },
+      { icon: Users, label: 'Clientes', to: '/clientes', badge: null, permission: 'clientes' },
+      { icon: UserCheck, label: 'Empleados', to: '/empleados', badge: null, permission: 'empleados' },
+      { icon: Truck, label: 'Proveedores', to: '/proveedores', badge: null, permission: 'proveedores' },
+      { icon: Tag, label: 'Categorías', to: '/categorias', badge: null, permission: 'categorias' },
+      { icon: BarChart3, label: 'Reportes', to: '/reportes', badge: null, permission: 'reportes' },
     ];
 
+    // Filtrar módulos según permisos
+    const filteredNavigation = base.filter(item => {
+      // Si es admin, mostrar todo
+      if (permissions?.includes('admin')) {
+        return true;
+      }
+      // Si tiene el permiso específico
+      return permissions?.includes(item.permission);
+    });
+
     // Agregar módulos condicionales por permisos
-    const result = [...base];
+    const result = [...filteredNavigation];
     
-    if (permissions?.includes('purchases') || permissions?.includes('admin')) {
-      result.splice(5, 0, { 
+    if (permissions?.includes('compras') || permissions?.includes('admin')) {
+      result.push({ 
         icon: Truck, 
         label: 'Compras', 
         to: '/compras', 
-        badge: null 
+        badge: null,
+        permission: 'compras'
       });
     }
     
-    if (permissions?.includes('expenses') || permissions?.includes('admin')) {
-      result.splice(6, 0, { 
+    if (permissions?.includes('gastos') || permissions?.includes('admin')) {
+      result.push({ 
         icon: CreditCard, 
         label: 'Gastos', 
         to: '/gastos', 
-        badge: null 
+        badge: null,
+        permission: 'gastos'
       });
     }
 

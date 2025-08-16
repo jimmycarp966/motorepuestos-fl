@@ -6,6 +6,9 @@ import 'react-toastify/dist/ReactToastify.css';
 // Store
 import { useAppStore } from './store';
 
+// Context
+import { PermissionsProvider } from './context/PermissionsContext';
+
 // Componentes base
 import ErrorBoundary from './components/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -102,45 +105,47 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <Router>
-        <div className="min-h-screen bg-gray-50">
-          {/* Indicador de estado offline */}
-          {!isOnline && <OfflineIndicator />}
+      <PermissionsProvider permissions={auth.permissions}>
+        <Router>
+          <div className="min-h-screen bg-gray-50">
+            {/* Indicador de estado offline */}
+            {!isOnline && <OfflineIndicator />}
 
-          {/* Layout principal */}
-          <Suspense fallback={<LoadingSpinner />}>
-            <MainLayout>
-              <Routes>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/productos" element={<Productos />} />
-                <Route path="/ventas" element={<Ventas />} />
-                <Route path="/caja" element={<Caja />} />
-                <Route path="/clientes" element={<Clientes />} />
-                <Route path="/empleados" element={<Empleados />} />
-                <Route path="/reportes" element={<Reportes />} />
-                
-                {/* Ruta por defecto */}
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
-              </Routes>
-            </MainLayout>
-          </Suspense>
+            {/* Layout principal */}
+            <Suspense fallback={<LoadingSpinner />}>
+              <MainLayout>
+                <Routes>
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/productos" element={<Productos />} />
+                  <Route path="/ventas" element={<Ventas />} />
+                  <Route path="/caja" element={<Caja />} />
+                  <Route path="/clientes" element={<Clientes />} />
+                  <Route path="/empleados" element={<Empleados />} />
+                  <Route path="/reportes" element={<Reportes />} />
+                  
+                  {/* Ruta por defecto */}
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
+              </MainLayout>
+            </Suspense>
 
-          {/* Notificaciones */}
-          <ToastContainer 
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
-        </div>
-      </Router>
+            {/* Notificaciones */}
+            <ToastContainer 
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+            />
+          </div>
+        </Router>
+      </PermissionsProvider>
     </ErrorBoundary>
   );
 }
