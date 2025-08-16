@@ -36,7 +36,7 @@ export interface Database {
           id: string
           nombre: string
           email: string
-          rol: 'admin' | 'cajero' | 'vendedor' | 'consulta'
+          rol: 'Administrador' | 'Gerente' | 'Vendedor' | 'Técnico' | 'Almacén' | 'Cajero'
           activo: boolean
           created_at: string
           updated_at: string
@@ -45,7 +45,7 @@ export interface Database {
           id?: string
           nombre: string
           email: string
-          rol: 'admin' | 'cajero' | 'vendedor' | 'consulta'
+          rol: 'Administrador' | 'Gerente' | 'Vendedor' | 'Técnico' | 'Almacén' | 'Cajero'
           activo?: boolean
           created_at?: string
           updated_at?: string
@@ -54,7 +54,7 @@ export interface Database {
           id?: string
           nombre?: string
           email?: string
-          rol?: 'admin' | 'cajero' | 'vendedor' | 'consulta'
+          rol?: 'Administrador' | 'Gerente' | 'Vendedor' | 'Técnico' | 'Almacén' | 'Cajero'
           activo?: boolean
           created_at?: string
           updated_at?: string

@@ -1,6 +1,7 @@
 import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
-import type { AppStore, AuthState } from '../index'
+import type { AppStore } from '../index'
+import type { AuthState } from '../types'
 
 const initialState: AuthState = {
   session: null,
@@ -41,7 +42,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
               .insert([{
                 nombre: 'Usuario de Prueba',
                 email: email,
-                rol: 'admin',
+                rol: 'Administrador',
                 activo: true
               }])
               .select()
@@ -63,7 +64,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
                 id: 'temp-user',
                 nombre: 'Usuario de Prueba',
                 email: email,
-                rol: 'admin',
+                rol: 'Administrador',
                 activo: true,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
@@ -101,7 +102,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
             .insert([{
               nombre: 'Usuario de Prueba',
               email: data.user.email,
-              rol: 'admin',
+              rol: 'Administrador',
               activo: true
             }])
             .select()
@@ -117,7 +118,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
                    id: data.user.id,
                    nombre: data.user.user_metadata?.nombre || 'Usuario',
                    email: data.user.email || '',
-                   rol: data.user.user_metadata?.rol || 'admin',
+                   rol: data.user.user_metadata?.rol || 'Administrador',
                    activo: true,
                    created_at: data.user.created_at,
                    updated_at: data.user.updated_at || data.user.created_at

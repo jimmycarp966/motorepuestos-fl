@@ -70,78 +70,121 @@ export const MovimientoForm: React.FC<MovimientoFormProps> = ({ tipo, onClose })
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-md p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold">
-            Nuevo {tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}
-          </h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-          >
-            <X className="w-4 h-4" />
-          </Button>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+        {/* Header con gradiente */}
+        <div className={`px-6 py-4 ${
+          tipo === 'ingreso' 
+            ? 'bg-gradient-to-r from-green-600 to-emerald-600' 
+            : 'bg-gradient-to-r from-red-600 to-pink-600'
+        }`}>
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold text-white">
+                {tipo === 'ingreso' ? '💰 Nuevo Ingreso' : '💸 Nuevo Egreso'}
+              </h2>
+              <p className={`text-sm mt-1 ${
+                tipo === 'ingreso' ? 'text-green-100' : 'text-red-100'
+              }`}>
+                {tipo === 'ingreso' ? 'Registra un nuevo ingreso en caja' : 'Registra un nuevo egreso de caja'}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-white/80 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Monto *
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <DollarSign className="h-5 w-5 text-gray-400" />
+        {/* Contenido del formulario */}
+        <div className="p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Campo Monto */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                💵 Monto *
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg">$</span>
+                <Input
+                  type="number"
+                  step="0.01"
+                  {...register('monto', { valueAsNumber: true })}
+                  placeholder="0.00"
+                  className={`w-full pl-8 pr-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:border-transparent ${
+                    tipo === 'ingreso' ? 'focus:ring-green-500' : 'focus:ring-red-500'
+                  } ${
+                    errors.monto ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                />
               </div>
-              <Input
-                type="number"
-                step="0.01"
-                {...register('monto', { valueAsNumber: true })}
-                placeholder="0.00"
-                className="pl-10"
-              />
+              {errors.monto && (
+                <p className="text-red-500 text-sm flex items-center mt-1">
+                  <span className="mr-1">⚠️</span>
+                  {errors.monto.message}
+                </p>
+              )}
             </div>
-            {errors.monto && (
-              <p className="text-red-500 text-sm mt-1">{errors.monto.message}</p>
-            )}
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Concepto *
-            </label>
-            <Input
-              {...register('concepto')}
-              placeholder={`Concepto del ${tipo}`}
-            />
-            {errors.concepto && (
-              <p className="text-red-500 text-sm mt-1">{errors.concepto.message}</p>
-            )}
-          </div>
+            {/* Campo Concepto */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                📝 Concepto *
+              </label>
+              <textarea
+                {...register('concepto')}
+                placeholder={`Describe el motivo del ${tipo}...`}
+                className={`w-full px-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:border-transparent resize-none ${
+                  tipo === 'ingreso' ? 'focus:ring-green-500' : 'focus:ring-red-500'
+                } ${
+                  errors.concepto ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                }`}
+                rows={3}
+              />
+              {errors.concepto && (
+                <p className="text-red-500 text-sm flex items-center mt-1">
+                  <span className="mr-1">⚠️</span>
+                  {errors.concepto.message}
+                </p>
+              )}
+            </div>
 
-          <div className="flex justify-end space-x-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className={`${
-                tipo === 'ingreso' 
-                  ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700'
-                  : 'bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700'
-              }`}
-            >
-              {isSubmitting ? 'Registrando...' : `Registrar ${tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}`}
-            </Button>
-          </div>
-        </form>
-      </Card>
+            {/* Botones de acción */}
+            <div className="flex space-x-3 pt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="flex-1 py-3 px-6 border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium"
+              >
+                ❌ Cancelar
+              </Button>
+              <Button
+                type="submit"
+                className={`flex-1 py-3 px-6 text-white font-medium transition-all duration-200 shadow-lg hover:shadow-xl ${
+                  tipo === 'ingreso' 
+                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700'
+                    : 'bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700'
+                }`}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Registrando...
+                  </span>
+                ) : (
+                  <span>
+                    {tipo === 'ingreso' ? '💰 Registrar Ingreso' : '💸 Registrar Egreso'}
+                  </span>
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   )
 }

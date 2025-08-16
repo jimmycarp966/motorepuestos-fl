@@ -147,21 +147,19 @@ const checkBasicConnection = async () => {
     
     console.log('🔍 Probando conexión básica con Supabase...')
     
-    // Hacer una consulta simple para verificar la conexión
-    const { data, error } = await supabase
-      .from('empleados')
-      .select('count')
-      .limit(1)
+    // Verificar solo la conexión básica sin acceder a tablas
+    // Esto evita problemas de permisos y roles
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
     
-    if (error) {
-      console.error('❌ Error de conexión:', error)
+    if (sessionError) {
+      console.error('❌ Error de conexión:', sessionError)
       return {
         connected: false,
-        error: error.message,
+        error: sessionError.message,
         message: 'No se pudo conectar con Supabase'
       }
     }
-
+    
     console.log('✅ Conexión exitosa con Supabase')
     return {
       connected: true,

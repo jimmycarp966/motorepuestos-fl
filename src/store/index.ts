@@ -6,36 +6,35 @@ import { productosSlice } from './slices/productosSlice'
 import { clientesSlice } from './slices/clientesSlice'
 import { ventasSlice } from './slices/ventasSlice'
 import { cajaSlice } from './slices/cajaSlice'
+import { calendarioSlice } from './slices/calendarioSlice'
 import { uiSlice } from './slices/uiSlice'
 import { notificationsSlice } from './slices/notificationsSlice'
-
-// Store principal que combina todos los slices
-export const useAppStore = create<AppStore>()(
-  devtools(
-    persist(
-      (...a) => ({
-        ...authSlice(...a),
-        ...empleadosSlice(...a),
-        ...productosSlice(...a),
-        ...clientesSlice(...a),
-        ...ventasSlice(...a),
-        ...cajaSlice(...a),
-        ...uiSlice(...a),
-        ...notificationsSlice(...a),
-      }),
-      {
-        name: 'motorepuestos-fl-store',
-        partialize: (state) => ({
-          auth: state.auth,
-          ui: state.ui,
-        }),
-      }
-    ),
-    {
-      name: 'motorepuestos-fl-store',
-    }
-  )
-)
+import type {
+  Empleado,
+  CreateEmpleadoData,
+  UpdateEmpleadoData,
+  Producto,
+  CreateProductoData,
+  UpdateProductoData,
+  Cliente,
+  CreateClienteData,
+  UpdateClienteData,
+  Venta,
+  CreateVentaData,
+  MovimientoCaja,
+  Notification,
+  AuthenticatedUser,
+  AuthState,
+  EmpleadosState,
+  ProductosState,
+  ClientesState,
+  VentasState,
+  CajaState,
+  CalendarioState,
+  CreateEventoData,
+  UIState,
+  NotificationsState
+} from './types'
 
 // Tipos para el store
 export interface AppStore {
@@ -51,6 +50,9 @@ export interface AppStore {
   createEmpleado: (empleado: CreateEmpleadoData) => Promise<void>
   updateEmpleado: (id: string, empleado: UpdateEmpleadoData) => Promise<void>
   deleteEmpleado: (id: string) => Promise<void>
+  createEmpleadoWithAuth: (empleado: CreateEmpleadoData) => Promise<void>
+  updateEmpleadoWithAuth: (id: string, empleado: UpdateEmpleadoData) => Promise<void>
+  getEmpleadoPermissions: (rol: string) => string[]
 
   // Productos
   productos: ProductosState
@@ -65,6 +67,7 @@ export interface AppStore {
   createCliente: (cliente: CreateClienteData) => Promise<void>
   updateCliente: (id: string, cliente: UpdateClienteData) => Promise<void>
   deleteCliente: (id: string) => Promise<void>
+  actualizarCuentaCorriente: (clienteId: string, monto: number, tipo: 'cargo' | 'pago') => Promise<void>
 
   // Ventas
   ventas: VentasState
@@ -75,7 +78,26 @@ export interface AppStore {
   caja: CajaState
   fetchMovimientos: () => Promise<void>
   registrarIngreso: (monto: number, concepto: string) => Promise<void>
-  registrarEgreso: (monto: number, concepto: string) => Promise<void>
+  registrarEgreso: (monto: number, concepto: string, metodo_pago?: 'efectivo' | 'transferencia' | 'debito' | 'credito' | 'cuenta_corriente') => Promise<void>
+  abrirCaja: (saldoInicial: number) => Promise<void>
+  cerrarCaja: (saldoFinal: number) => Promise<void>
+  realizarArqueo: (arqueoData: {
+    efectivo_real: number
+    transferencia_real: number
+    debito_real: number
+    credito_real: number
+    cuenta_corriente_real: number
+    observaciones?: string
+  }) => Promise<void>
+  fetchCajasDiarias: () => Promise<void>
+  fetchArqueos: () => Promise<void>
+
+  // Calendario
+  calendario: CalendarioState
+  fetchEventos: () => Promise<void>
+  createEvento: (evento: CreateEventoData) => Promise<void>
+  updateEvento: (id: string, evento: Partial<CreateEventoData>) => Promise<void>
+  deleteEvento: (id: string) => Promise<void>
 
   // UI
   ui: UIState
@@ -87,195 +109,113 @@ export interface AppStore {
   notifications: NotificationsState
   addNotification: (notification: Notification) => void
   removeNotification: (id: string) => void
-  clearNotifications: () => void
 }
 
-// Tipos de datos
-export interface Empleado {
-  id: string
-  nombre: string
-  email: string
-  rol: 'admin' | 'cajero' | 'vendedor' | 'consulta'
-  activo: boolean
-  created_at: string
-  updated_at: string
-}
+// Store principal que combina todos los slices
+export const useAppStore = create<AppStore>()((set, get) => {
+  // Crear cada slice
+  const auth = authSlice(set, get, {})
+  const empleados = empleadosSlice(set, get, {})
+  const productos = productosSlice(set, get, {})
+  const clientes = clientesSlice(set, get, {})
+  const ventas = ventasSlice(set, get, {})
+  const caja = cajaSlice(set, get, {})
+  const calendario = calendarioSlice(set, get, {})
+  const ui = uiSlice(set, get, {})
+  const notifications = notificationsSlice(set, get, {})
+  
+  // Combinar todos los slices
+  return {
+    // Auth slice
+    auth: auth.auth,
+    login: auth.login,
+    logout: auth.logout,
+    checkAuth: auth.checkAuth,
+    
+    // Empleados slice
+    empleados: empleados.empleados,
+    fetchEmpleados: empleados.fetchEmpleados,
+    createEmpleado: empleados.createEmpleado,
+    updateEmpleado: empleados.updateEmpleado,
+    deleteEmpleado: empleados.deleteEmpleado,
+    createEmpleadoWithAuth: empleados.createEmpleadoWithAuth,
+    updateEmpleadoWithAuth: empleados.updateEmpleadoWithAuth,
+    getEmpleadoPermissions: empleados.getEmpleadoPermissions,
+    
+    // Productos slice
+    productos: productos.productos,
+    fetchProductos: productos.fetchProductos,
+    createProducto: productos.createProducto,
+    updateProducto: productos.updateProducto,
+    deleteProducto: productos.deleteProducto,
+    
+    // Clientes slice
+    clientes: clientes.clientes,
+    fetchClientes: clientes.fetchClientes,
+    createCliente: clientes.createCliente,
+    updateCliente: clientes.updateCliente,
+    deleteCliente: clientes.deleteCliente,
+    actualizarCuentaCorriente: clientes.actualizarCuentaCorriente,
+    
+    // Ventas slice
+    ventas: ventas.ventas,
+    fetchVentas: ventas.fetchVentas,
+    registrarVenta: ventas.registrarVenta,
+    
+    // Caja slice
+    caja: caja.caja,
+    fetchMovimientos: caja.fetchMovimientos,
+    registrarIngreso: caja.registrarIngreso,
+    registrarEgreso: caja.registrarEgreso,
+    abrirCaja: caja.abrirCaja,
+    cerrarCaja: caja.cerrarCaja,
+    realizarArqueo: caja.realizarArqueo,
+    fetchCajasDiarias: caja.fetchCajasDiarias,
+    fetchArqueos: caja.fetchArqueos,
+    
+    // Calendario slice
+    calendario: calendario.calendario,
+    fetchEventos: calendario.fetchEventos,
+    createEvento: calendario.createEvento,
+    updateEvento: calendario.updateEvento,
+    deleteEvento: calendario.deleteEvento,
+    
+    // UI slice
+    ui: ui.ui,
+    setTheme: ui.setTheme,
+    setSidebarOpen: ui.setSidebarOpen,
+    setCurrentModule: ui.setCurrentModule,
+    
+    // Notifications slice
+    notifications: notifications.notifications,
+    addNotification: notifications.addNotification,
+    removeNotification: notifications.removeNotification,
+  }
+})
 
-export interface CreateEmpleadoData {
-  nombre: string
-  email: string
-  rol: 'admin' | 'cajero' | 'vendedor' | 'consulta'
-}
-
-export interface UpdateEmpleadoData {
-  nombre?: string
-  email?: string
-  rol?: 'admin' | 'cajero' | 'vendedor' | 'consulta'
-  activo?: boolean
-}
-
-export interface Producto {
-  id: string
-  nombre: string
-  descripcion: string | null
-  precio: number
-  stock: number
-  categoria: string
-  unidad_medida: string
-  activo: boolean
-  created_at: string
-  updated_at: string
-}
-
-export interface CreateProductoData {
-  nombre: string
-  descripcion?: string
-  precio: number
-  stock: number
-  categoria: string
-  unidad_medida: string
-}
-
-export interface UpdateProductoData {
-  nombre?: string
-  descripcion?: string
-  precio?: number
-  stock?: number
-  categoria?: string
-  unidad_medida?: string
-  activo?: boolean
-}
-
-export interface Cliente {
-  id: string
-  nombre: string
-  email: string | null
-  telefono: string | null
-  direccion: string | null
-  activo: boolean
-  created_at: string
-  updated_at: string
-}
-
-export interface CreateClienteData {
-  nombre: string
-  email?: string
-  telefono?: string
-  direccion?: string
-}
-
-export interface UpdateClienteData {
-  nombre?: string
-  email?: string
-  telefono?: string
-  direccion?: string
-  activo?: boolean
-}
-
-export interface Venta {
-  id: string
-  cliente_id: string | null
-  empleado_id: string
-  total: number
-  fecha: string
-  created_at: string
-  cliente?: Cliente
-  empleado?: Empleado
-  items?: VentaItem[]
-}
-
-export interface VentaItem {
-  id: string
-  venta_id: string
-  producto_id: string
-  cantidad: number
-  precio_unitario: number
-  subtotal: number
-  producto?: Producto
-}
-
-export interface CreateVentaData {
-  cliente_id?: string
-  items: Array<{
-    producto_id: string
-    cantidad: number
-  }>
-}
-
-export interface MovimientoCaja {
-  id: string
-  tipo: 'ingreso' | 'egreso'
-  monto: number
-  concepto: string
-  empleado_id: string
-  fecha: string
-  created_at: string
-  empleado?: Empleado
-}
-
-export interface Notification {
-  id: string
-  type: 'success' | 'error' | 'warning' | 'info'
-  title: string
-  message: string
-  duration?: number
-}
-
-// Tipos para el usuario autenticado
-export interface AuthenticatedUser {
-  id: string
-  nombre: string
-  email: string
-  rol: 'admin' | 'cajero' | 'vendedor' | 'consulta'
-  activo: boolean
-  created_at: string
-  updated_at: string
-}
-
-// Estados de los slices
-export interface AuthState {
-  session: unknown | null
-  user: AuthenticatedUser | null
-  loading: boolean
-}
-
-export interface EmpleadosState {
-  empleados: Empleado[]
-  loading: boolean
-  error: string | null
-}
-
-export interface ProductosState {
-  productos: Producto[]
-  loading: boolean
-  error: string | null
-}
-
-export interface ClientesState {
-  clientes: Cliente[]
-  loading: boolean
-  error: string | null
-}
-
-export interface VentasState {
-  ventas: Venta[]
-  loading: boolean
-  error: string | null
-}
-
-export interface CajaState {
-  movimientos: MovimientoCaja[]
-  saldo: number
-  loading: boolean
-  error: string | null
-}
-
-export interface UIState {
-  theme: 'light' | 'dark'
-  sidebarOpen: boolean
-  currentModule: string
-}
-
-export interface NotificationsState {
-  notifications: Notification[]
-}
+// Re-exportar tipos desde el archivo de tipos
+export type {
+  Empleado,
+  CreateEmpleadoData,
+  UpdateEmpleadoData,
+  Producto,
+  CreateProductoData,
+  UpdateProductoData,
+  Cliente,
+  CreateClienteData,
+  UpdateClienteData,
+  Venta,
+  VentaItem,
+  CreateVentaData,
+  MovimientoCaja,
+  Notification,
+  AuthenticatedUser,
+  AuthState,
+  EmpleadosState,
+  ProductosState,
+  ClientesState,
+  VentasState,
+  CajaState,
+  UIState,
+  NotificationsState
+} from './types'

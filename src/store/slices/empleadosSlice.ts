@@ -1,6 +1,7 @@
 import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
-import type { AppStore, EmpleadosState, CreateEmpleadoData, UpdateEmpleadoData } from '../index'
+import type { AppStore } from '../index'
+import type { EmpleadosState, CreateEmpleadoData, UpdateEmpleadoData, ModuloPermitido, PermisosModulo } from '../types'
 
 // Estados iniciales
 const initialState: EmpleadosState = {
@@ -9,27 +10,81 @@ const initialState: EmpleadosState = {
   error: null,
 }
 
-// Mapeo de roles a permisos de acceso
+// Configuración de módulos y permisos
+export const MODULOS_DISPONIBLES: PermisosModulo[] = [
+  {
+    modulo: 'dashboard',
+    nombre: 'Dashboard',
+    descripcion: 'Panel principal con estadísticas',
+    roles_permitidos: ['Administrador', 'Gerente', 'Vendedor', 'Técnico', 'Almacén', 'Cajero']
+  },
+  {
+    modulo: 'empleados',
+    nombre: 'Empleados',
+    descripcion: 'Gestión de personal',
+    roles_permitidos: ['Administrador', 'Gerente']
+  },
+  {
+    modulo: 'productos',
+    nombre: 'Productos',
+    descripcion: 'Gestión de inventario',
+    roles_permitidos: ['Administrador', 'Gerente', 'Técnico', 'Almacén']
+  },
+  {
+    modulo: 'clientes',
+    nombre: 'Clientes',
+    descripcion: 'Gestión de clientes',
+    roles_permitidos: ['Administrador', 'Gerente', 'Vendedor', 'Cajero']
+  },
+  {
+    modulo: 'ventas',
+    nombre: 'Ventas',
+    descripcion: 'Registro de ventas',
+    roles_permitidos: ['Administrador', 'Gerente', 'Vendedor', 'Cajero']
+  },
+  {
+    modulo: 'caja',
+    nombre: 'Caja',
+    descripcion: 'Gestión de caja y arqueos',
+    roles_permitidos: ['Administrador', 'Gerente', 'Cajero']
+  },
+  {
+    modulo: 'calendario',
+    nombre: 'Calendario',
+    descripcion: 'Eventos y programación',
+    roles_permitidos: ['Administrador', 'Gerente', 'Vendedor', 'Técnico', 'Almacén', 'Cajero']
+  }
+]
+
+// Mapeo de roles a permisos de acceso (legacy - mantener para compatibilidad)
 export const ROLES_PERMISSIONS = {
-  admin: {
-    canAccess: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'reportes'],
-    canManage: ['empleados', 'productos', 'clientes', 'ventas', 'caja', 'reportes'],
+  Administrador: {
+    canAccess: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'],
+    canManage: ['empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'],
   },
-  cajero: {
-    canAccess: ['dashboard', 'ventas', 'caja', 'clientes'],
-    canManage: ['ventas', 'caja'],
+  Gerente: {
+    canAccess: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'],
+    canManage: ['productos', 'clientes', 'ventas', 'caja', 'calendario'],
   },
-  vendedor: {
-    canAccess: ['dashboard', 'ventas', 'clientes'],
+  Vendedor: {
+    canAccess: ['dashboard', 'ventas', 'clientes', 'calendario'],
     canManage: ['ventas'],
   },
-  consulta: {
-    canAccess: ['dashboard', 'productos', 'clientes'],
-    canManage: [],
+  Técnico: {
+    canAccess: ['dashboard', 'productos', 'calendario'],
+    canManage: ['productos'],
+  },
+  Almacén: {
+    canAccess: ['dashboard', 'productos', 'calendario'],
+    canManage: ['productos'],
+  },
+  Cajero: {
+    canAccess: ['dashboard', 'ventas', 'caja', 'clientes', 'calendario'],
+    canManage: ['ventas', 'caja'],
   },
 } as const
 
-export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empleados' | 'fetchEmpleados' | 'createEmpleado' | 'updateEmpleado' | 'deleteEmpleado'>> = (set, get) => ({
+export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empleados' | 'fetchEmpleados' | 'createEmpleado' | 'updateEmpleado' | 'deleteEmpleado' | 'createEmpleadoWithAuth' | 'updateEmpleadoWithAuth' | 'getEmpleadoPermissions'>> = (set, get) => ({
   empleados: initialState,
 
   // Obtener todos los empleados
@@ -81,19 +136,171 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
     }
   },
 
-  // Crear nuevo empleado
+  // Crear nuevo empleado con autenticación
+  createEmpleadoWithAuth: async (empleadoData: CreateEmpleadoData) => {
+    set((state) => ({
+      empleados: { ...state.empleados, loading: true, error: null }
+    }))
+
+    try {
+      // 1. Crear usuario en auth.users
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email: empleadoData.email,
+        password: empleadoData.password,
+        email_confirm: true,
+        user_metadata: {
+          nombre: empleadoData.nombre,
+          rol: empleadoData.rol
+        }
+      })
+
+      if (authError) throw authError
+
+      // 2. Crear empleado en tabla empleados
+      const { data: empleadoDataResult, error: empleadoError } = await supabase
+        .from('empleados')
+        .insert([{
+          id: authData.user.id,
+          nombre: empleadoData.nombre,
+          email: empleadoData.email,
+          rol: empleadoData.rol,
+          salario: empleadoData.salario,
+          permisos_modulos: empleadoData.permisos_modulos,
+          activo: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }])
+        .select()
+        .single()
+
+      if (empleadoError) throw empleadoError
+
+      // Actualizar estado local
+      set((state) => ({
+        empleados: {
+          ...state.empleados,
+          empleados: [empleadoDataResult, ...state.empleados.empleados],
+          loading: false,
+        }
+      }))
+
+      // Notificar éxito
+      get().addNotification({
+        id: Date.now().toString(),
+        type: 'success',
+        title: 'Empleado creado',
+        message: `Empleado ${empleadoData.nombre} creado exitosamente con acceso al sistema`,
+      })
+
+    } catch (error: any) {
+      set((state) => ({
+        empleados: {
+          ...state.empleados,
+          loading: false,
+          error: error.message,
+        }
+      }))
+
+      // Notificar error
+      get().addNotification({
+        id: Date.now().toString(),
+        type: 'error',
+        title: 'Error al crear empleado',
+        message: error.message,
+      })
+    }
+  },
+
+  // Actualizar empleado con autenticación
+  updateEmpleadoWithAuth: async (id: string, empleadoData: UpdateEmpleadoData) => {
+    set((state) => ({
+      empleados: { ...state.empleados, loading: true, error: null }
+    }))
+
+    try {
+      // 1. Actualizar datos de autenticación si se proporciona password
+      if (empleadoData.password) {
+        const { error: authError } = await supabase.auth.admin.updateUserById(id, {
+          password: empleadoData.password,
+          user_metadata: {
+            nombre: empleadoData.nombre,
+            rol: empleadoData.rol
+          }
+        })
+
+        if (authError) throw authError
+      }
+
+      // 2. Actualizar empleado en tabla empleados
+      const { data, error } = await supabase
+        .from('empleados')
+        .update({
+          nombre: empleadoData.nombre,
+          email: empleadoData.email,
+          rol: empleadoData.rol,
+          salario: empleadoData.salario,
+          permisos_modulos: empleadoData.permisos_modulos,
+          activo: empleadoData.activo,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      // Actualizar estado local
+      set((state) => ({
+        empleados: {
+          ...state.empleados,
+          empleados: state.empleados.empleados.map(emp => 
+            emp.id === id ? data : emp
+          ),
+          loading: false,
+        }
+      }))
+
+      // Notificar éxito
+      get().addNotification({
+        id: Date.now().toString(),
+        type: 'success',
+        title: 'Empleado actualizado',
+        message: `Empleado ${empleadoData.nombre || 'actualizado'} exitosamente`,
+      })
+
+    } catch (error: any) {
+      set((state) => ({
+        empleados: {
+          ...state.empleados,
+          loading: false,
+          error: error.message,
+        }
+      }))
+
+      // Notificar error
+      get().addNotification({
+        id: Date.now().toString(),
+        type: 'error',
+        title: 'Error al actualizar empleado',
+        message: error.message,
+      })
+    }
+  },
+
+  // Obtener permisos de módulos para un rol
+  getEmpleadoPermissions: (rol: string): ModuloPermitido[] => {
+    return MODULOS_DISPONIBLES
+      .filter(modulo => modulo.roles_permitidos.includes(rol))
+      .map(modulo => modulo.modulo)
+  },
+
+  // Crear nuevo empleado (legacy - mantener para compatibilidad)
   createEmpleado: async (empleadoData: CreateEmpleadoData) => {
     set((state) => ({
       empleados: { ...state.empleados, loading: true, error: null }
     }))
 
     try {
-      // Validar que el usuario actual sea admin
-      const currentUser = get().auth.user
-      if (!currentUser || currentUser.rol !== 'admin') {
-        throw new Error('No tienes permisos para crear empleados')
-      }
-
       const { data, error } = await supabase
         .from('empleados')
         .insert([{
@@ -143,19 +350,13 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
     }
   },
 
-  // Actualizar empleado
+  // Actualizar empleado (legacy - mantener para compatibilidad)
   updateEmpleado: async (id: string, empleadoData: UpdateEmpleadoData) => {
     set((state) => ({
       empleados: { ...state.empleados, loading: true, error: null }
     }))
 
     try {
-      // Validar que el usuario actual sea admin
-      const currentUser = get().auth.user
-      if (!currentUser || currentUser.rol !== 'admin') {
-        throw new Error('No tienes permisos para editar empleados')
-      }
-
       const { data, error } = await supabase
         .from('empleados')
         .update({
@@ -213,17 +414,6 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
     }))
 
     try {
-      // Validar que el usuario actual sea admin
-      const currentUser = get().auth.user
-      if (!currentUser || currentUser.rol !== 'admin') {
-        throw new Error('No tienes permisos para eliminar empleados')
-      }
-
-      // Verificar que no se elimine a sí mismo
-      if (currentUser.id === id) {
-        throw new Error('No puedes eliminar tu propia cuenta')
-      }
-
       const { error } = await supabase
         .from('empleados')
         .update({ 
@@ -273,7 +463,7 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
   },
 })
 
-// Utilidades para verificar permisos
+// Utilidades para verificar permisos (legacy - mantener para compatibilidad)
 export const hasPermission = (userRole: string, action: string): boolean => {
   const permissions = ROLES_PERMISSIONS[userRole as keyof typeof ROLES_PERMISSIONS]
   if (!permissions) return false

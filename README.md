@@ -53,10 +53,10 @@ npm install
 ### **4. Variables de Entorno**
 Crear archivo `.env` en la carpeta `client`:
 ```env
-REACT_APP_SUPABASE_URL=tu_supabase_url
-REACT_APP_SUPABASE_ANON_KEY=tu_supabase_anon_key
-REACT_APP_APP_NAME=Motorepuestos FL
-REACT_APP_APP_VERSION=1.0.0
+VITE_SUPABASE_URL=tu_supabase_url
+VITE_SUPABASE_ANON_KEY=tu_supabase_anon_key
+VITE_APP_NAME=Motorepuestos F.L.
+VITE_APP_VERSION=1.0.0
 ```
 
 ### **5. Ejecutar en Desarrollo**

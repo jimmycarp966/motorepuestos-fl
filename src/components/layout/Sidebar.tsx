@@ -8,113 +8,151 @@ import {
   UserCheck, 
   ShoppingCart, 
   DollarSign, 
+  Calendar,
   BarChart3, 
-  LogOut,
-  Menu,
-  X
+  LogOut
 } from 'lucide-react'
-import { canAccessModule } from '../../store/slices/empleadosSlice'
+import { useDebug } from '../../hooks/useDebug'
 
 const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'empleados', label: 'Empleados', icon: Users },
-  { id: 'productos', label: 'Productos', icon: Package },
-  { id: 'clientes', label: 'Clientes', icon: UserCheck },
-  { id: 'ventas', label: 'Ventas', icon: ShoppingCart },
-  { id: 'caja', label: 'Caja', icon: DollarSign },
-  { id: 'reportes', label: 'Reportes', icon: BarChart3 },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: '#667eea' },
+  { id: 'empleados', label: 'Empleados', icon: Users, color: '#f093fb' },
+  { id: 'productos', label: 'Productos', icon: Package, color: '#4facfe' },
+  { id: 'clientes', label: 'Clientes', icon: UserCheck, color: '#43e97b' },
+  { id: 'ventas', label: 'Ventas', icon: ShoppingCart, color: '#fa709a' },
+  { id: 'caja', label: 'Caja', icon: DollarSign, color: '#ffecd2' },
+  { id: 'calendario', label: 'Calendario', icon: Calendar, color: '#a8edea' },
+  { id: 'reportes', label: 'Reportes', icon: BarChart3, color: '#a8edea' },
 ]
 
-interface SidebarProps {
-  isOpen: boolean
-  onToggle: () => void
-}
-
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
+export const Sidebar: React.FC = () => {
+  // Registrar componente para debug
+  const { logError, logInfo } = useDebug({ componentName: 'Sidebar' })
+  
   const user = useAppStore((state) => state.auth.user)
   const logout = useAppStore((state) => state.logout)
-  const sidebarOpen = useAppStore((state) => state.ui.sidebarOpen)
-  const setSidebarOpen = useAppStore((state) => state.setSidebarOpen)
   const currentModule = useAppStore((state) => state.ui.currentModule)
   const setCurrentModule = useAppStore((state) => state.setCurrentModule)
 
   const handleLogout = async () => {
-    await logout()
+    try {
+      logInfo('Intentando logout')
+      await logout()
+      logInfo('Logout exitoso')
+    } catch (error) {
+      logError(error, 'Error en logout')
+    }
   }
 
   const handleMenuClick = (moduleId: string) => {
+    logInfo('Cambiando módulo', { from: currentModule, to: moduleId })
     setCurrentModule(moduleId)
-    if (window.innerWidth < 768) {
-      setSidebarOpen(false)
-    }
   }
 
   if (!user) return null
 
-  const accessibleModules = menuItems.filter(item => 
-    canAccessModule(user.rol, item.id)
-  )
+  // Usar permisos específicos del usuario si están disponibles, sino usar el sistema legacy
+  const userPermisos = (user as any).permisos_modulos || []
+  const accessibleModules = menuItems.filter(item => {
+    // Si el usuario tiene permisos específicos, usarlos
+    if (userPermisos.length > 0) {
+      return userPermisos.includes(item.id)
+    }
+    // Sino, usar el sistema legacy basado en roles
+    const rolePermissions = {
+      'Administrador': ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario', 'reportes'],
+      'Gerente': ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario', 'reportes'],
+      'Vendedor': ['dashboard', 'ventas', 'clientes', 'calendario'],
+      'Técnico': ['dashboard', 'productos', 'calendario'],
+      'Almacén': ['dashboard', 'productos', 'calendario'],
+      'Cajero': ['dashboard', 'ventas', 'caja', 'clientes', 'calendario'],
+    }
+    return rolePermissions[user.rol as keyof typeof rolePermissions]?.includes(item.id) || false
+  })
 
   return (
-    <>
-      {/* Overlay para móviles */}
-      {isOpen && (
-        <div 
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 40
-          }}
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        height: '100%',
-        backgroundColor: 'white',
-        borderRight: '1px solid #e5e7eb',
-        zIndex: 50,
-        transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
-        transition: 'transform 0.3s ease-in-out',
-        width: '256px',
-        boxShadow: '2px 0 10px rgba(0, 0, 0, 0.1)'
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          {/* Header */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '1rem',
-            borderBottom: '1px solid #e5e7eb',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white'
-          }}>
-            <div>
-              <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Motorepuestos F.L.</h1>
-              <p style={{ fontSize: '0.875rem', opacity: 0.9 }}>{user.nombre}</p>
-            </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'white',
-                cursor: 'pointer',
-                padding: '0.5rem'
-              }}
-            >
-              <X size={16} />
-            </button>
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      height: '100%',
+      backgroundColor: 'white',
+      borderRight: '1px solid #e2e8f0',
+      zIndex: 50,
+      width: '280px',
+      boxShadow: '4px 0 20px rgba(0, 0, 0, 0.1)',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+        {/* Header del sidebar */}
+        <div style={{
+          padding: '2rem 1.5rem 1.5rem',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+          borderBottom: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <h1 style={{ 
+              fontSize: '1.5rem', 
+              fontWeight: '700',
+              margin: 0,
+              letterSpacing: '-0.025em'
+            }}>
+              Motorepuestos F.L.
+            </h1>
           </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.25rem',
+              fontWeight: '600'
+            }}>
+              {user.nombre.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.25rem' }}>
+                {user.nombre}
+              </div>
+              <div style={{ 
+                fontSize: '0.875rem', 
+                opacity: 0.9,
+                background: 'rgba(255,255,255,0.2)',
+                padding: '0.25rem 0.5rem',
+                borderRadius: '0.25rem',
+                display: 'inline-block'
+              }}>
+                {user.rol}
+              </div>
+            </div>
+          </div>
+        </div>
 
-          {/* Navigation */}
-          <nav style={{ flex: 1, padding: '1rem' }}>
+        {/* Navegación */}
+        <nav style={{ 
+          flex: 1, 
+          padding: '1.5rem 1rem',
+          overflowY: 'auto'
+        }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <div style={{ 
+              fontSize: '0.75rem', 
+              fontWeight: '600', 
+              color: '#64748b',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              marginBottom: '0.75rem',
+              paddingLeft: '0.5rem'
+            }}>
+              Navegación
+            </div>
+            
             {accessibleModules.map((item) => {
               const Icon = item.icon
               const isActive = currentModule === item.id
@@ -127,20 +165,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.75rem',
-                    padding: '0.75rem',
+                    padding: '0.875rem 1rem',
                     textAlign: 'left',
-                    color: isActive ? '#667eea' : '#374151',
-                    borderRadius: '0.5rem',
+                    color: isActive ? '#667eea' : '#64748b',
+                    borderRadius: '0.75rem',
                     border: 'none',
-                    background: isActive ? '#f0f4ff' : 'none',
+                    background: isActive ? '#f1f5f9' : 'transparent',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
                     marginBottom: '0.5rem',
-                    fontWeight: isActive ? '600' : '400'
+                    fontWeight: isActive ? '600' : '500',
+                    fontSize: '0.875rem',
+                    position: 'relative'
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.backgroundColor = '#f3f4f6'
+                      e.currentTarget.style.backgroundColor = '#f8fafc'
                       e.currentTarget.style.transform = 'translateX(4px)'
                     }
                   }}
@@ -151,81 +191,95 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                     }
                   }}
                 >
-                  <Icon size={20} />
+                  {isActive && (
+                    <div style={{
+                      position: 'absolute',
+                      left: 0,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '4px',
+                      height: '60%',
+                      backgroundColor: '#667eea',
+                      borderRadius: '0 2px 2px 0'
+                    }} />
+                  )}
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: isActive ? '#667eea' : '#94a3b8'
+                  }}>
+                    <Icon size={20} />
+                  </div>
                   <span>{item.label}</span>
                 </button>
               )
             })}
-          </nav>
-
-          {/* Footer */}
-          <div style={{
-            padding: '1rem',
-            borderTop: '1px solid #e5e7eb',
-            backgroundColor: '#f9fafb'
-          }}>
-            <div style={{ marginBottom: '0.5rem' }}>
-              <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>Rol:</span>
-              <span style={{ 
-                marginLeft: '0.25rem', 
-                fontSize: '0.875rem', 
-                fontWeight: '500',
-                textTransform: 'capitalize',
-                color: '#667eea'
-              }}>{user.rol}</span>
-            </div>
-            <button
-              onClick={handleLogout}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                padding: '0.5rem 1rem',
-                border: '1px solid #d1d5db',
-                borderRadius: '0.375rem',
-                backgroundColor: 'white',
-                color: '#374151',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                fontSize: '0.875rem'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f3f4f6'
-                e.currentTarget.style.borderColor = '#9ca3af'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'white'
-                e.currentTarget.style.borderColor = '#d1d5db'
-              }}
-            >
-              <LogOut size={16} />
-              Cerrar Sesión
-            </button>
           </div>
+        </nav>
+
+        {/* Footer del sidebar */}
+        <div style={{
+          padding: '1.5rem',
+          borderTop: '1px solid #e2e8f0',
+          backgroundColor: '#f8fafc'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem',
+            marginBottom: '1rem',
+            padding: '0.75rem',
+            backgroundColor: 'white',
+            borderRadius: '0.5rem',
+            border: '1px solid #e2e8f0'
+          }}>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: '#10b981'
+            }} />
+            <span style={{ fontSize: '0.875rem', color: '#64748b' }}>
+              Sistema activo
+            </span>
+          </div>
+          
+          <button
+            onClick={handleLogout}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              padding: '0.75rem 1rem',
+              border: '1px solid #e2e8f0',
+              borderRadius: '0.5rem',
+              backgroundColor: 'white',
+              color: '#64748b',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              fontSize: '0.875rem',
+              fontWeight: '500'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f1f5f9'
+              e.currentTarget.style.borderColor = '#cbd5e1'
+              e.currentTarget.style.color = '#475569'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'white'
+              e.currentTarget.style.borderColor = '#e2e8f0'
+              e.currentTarget.style.color = '#64748b'
+            }}
+          >
+            <LogOut size={16} />
+            Cerrar Sesión
+          </button>
         </div>
       </div>
-
-      {/* Mobile menu button */}
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        style={{
-          position: 'fixed',
-          top: '1rem',
-          left: '1rem',
-          zIndex: 50,
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          border: 'none',
-          borderRadius: '0.375rem',
-          padding: '0.5rem',
-          color: 'white',
-          cursor: 'pointer',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-        }}
-      >
-        <Menu size={20} />
-      </button>
-    </>
   )
 }

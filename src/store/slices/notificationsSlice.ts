@@ -1,5 +1,6 @@
 import type { StateCreator } from 'zustand'
-import type { AppStore, NotificationsState, Notification } from '../index'
+import type { AppStore } from '../index'
+import type { NotificationsState, Notification } from '../types'
 
 const initialState: NotificationsState = {
   notifications: [],

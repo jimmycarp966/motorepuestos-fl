@@ -108,7 +108,7 @@ export const ConnectionError: React.FC<ConnectionErrorProps> = ({
           </button>
         </div>
         
-        {process.env.NODE_ENV === 'development' && (
+        {import.meta.env.MODE === 'development' && (
           <div style={{
             marginTop: '2rem',
             padding: '1rem',
@@ -120,7 +120,7 @@ export const ConnectionError: React.FC<ConnectionErrorProps> = ({
             <p><strong>Debug Info:</strong></p>
             <p>VITE_SUPABASE_URL: {import.meta.env.VITE_SUPABASE_URL ? '✅' : '❌'}</p>
             <p>VITE_SUPABASE_ANON_KEY: {import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅' : '❌'}</p>
-            <p>NODE_ENV: {process.env.NODE_ENV}</p>
+            <p>MODE: {import.meta.env.MODE}</p>
           </div>
         )}
       </div>

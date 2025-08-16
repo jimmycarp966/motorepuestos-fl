@@ -200,10 +200,8 @@ function isApiCall(href) {
     // Ignorar completamente canales de Firestore Listen (evitar interferir realtime)
     if (path.includes('/google.firestore.v1.Firestore/Listen/')) return false;
     return path.includes('/api/') ||
-           host.includes('firebase') ||
-           host.includes('googleapis') ||
-           host.includes('gstatic.com') ||
-           host.includes('firestore.googleapis.com');
+           host.includes('supabase') ||
+           host.includes('supabase.co');
   } catch (e) {
     return false;
   }

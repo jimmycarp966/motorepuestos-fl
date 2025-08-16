@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useAppStore } from './store/index.js'
+import React, { useState, useEffect } from 'react'
+import { useAppStore } from './store'
 import { LoginForm } from './components/auth/LoginForm'
 import { Sidebar } from './components/layout/Sidebar'
 import { Dashboard } from './components/dashboard/Dashboard'
@@ -9,16 +9,19 @@ import { ClientesTable } from './components/clientes/ClientesTable'
 import { VentasTable } from './components/ventas/VentasTable'
 import { CajaTable } from './components/caja/CajaTable'
 import { ReportesTable } from './components/reportes/ReportesTable'
+import { Calendario } from './components/calendario/Calendario'
 import { NotificationsContainer } from './components/ui/notifications'
 import { ConnectionError } from './components/ui/ConnectionError'
 import { performSimpleHealthCheck } from './utils/simpleHealthCheck'
+import { debugStore } from './utils/debugStore'
+import { testStore } from './utils/testStore'
+import { quickTest } from './utils/quickTest'
+import { SimpleDebugButton } from './components/ui/SimpleDebugButton'
 
 function App() {
   const user = useAppStore((state) => state.auth.user)
   const loading = useAppStore((state) => state.auth.loading)
-  const checkSession = useAppStore((state) => state.checkSession)
-  const sidebarOpen = useAppStore((state) => state.ui.sidebarOpen)
-  const setSidebarOpen = useAppStore((state) => state.setSidebarOpen)
+  const checkAuth = useAppStore((state) => state.checkAuth)
   const currentModule = useAppStore((state) => state.ui.currentModule)
   
   // Estado de debug y manejo de errores
@@ -39,6 +42,17 @@ function App() {
   useEffect(() => {
     console.log('🔍 App: Iniciando verificación completa del sistema...')
     
+    // Debug del store
+    debugStore()
+    
+    // Test del store
+    const storeTest = testStore()
+    console.log('🧪 Resultado del test del store:', storeTest)
+    
+    // Quick test
+    const quickTestResult = quickTest()
+    console.log('⚡ Quick test result:', quickTestResult)
+    
     const performSystemCheck = async () => {
       try {
         // Realizar health check simplificado
@@ -57,7 +71,7 @@ function App() {
         console.log('🔍 App: Iniciando verificación de autenticación...')
         console.log('🔍 App: Estado inicial - loading:', loading, 'user:', user)
         
-        await checkSession()
+        await checkAuth()
         setDebugInfo(prev => ({ ...prev, authChecked: true }))
         console.log('✅ App: Verificación de autenticación completada')
         
@@ -74,7 +88,7 @@ function App() {
     }
     
     performSystemCheck()
-  }, [checkSession])
+  }, [checkAuth])
 
   // Log del estado actual
   useEffect(() => {
@@ -112,7 +126,8 @@ function App() {
             await Promise.all([
               fetchVentas(),
               fetchMovimientos(),
-              fetchProductos()
+              fetchProductos(),
+              fetchClientes()
             ])
         }
       } catch (error) {
@@ -138,6 +153,8 @@ function App() {
         return <VentasTable />
       case 'caja':
         return <CajaTable />
+      case 'calendario':
+        return <Calendario />
       case 'reportes':
         return <ReportesTable />
       default:
@@ -157,7 +174,7 @@ function App() {
         error={debugInfo.connectionError}
         onRetry={() => {
           setDebugInfo(prev => ({ ...prev, connectionError: null, authError: null }))
-          initAuth()
+          window.location.reload()
         }}
       />
     )
@@ -171,18 +188,25 @@ function App() {
         alignItems: 'center',
         justifyContent: 'center',
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white'
+        color: 'white',
+        fontFamily: 'Inter, system-ui, sans-serif'
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{
-            animation: 'spin 1s linear infinite',
+            width: '60px',
+            height: '60px',
+            border: '4px solid rgba(255,255,255,0.3)',
+            borderTop: '4px solid #ffffff',
             borderRadius: '50%',
-            height: '48px',
-            width: '48px',
-            borderBottom: '2px solid #ffffff',
-            margin: '0 auto'
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px'
           }}></div>
-          <p style={{ marginTop: '1rem', color: '#ffffff' }}>Cargando aplicación...</p>
+          <h2 style={{ marginBottom: '10px', fontSize: '1.5rem', fontWeight: '600' }}>
+            Cargando aplicación...
+          </h2>
+          <p style={{ opacity: 0.8, fontSize: '1rem' }}>
+            Inicializando sistema de gestión
+          </p>
           {process.env.NODE_ENV === 'development' && (
             <div style={{ marginTop: '1rem', fontSize: '12px', opacity: 0.8 }}>
               <p>Debug: Auth checked: {debugInfo.authChecked ? '✅' : '⏳'}</p>
@@ -190,46 +214,115 @@ function App() {
             </div>
           )}
         </div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     )
   }
 
   if (!user) {
-    return <LoginForm />
+    return (
+      <>
+        <LoginForm />
+        <SimpleDebugButton />
+      </>
+    )
   }
 
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#f9fafb',
-      fontFamily: 'Inter, system-ui, sans-serif'
+      backgroundColor: '#f8fafc',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      display: 'flex'
     }}>
       <NotificationsContainer />
+      <SimpleDebugButton />
       
-      <div style={{ display: 'flex' }}>
-        <Sidebar 
-          isOpen={sidebarOpen} 
-          onToggle={() => setSidebarOpen(!sidebarOpen)} 
-        />
-        
-        <main style={{
-          flex: 1,
-          marginLeft: sidebarOpen ? '256px' : '0',
-          minHeight: '100vh',
-          transition: 'margin-left 0.3s ease'
+      {/* Sidebar fijo */}
+      <Sidebar />
+      
+      {/* Contenido principal */}
+      <main style={{
+        flex: 1,
+        marginLeft: '280px',
+        minHeight: '100vh',
+        backgroundColor: '#f8fafc'
+      }}>
+        {/* Header moderno */}
+        <header style={{
+          backgroundColor: 'white',
+          borderBottom: '1px solid #e2e8f0',
+          padding: '1rem 2rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
         }}>
-          <div style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <h1 style={{ 
+              fontSize: '1.5rem', 
+              fontWeight: '600', 
+              color: '#1e293b',
+              margin: 0
+            }}>
+                             {currentModule === 'dashboard' ? 'Dashboard' :
+                currentModule === 'empleados' ? 'Empleados' :
+                currentModule === 'productos' ? 'Productos' :
+                currentModule === 'clientes' ? 'Clientes' :
+                currentModule === 'ventas' ? 'Ventas' :
+                currentModule === 'caja' ? 'Caja' :
+                currentModule === 'calendario' ? 'Calendario' :
+                currentModule === 'reportes' ? 'Reportes' : 'Dashboard'}
+            </h1>
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '0.875rem', color: '#64748b' }}>
+                Bienvenido
+              </div>
+              <div style={{ fontSize: '1rem', fontWeight: '500', color: '#1e293b' }}>
+                {user.nombre}
+              </div>
+            </div>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: '600',
+              fontSize: '1rem'
+            }}>
+              {user.nombre.charAt(0).toUpperCase()}
+            </div>
+          </div>
+        </header>
+
+        {/* Contenido del módulo */}
+        <div style={{ 
+          padding: '2rem',
+          maxWidth: '100%',
+          overflowX: 'auto'
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '0.75rem',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            overflow: 'hidden'
+          }}>
             {renderModule()}
           </div>
-        </main>
-      </div>
-      
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+        </div>
+      </main>
     </div>
   )
 }

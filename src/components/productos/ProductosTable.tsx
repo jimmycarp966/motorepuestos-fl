@@ -78,7 +78,10 @@ export const ProductosTable: React.FC = () => {
                   Categoría
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Precio
+                  SKU
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Precios
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Stock
@@ -116,9 +119,15 @@ export const ProductosTable: React.FC = () => {
                       {producto.categoria}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${producto.precio.toFixed(2)}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
+                    {producto.codigo_sku}
                   </td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div className="space-y-1">
+                    <div className="text-xs text-gray-500">Minorista: ${producto.precio_minorista.toFixed(2)}</div>
+                    <div className="text-xs text-gray-500">Mayorista: ${producto.precio_mayorista.toFixed(2)}</div>
+                  </div>
+                </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       producto.stock > 10 

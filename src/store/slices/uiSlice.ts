@@ -1,9 +1,10 @@
 import type { StateCreator } from 'zustand'
-import type { AppStore, UIState } from '../index'
+import type { AppStore } from '../index'
+import type { UIState } from '../types'
 
 const initialState: UIState = {
   theme: 'light',
-  sidebarOpen: false,
+  sidebarOpen: true,
   currentModule: 'dashboard',
 }
 

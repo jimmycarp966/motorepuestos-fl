@@ -1,143 +1,154 @@
-# Compilación Local - Motorepuestos FL
+# Compilación y Ejecución Local
 
 ## Requisitos Previos
 
-- Node.js 18+ instalado
-- npm o yarn instalado
-- Git configurado
+- Node.js (versión 16 o superior)
+- npm (incluido con Node.js)
 
 ## Configuración Inicial
 
-1. **Clonar el repositorio** (si no lo has hecho):
-   ```bash
-   git clone <url-del-repositorio>
-   cd Motorepuestos-FL
-   ```
-
+1. **Clonar el repositorio** (si no lo has hecho ya)
 2. **Instalar dependencias**:
    ```bash
    npm install
    ```
 
-3. **Configurar variables de entorno**:
-   - El archivo `.env` ya está configurado con las credenciales de Supabase
-   - Las variables usan el prefijo `VITE_` para compatibilidad con Vite
+## Variables de Entorno
 
-## Desarrollo Local
+El archivo `.env` se crea automáticamente con los scripts, pero puedes crearlo manualmente:
 
-### Opción 1: Usando scripts batch (Windows)
-```bash
-# Iniciar servidor de desarrollo
-start-dev.bat
+```env
+# Supabase Configuration
+VITE_SUPABASE_URL=https://hsajhnxtlgfpkpzcrjyb.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzYWpobnh0bGdmcGtwemNyanliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyNTc2NDUsImV4cCI6MjA3MDgzMzY0NX0.QAe7NTVEervkqmq2zFvCsABFulvEM2Q0UgZ4EntMoj4
 
-# O compilar para producción
-build-prod.bat
+# App Configuration
+VITE_APP_NAME=Motorepuestos FL
+VITE_APP_VERSION=1.0.0
+VITE_APP_ENV=development
 ```
 
-### Opción 2: Usando comandos npm
+## Scripts Disponibles
+
+### Desarrollo Local
+
+**Windows (PowerShell/CMD):**
 ```bash
-# Servidor de desarrollo
+.\start-dev.bat
+```
+
+**Linux/Mac:**
+```bash
+npm run dev
+```
+
+La aplicación estará disponible en: **http://localhost:3000**
+
+### Compilación de Producción
+
+**Windows (PowerShell/CMD):**
+```bash
+.\build-prod.bat
+```
+
+**Linux/Mac:**
+```bash
+npm run build
+```
+
+### Servir Aplicación Compilada
+
+**Windows (PowerShell/CMD):**
+```bash
+.\serve-prod.bat
+```
+
+**Linux/Mac:**
+```bash
+npm install -g serve
+serve -s dist -l 3000
+```
+
+## Solución de Problemas
+
+### Error de Conexión con Supabase
+
+Si ves el error "Error de Conexión", verifica:
+
+1. **Variables de entorno**: Asegúrate de que el archivo `.env` existe y tiene las variables correctas
+2. **Conexión a internet**: Verifica que tienes conexión a internet
+3. **Supabase**: Verifica que el proyecto de Supabase esté activo
+
+### Puerto 3000 Ocupado
+
+Si el puerto 3000 está ocupado:
+
+1. **Cambiar puerto en vite.config.ts**:
+   ```typescript
+   server: {
+     port: 3001, // Cambiar a otro puerto
+     open: true,
+     host: true,
+   },
+   ```
+
+2. **O usar otro puerto directamente**:
+   ```bash
+   npm run dev -- --port 3001
+   ```
+
+### Errores de Compilación
+
+1. **Limpiar caché**:
+   ```bash
+   npm run build -- --force
+   ```
+
+2. **Reinstalar dependencias**:
+   ```bash
+   rm -rf node_modules package-lock.json
+   npm install
+   ```
+
+## Estructura del Proyecto
+
+```
+src/
+├── components/          # Componentes React
+├── store/              # Estado global (Zustand)
+├── lib/                # Configuración y utilidades
+├── utils/              # Utilidades y helpers
+└── App.tsx             # Componente principal
+```
+
+## Tecnologías Utilizadas
+
+- **Frontend**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **Estado**: Zustand
+- **UI**: Tailwind CSS + shadcn/ui
+- **Backend**: Supabase (PostgreSQL + Auth)
+- **Formularios**: React Hook Form + Zod
+- **Gráficos**: Recharts
+
+## Comandos Útiles
+
+```bash
+# Instalar dependencias
+npm install
+
+# Ejecutar en desarrollo
 npm run dev
 
 # Compilar para producción
 npm run build
 
-# Previsualizar build de producción
+# Previsualizar compilación
 npm run preview
-```
-
-## Puertos y URLs
-
-- **Desarrollo**: http://localhost:3001 (o el siguiente puerto disponible)
-- **Producción**: Los archivos se generan en la carpeta `dist/`
-
-## Estructura del Proyecto
-
-```
-Motorepuestos-FL/
-├── src/
-│   ├── components/     # Componentes React
-│   ├── store/         # Estado global con Zustand
-│   ├── lib/           # Utilidades y configuración
-│   └── main.tsx       # Punto de entrada
-├── public/            # Archivos estáticos
-├── dist/              # Build de producción
-├── .env               # Variables de entorno
-└── package.json       # Dependencias y scripts
-```
-
-## Solución de Problemas
-
-### Error: "Port 3000 is in use"
-- El servidor automáticamente usará el siguiente puerto disponible
-- Verifica en la consola qué puerto se está usando
-
-### Error: "Missing Supabase environment variables"
-- Verifica que el archivo `.env` existe y tiene las variables correctas
-- Las variables deben usar el prefijo `VITE_`
-
-### Error: "Cannot find module"
-- Ejecuta `npm install` para reinstalar dependencias
-- Verifica que no hay procesos de Node.js bloqueando archivos
-
-### Archivos bloqueados en Windows
-```bash
-# Matar todos los procesos de Node.js
-taskkill /f /im node.exe
-
-# Limpiar cache de npm
-npm cache clean --force
-
-# Reinstalar dependencias
-npm install
-```
-
-## Comandos Útiles
-
-```bash
-# Limpiar cache
-npm cache clean --force
-
-# Verificar dependencias
-npm audit
-
-# Actualizar dependencias
-npm update
-
-# Ejecutar linting
-npm run lint
 
 # Ejecutar tests
-npm test
+npm run test
+
+# Linting
+npm run lint
 ```
-
-## Despliegue
-
-### Vercel (Recomendado)
-```bash
-# Instalar Vercel CLI
-npm i -g vercel
-
-# Desplegar
-vercel
-```
-
-### Otros servicios
-- Los archivos en `dist/` están listos para cualquier servidor web estático
-- Configura las variables de entorno en tu plataforma de hosting
-
-## Notas Importantes
-
-- El proyecto usa **Vite** como bundler
-- **Zustand** para manejo de estado global
-- **Supabase** como backend
-- **TypeScript** para tipado
-- **Tailwind CSS** para estilos
-
-## Soporte
-
-Si encuentras problemas:
-1. Verifica que todas las dependencias están instaladas
-2. Revisa la consola del navegador para errores
-3. Verifica que las variables de entorno están configuradas
-4. Asegúrate de que Supabase está funcionando

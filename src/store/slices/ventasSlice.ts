@@ -1,6 +1,7 @@
 import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
-import type { AppStore, VentasState, CreateVentaData } from '../index'
+import type { AppStore } from '../index'
+import type { VentasState, CreateVentaData } from '../types'
 
 const initialState: VentasState = {
   ventas: [],
@@ -52,13 +53,18 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
         if (!producto) throw new Error(`Producto ${item.producto_id} no encontrado`)
         if (producto.stock < item.cantidad) throw new Error(`Stock insuficiente para ${producto.nombre}`)
 
-        const subtotal = producto.precio * item.cantidad
+        // Usar precio según tipo seleccionado
+        const precio = ventaData.tipo_precio === 'mayorista' 
+          ? producto.precio_mayorista 
+          : producto.precio_minorista
+
+        const subtotal = precio * item.cantidad
         total += subtotal
 
         itemsToInsert.push({
           producto_id: item.producto_id,
           cantidad: item.cantidad,
-          precio_unitario: producto.precio,
+          precio_unitario: precio,
           subtotal,
         })
       }
@@ -114,12 +120,15 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
       // 7. Refrescar productos para actualizar stock
       await get().fetchProductos()
 
+      // 8. Refrescar caja para actualizar saldo
+      await get().fetchMovimientos()
+
       // Notificar éxito
       get().addNotification({
         id: Date.now().toString(),
         type: 'success',
         title: 'Venta registrada',
-        message: `Venta #${venta.id} registrada por $${total.toFixed(2)}`,
+        message: `Venta #${venta.id} registrada por $${total.toFixed(2)} (${ventaData.tipo_precio})`,
       })
 
     } catch (error: any) {
