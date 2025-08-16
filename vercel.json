@@ -23,7 +23,9 @@
   ],
   "env": {
     "VITE_APP_NAME": "Motorepuestos F.L.",
-    "VITE_APP_VERSION": "1.0.1"
+    "VITE_APP_VERSION": "1.0.1",
+    "VITE_SUPABASE_URL": "https://hsajhnxtlgfpkpzcrjyb.supabase.co",
+    "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzYWpobnh0bGdmcGtwemNyanliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyNTc2NDUsImV4cCI6MjA3MDgzMzY0NX0.QAe7NTVEervkqmq2zFvCsABFulvEM2Q0UgZ4EntMoj4"
   },
   "regions": ["iad1"]
 }

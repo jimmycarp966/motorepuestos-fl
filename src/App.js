@@ -13,6 +13,7 @@ import { PermissionsProvider } from './context/PermissionsContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
 import OfflineIndicator from './components/OfflineIndicator';
+import SupabaseDiagnostic from './components/SupabaseDiagnostic';
 
 // Componentes de autenticación
 import SupabaseAuth from './components/SupabaseAuth';
@@ -41,10 +42,22 @@ function App() {
   } = useAppStore();
 
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [supabaseError, setSupabaseError] = useState(false);
 
   // Manejo del estado de autenticación
   useEffect(() => {
-    checkSession();
+    const initializeApp = async () => {
+      try {
+        await checkSession();
+      } catch (error) {
+        console.error('Error inicializando aplicación:', error);
+        if (error.message.includes('Supabase') || error.message.includes('Missing')) {
+          setSupabaseError(true);
+        }
+      }
+    };
+
+    initializeApp();
   }, [checkSession]);
 
   // Manejo del estado de conexión
@@ -75,6 +88,11 @@ function App() {
       window.removeEventListener('offline', handleOffline);
     };
   }, [addNotification]);
+
+  // Mostrar diagnóstico si hay error de Supabase
+  if (supabaseError) {
+    return <SupabaseDiagnostic />;
+  }
 
   // Componente de carga
   if (auth.loading) {
