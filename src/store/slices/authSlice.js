@@ -1,4 +1,4 @@
-import { supabase } from '../../lib/supabase.js'
+import { supabase } from '../../lib/supabase-config.js'
 
 export const createAuthSlice = (set, get) => ({
   auth: {
@@ -129,6 +129,7 @@ export const createAuthSlice = (set, get) => ({
         }
       }))
     } catch (error) {
+      console.error('Error en checkSession:', error)
       set((state) => ({
         auth: {
           ...state.auth,
@@ -139,41 +140,68 @@ export const createAuthSlice = (set, get) => ({
     }
   },
 
-  // Nueva función para obtener permisos del usuario
+  // Función mejorada para obtener permisos del usuario
   getUserPermissions: async (email) => {
     try {
-      // Verificar si es admin en auth.users
-      const { data: authUser } = await supabase.auth.getUser()
-      if (authUser?.user?.role === 'admin') {
-        return ['admin', 'dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'reportes', 'inventario', 'proveedores', 'categorias', 'compras', 'gastos']
-      }
-
-      // Buscar en tabla empleados
-      const { data: empleado, error } = await supabase
+      console.log('🔍 Obteniendo permisos para:', email)
+      
+      // Primero verificar en tabla empleados (más confiable)
+      const { data: empleado, error: empleadoError } = await supabase
         .from('empleados')
         .select('rol, activo')
         .eq('email', email)
         .eq('activo', true)
         .single()
 
-      if (error || !empleado) {
-        return []
+      if (empleadoError) {
+        console.log('❌ Error buscando empleado:', empleadoError.message)
+      } else if (empleado) {
+        console.log('✅ Empleado encontrado:', empleado.rol)
+        
+        // Mapear rol a permisos
+        const rolePermissions = {
+          'Administrador': ['admin', 'dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'reportes', 'inventario', 'proveedores', 'categorias', 'compras', 'gastos'],
+          'Gerente': ['dashboard', 'productos', 'clientes', 'ventas', 'reportes', 'inventario'],
+          'Vendedor': ['dashboard', 'productos', 'clientes', 'ventas'],
+          'Técnico': ['dashboard', 'productos', 'inventario', 'reportes'],
+          'Almacén': ['dashboard', 'productos', 'inventario', 'reportes'],
+          'Cajero': ['dashboard', 'ventas', 'caja', 'clientes']
+        }
+
+        const permissions = rolePermissions[empleado.rol] || []
+        console.log('📋 Permisos asignados:', permissions)
+        return permissions
       }
 
-      // Mapear rol a permisos
-      const rolePermissions = {
-        'Administrador': ['admin', 'dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'reportes', 'inventario', 'proveedores', 'categorias', 'compras', 'gastos'],
-        'Gerente': ['dashboard', 'productos', 'clientes', 'ventas', 'reportes', 'inventario'],
-        'Vendedor': ['dashboard', 'productos', 'clientes', 'ventas'],
-        'Técnico': ['dashboard', 'productos', 'inventario', 'reportes'],
-        'Almacén': ['dashboard', 'productos', 'inventario', 'reportes'],
-        'Cajero': ['dashboard', 'ventas', 'caja', 'clientes']
+      // Si no se encuentra en empleados, verificar auth.users
+      try {
+        const { data: authUser, error: authError } = await supabase.auth.getUser()
+        
+        if (authError) {
+          console.log('❌ Error obteniendo usuario auth:', authError.message)
+        } else if (authUser?.user) {
+          console.log('✅ Usuario auth encontrado:', authUser.user.email)
+          
+          // Verificar si tiene rol admin en metadata
+          const userRole = authUser.user.user_metadata?.role || authUser.user.raw_user_meta_data?.role
+          
+          if (userRole === 'admin') {
+            console.log('👑 Usuario es admin, asignando todos los permisos')
+            return ['admin', 'dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'reportes', 'inventario', 'proveedores', 'categorias', 'compras', 'gastos']
+          }
+        }
+      } catch (authError) {
+        console.log('❌ Error en verificación de auth:', authError.message)
       }
 
-      return rolePermissions[empleado.rol] || []
+      // Si no se encuentra en ningún lado, dar permisos básicos
+      console.log('⚠️ Usuario no encontrado, asignando permisos básicos')
+      return ['dashboard']
+      
     } catch (error) {
-      console.error('Error obteniendo permisos:', error)
-      return []
+      console.error('❌ Error obteniendo permisos:', error)
+      // En caso de error, dar permisos básicos
+      return ['dashboard']
     }
   },
 
