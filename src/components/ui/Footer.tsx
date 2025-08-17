@@ -10,34 +10,19 @@ export const Footer: React.FC = () => {
       marginTop: 'auto',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'space-between',
+      justifyContent: 'center',
       fontSize: '0.875rem'
     }}>
-             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-         <img 
-           src="/logo-sistemas.png" 
-           alt="Sirius" 
-           style={{ 
-             height: '28px', 
-             width: 'auto',
-             filter: 'brightness(0) invert(1)',
-             objectFit: 'contain'
-           }} 
-         />
-         <span style={{ fontWeight: '600', color: '#e2e8f0', fontSize: '1rem' }}>
-           Sirius
-         </span>
-       </div>
-       
-               <div style={{ textAlign: 'center' }}>
-          <span>© 2025 Sirius - Todos los derechos reservados | Vercel Ready</span>
-        </div>
-      
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <span>Desarrollado por</span>
-        <span style={{ fontWeight: '600', color: '#e2e8f0', fontSize: '1rem' }}>
-          Sirius
-        </span>
+        <img 
+          src="/LOGO SISTEMAS.png" 
+          alt="Sirius" 
+          style={{ 
+            height: '40px', 
+            width: 'auto',
+            objectFit: 'contain'
+          }} 
+        />
       </div>
     </footer>
   )
