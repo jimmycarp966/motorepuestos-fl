@@ -53,12 +53,7 @@ export const Sidebar: React.FC = () => {
 
   // Lógica de permisos basada en permisos específicos del usuario
   const accessibleModules = menuItems.filter(item => {
-    // Para desarrollo, mostrar todos los módulos
-    if (import.meta.env.DEV) {
-      return true
-    }
-    
-    // Usar los permisos específicos asignados al usuario
+    // Usar los permisos específicos asignados al usuario (siempre)
     return user.permisos_modulos?.includes(item.id) || false
   })
 
@@ -66,8 +61,7 @@ export const Sidebar: React.FC = () => {
   logInfo('Módulos accesibles', { 
     total: accessibleModules.length, 
     modules: accessibleModules.map(m => m.id),
-    userRol: user.rol,
-    isDev: import.meta.env.DEV
+    userRol: user.rol
   })
 
   return (

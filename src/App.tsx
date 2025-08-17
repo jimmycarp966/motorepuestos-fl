@@ -59,11 +59,8 @@ function App() {
     performSystemCheck()
   }, [checkAuth])
 
-  // Log del estado actual (solo en desarrollo)
+  // Log del estado actual
   useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.log('🔄 App: Estado actualizado - loading:', loading, 'user:', user)
-    }
     setDebugInfo(prev => ({ ...prev, storeState: { loading, user } }))
   }, [loading, user])
 
@@ -135,9 +132,7 @@ function App() {
 
   // Debug: Mostrar información de estado
   if (process.env.NODE_ENV === 'development') {
-    if (import.meta.env.DEV) {
-      console.log('🎯 App: Renderizando con estado:', { loading, user, debugInfo })
-    }
+    console.log('🎯 App: Renderizando con estado:', { loading, user, debugInfo })
   }
 
   // Mostrar error de conexión si existe

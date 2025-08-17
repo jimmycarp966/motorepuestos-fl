@@ -66,8 +66,7 @@ export const DebugButton: React.FC = () => {
     URL.revokeObjectURL(url)
   }
 
-  // Solo mostrar en desarrollo
-  if (import.meta.env.PROD) return null
+  // Mostrar siempre para debugging
 
   return (
     <>

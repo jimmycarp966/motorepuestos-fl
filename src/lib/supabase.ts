@@ -12,15 +12,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Archivos .env disponibles:', import.meta.env)
   
   // Fallback para desarrollo
-  if (import.meta.env.DEV) {
-    console.warn('⚠️ Usando configuración de fallback para desarrollo')
-  } else {
-    throw new Error('Missing Supabase environment variables. Please check your .env file.')
-  }
+  console.warn('⚠️ Usando configuración de fallback para desarrollo')
 } else {
-  if (import.meta.env.DEV) {
-    console.log('✅ Supabase configurado correctamente')
-  }
+  console.log('✅ Supabase configurado correctamente')
 }
 
 // Configuración final con fallbacks

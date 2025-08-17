@@ -108,21 +108,19 @@ export const ConnectionError: React.FC<ConnectionErrorProps> = ({
           </button>
         </div>
         
-        {import.meta.env.MODE === 'development' && (
-          <div style={{
-            marginTop: '2rem',
-            padding: '1rem',
-            backgroundColor: 'rgba(0, 0, 0, 0.2)',
-            borderRadius: '8px',
-            fontSize: '0.875rem',
-            opacity: 0.8
-          }}>
-            <p><strong>Debug Info:</strong></p>
-            <p>VITE_SUPABASE_URL: {import.meta.env.VITE_SUPABASE_URL ? '✅' : '❌'}</p>
-            <p>VITE_SUPABASE_ANON_KEY: {import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅' : '❌'}</p>
-            <p>MODE: {import.meta.env.MODE}</p>
-          </div>
-        )}
+        <div style={{
+          marginTop: '2rem',
+          padding: '1rem',
+          backgroundColor: 'rgba(0, 0, 0, 0.2)',
+          borderRadius: '8px',
+          fontSize: '0.875rem',
+          opacity: 0.8
+        }}>
+          <p><strong>Debug Info:</strong></p>
+          <p>VITE_SUPABASE_URL: {import.meta.env.VITE_SUPABASE_URL ? '✅' : '❌'}</p>
+          <p>VITE_SUPABASE_ANON_KEY: {import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅' : '❌'}</p>
+          <p>MODE: {import.meta.env.MODE}</p>
+        </div>
       </div>
     </div>
   )
