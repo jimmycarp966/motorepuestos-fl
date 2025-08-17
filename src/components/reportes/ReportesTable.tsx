@@ -31,7 +31,7 @@ import {
 
 export const ReportesTable: React.FC = () => {
   const ventas = useAppStore((state) => state.ventas.ventas)
-  const productos = useAppStore((state) => state.productos.productos)
+  const productos = useAppStore((state) => state.productos)
   const clientes = useAppStore((state) => state.clientes.clientes)
   const movimientos = useAppStore((state) => state.caja.movimientos)
   const [periodo, setPeriodo] = useState<'dia' | 'semana' | 'mes'>('dia')

@@ -18,12 +18,12 @@ export { ClienteForm } from './clientes/ClienteForm'
 
 // Ventas
 export { VentasTable } from './ventas/VentasTable'
-export { VentaForm } from './ventas/VentaForm'
-export { VentaDetails } from './ventas/VentaDetails'
 
 // Caja
 export { CajaTable } from './caja/CajaTable'
 export { MovimientoForm } from './caja/MovimientoForm'
+export { AbrirCajaForm } from './caja/AbrirCajaForm'
+export { GastosForm } from './caja/GastosForm'
 
 // Reportes
 export { ReportesTable } from './reportes/ReportesTable'
@@ -35,5 +35,7 @@ export { Sidebar } from './layout/Sidebar'
 export { Button } from './ui/button'
 export { Card } from './ui/card'
 export { Input } from './ui/input'
+export { Textarea } from './ui/textarea'
 export { NotificationsContainer } from './ui/notifications'
 export { DebugButton } from './ui/DebugButton'
+export { DebugVentasCompleto } from './ui/DebugVentasCompleto'

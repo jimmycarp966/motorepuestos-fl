@@ -10,21 +10,50 @@ const initialState: ProductosState = {
 }
 
 export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'productos' | 'fetchProductos' | 'createProducto' | 'updateProducto' | 'deleteProducto'>> = (set, get) => ({
-  productos: initialState,
+  productos: initialState.productos,
+  loading: initialState.loading,
+  error: initialState.error,
 
   fetchProductos: async () => {
-    set((state) => ({ productos: { ...state.productos, loading: true, error: null } }))
+    console.log('🔍 [productosSlice] Iniciando fetchProductos...')
+    set((state) => ({ loading: true, error: null }))
     try {
-      const { data, error } = await supabase.from('productos').select('*').order('created_at', { ascending: false })
-      if (error) throw error
-      set((state) => ({ productos: { ...state.productos, productos: data || [], loading: false } }))
+      console.log('🔍 [productosSlice] Ejecutando consulta a Supabase...')
+      const { data, error } = await supabase
+        .from('productos')
+        .select('*')
+        .order('created_at', { ascending: false })
+      
+      console.log('🔍 [productosSlice] Respuesta de Supabase:', { data, error })
+      
+      if (error) {
+        console.error('❌ [productosSlice] Error de Supabase:', error)
+        throw error
+      }
+      
+      console.log('✅ [productosSlice] Productos obtenidos:', data?.length)
+      console.log('✅ [productosSlice] Primer producto:', data?.[0])
+      
+      set((state) => ({ 
+        productos: data || [], 
+        loading: false,
+        error: null 
+      }))
+      
+      console.log('✅ [productosSlice] Estado actualizado correctamente')
     } catch (error: any) {
-      set((state) => ({ productos: { ...state.productos, loading: false, error: error.message } }))
+      console.error('❌ [productosSlice] Error fetching productos:', error)
+      const errorMessage = error?.message || 'Error desconocido al cargar productos'
+      set((state) => ({ 
+        loading: false, 
+        error: errorMessage,
+        productos: [] 
+      }))
     }
   },
 
   createProducto: async (productoData: CreateProductoData) => {
-    set((state) => ({ productos: { ...state.productos, loading: true, error: null } }))
+    set((state) => ({ loading: true, error: null }))
     try {
       // Validar que el SKU sea único
       const { data: existingProduct } = await supabase
@@ -41,7 +70,7 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
       if (error) throw error
       
       // Actualizar estado local
-      set((state) => ({ productos: { ...state.productos, productos: [data, ...state.productos.productos], loading: false } }))
+      set((state) => ({ productos: [data, ...state.productos], loading: false }))
       
       // Notificar éxito
       get().addNotification({
@@ -52,7 +81,7 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
       })
       
     } catch (error: any) {
-      set((state) => ({ productos: { ...state.productos, loading: false, error: error.message } }))
+      set((state) => ({ loading: false, error: error.message }))
       
       // Notificar error
       get().addNotification({
@@ -65,24 +94,24 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
   },
 
   updateProducto: async (id: string, productoData: UpdateProductoData) => {
-    set((state) => ({ productos: { ...state.productos, loading: true, error: null } }))
+    set((state) => ({ loading: true, error: null }))
     try {
       const { data, error } = await supabase.from('productos').update(productoData).eq('id', id).select().single()
       if (error) throw error
-      set((state) => ({ productos: { ...state.productos, productos: state.productos.productos.map(p => p.id === id ? data : p), loading: false } }))
+      set((state) => ({ productos: state.productos.map(p => p.id === id ? data : p), loading: false }))
     } catch (error: any) {
-      set((state) => ({ productos: { ...state.productos, loading: false, error: error.message } }))
+      set((state) => ({ loading: false, error: error.message }))
     }
   },
 
   deleteProducto: async (id: string) => {
-    set((state) => ({ productos: { ...state.productos, loading: true, error: null } }))
+    set((state) => ({ loading: true, error: null }))
     try {
       const { error } = await supabase.from('productos').update({ activo: false }).eq('id', id)
       if (error) throw error
-      set((state) => ({ productos: { ...state.productos, productos: state.productos.productos.map(p => p.id === id ? { ...p, activo: false } : p), loading: false } }))
+      set((state) => ({ productos: state.productos.map(p => p.id === id ? { ...p, activo: false } : p), loading: false }))
     } catch (error: any) {
-      set((state) => ({ productos: { ...state.productos, loading: false, error: error.message } }))
+      set((state) => ({ loading: false, error: error.message }))
     }
   },
 })

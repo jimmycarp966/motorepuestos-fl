@@ -18,8 +18,8 @@ export const Dashboard: React.FC = () => {
   // Registrar componente para debug
   const { logError, logInfo } = useDebug({ componentName: 'Dashboard' })
   
-  const ventas = useAppStore((state) => state.ventas.ventas)
-  const productos = useAppStore((state) => state.productos.productos)
+  const ventas = useAppStore((state) => state.ventas)
+  const productos = useAppStore((state) => state.productos)
   const clientes = useAppStore((state) => state.clientes.clientes)
   const caja = useAppStore((state) => state.caja)
   const fetchVentas = useAppStore((state) => state.fetchVentas)
@@ -46,20 +46,20 @@ export const Dashboard: React.FC = () => {
   }, [fetchVentas, fetchMovimientos])
 
   // Calcular KPIs
-  const ventasHoy = ventas.filter(v => {
+  const ventasHoy = (ventas || []).filter(v => {
     const hoy = new Date().toDateString()
     return new Date(v.fecha).toDateString() === hoy
   })
   
   const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0)
-  const saldoCaja = caja.movimientos.reduce((sum, m) => sum + (m.monto || 0), 0)
-  const productosActivos = productos.filter(p => p.activo).length
-  const clientesActivos = clientes.filter(c => c.activo).length
+  const saldoCaja = (caja.movimientos || []).reduce((sum, m) => sum + (m.monto || 0), 0)
+  const productosActivos = (productos || []).filter(p => p.activo).length
+  const clientesActivos = (clientes || []).filter(c => c.activo).length
 
   // Obtener ventas de la semana pasada para comparación
   const unaSemanaAtras = new Date()
   unaSemanaAtras.setDate(unaSemanaAtras.getDate() - 7)
-  const ventasSemanaPasada = ventas.filter(v => new Date(v.fecha) >= unaSemanaAtras)
+  const ventasSemanaPasada = (ventas || []).filter(v => new Date(v.fecha) >= unaSemanaAtras)
   const totalVentasSemana = ventasSemanaPasada.reduce((sum, v) => sum + (v.total || 0), 0)
 
   const kpiCards = [
@@ -105,8 +105,8 @@ export const Dashboard: React.FC = () => {
     }
   ]
 
-  const recentVentas = ventas.slice(0, 5)
-  const recentMovimientos = caja.movimientos.slice(0, 5)
+  const recentVentas = (ventas || []).slice(0, 5)
+  const recentMovimientos = (caja.movimientos || []).slice(0, 5)
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -424,7 +424,7 @@ export const Dashboard: React.FC = () => {
               color: '#667eea',
               marginBottom: '0.5rem'
             }}>
-              {ventas.length}
+              {(ventas || []).length}
             </div>
             <div style={{ 
               fontSize: '0.875rem', 
@@ -472,7 +472,7 @@ export const Dashboard: React.FC = () => {
               color: '#f59e0b',
               marginBottom: '0.5rem'
             }}>
-              {productos.length}
+              {(productos || []).length}
             </div>
             <div style={{ 
               fontSize: '0.875rem', 
@@ -496,7 +496,7 @@ export const Dashboard: React.FC = () => {
               color: '#8b5cf6',
               marginBottom: '0.5rem'
             }}>
-              {clientes.length}
+              {(clientes || []).length}
             </div>
             <div style={{ 
               fontSize: '0.875rem', 

@@ -53,11 +53,13 @@ export interface AppStore {
   deleteEmpleado: (id: string) => Promise<void>
   createEmpleadoWithAuth: (empleado: CreateEmpleadoData) => Promise<void>
   updateEmpleadoWithAuth: (id: string, empleado: UpdateEmpleadoData) => Promise<void>
-  updateAdminPermissions: (email: string) => Promise<void>
+
   getEmpleadoPermissions: (rol: string) => string[]
 
   // Productos
-  productos: ProductosState
+  productos: Producto[]
+  productosLoading: boolean
+  productosError: string | null
   fetchProductos: () => Promise<void>
   createProducto: (producto: CreateProductoData) => Promise<void>
   updateProducto: (id: string, producto: UpdateProductoData) => Promise<void>
@@ -72,7 +74,9 @@ export interface AppStore {
   actualizarCuentaCorriente: (clienteId: string, monto: number, tipo: 'cargo' | 'pago') => Promise<void>
 
   // Ventas
-  ventas: VentasState
+  ventas: Venta[]
+  ventasLoading: boolean
+  ventasError: string | null
   fetchVentas: () => Promise<void>
   registrarVenta: (venta: CreateVentaData) => Promise<void>
 
@@ -142,11 +146,13 @@ export const useAppStore = create<AppStore>()((set, get) => {
     deleteEmpleado: empleados.deleteEmpleado,
     createEmpleadoWithAuth: empleados.createEmpleadoWithAuth,
     updateEmpleadoWithAuth: empleados.updateEmpleadoWithAuth,
-    updateAdminPermissions: empleados.updateAdminPermissions,
+
     getEmpleadoPermissions: empleados.getEmpleadoPermissions,
     
     // Productos slice
     productos: productos.productos,
+    productosLoading: productos.loading,
+    productosError: productos.error,
     fetchProductos: productos.fetchProductos,
     createProducto: productos.createProducto,
     updateProducto: productos.updateProducto,
@@ -162,6 +168,8 @@ export const useAppStore = create<AppStore>()((set, get) => {
     
     // Ventas slice
     ventas: ventas.ventas,
+    ventasLoading: ventas.loading,
+    ventasError: ventas.error,
     fetchVentas: ventas.fetchVentas,
     registrarVenta: ventas.registrarVenta,
     

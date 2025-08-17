@@ -1,33 +1,71 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAppStore } from '../../store'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
-import { Plus, DollarSign, TrendingUp, TrendingDown, Calendar, User, Lock, Unlock } from 'lucide-react'
+import { 
+  Plus, 
+  DollarSign, 
+  TrendingUp, 
+  TrendingDown, 
+  Calendar, 
+  User, 
+  Lock, 
+  Unlock,
+  Minus,
+  RefreshCw,
+  BarChart3,
+  ShoppingCart,
+  CreditCard,
+  Receipt
+} from 'lucide-react'
 import { MovimientoForm } from './MovimientoForm'
 import { AbrirCajaForm } from './AbrirCajaForm'
+import { GastosForm } from './GastosForm'
 
 export const CajaTable: React.FC = () => {
   const movimientos = useAppStore((state) => state.caja.movimientos)
   const saldo = useAppStore((state) => state.caja.saldo)
   const loading = useAppStore((state) => state.caja.loading)
   const cajaAbierta = useAppStore((state) => state.caja.cajaAbierta)
+  const ventas = useAppStore((state) => state.ventas)
+  const fetchMovimientos = useAppStore((state) => state.fetchMovimientos)
+  const fetchVentas = useAppStore((state) => state.fetchVentas)
+  const cerrarCaja = useAppStore((state) => state.cerrarCaja)
   const addNotification = useAppStore((state) => state.addNotification)
-  const [showForm, setShowForm] = useState(false)
+  
+  const [showIngresoForm, setShowIngresoForm] = useState(false)
   const [showAbrirCaja, setShowAbrirCaja] = useState(false)
+  const [showGastosForm, setShowGastosForm] = useState(false)
   const [tipoMovimiento, setTipoMovimiento] = useState<'ingreso' | 'egreso'>('ingreso')
 
+  // Cargar datos al montar
+  useEffect(() => {
+    fetchMovimientos()
+    fetchVentas()
+  }, [fetchMovimientos, fetchVentas])
+
+  // Refrescar datos cada 30 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchMovimientos()
+      fetchVentas()
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [fetchMovimientos, fetchVentas])
+
   const handleFormClose = () => {
-    setShowForm(false)
+    setShowIngresoForm(false)
   }
 
   const handleNuevoIngreso = () => {
     setTipoMovimiento('ingreso')
-    setShowForm(true)
+    setShowIngresoForm(true)
   }
 
   const handleNuevoEgreso = () => {
     setTipoMovimiento('egreso')
-    setShowForm(true)
+    setShowIngresoForm(true)
   }
 
   const handleAbrirCaja = () => {
@@ -38,64 +76,141 @@ export const CajaTable: React.FC = () => {
     setShowAbrirCaja(false)
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    )
+  const handleNuevoGasto = () => {
+    setShowGastosForm(true)
+  }
+
+  const handleCerrarGastosForm = () => {
+    setShowGastosForm(false)
+  }
+
+  const handleCerrarCaja = async () => {
+    try {
+      await cerrarCaja()
+      addNotification({
+        id: Date.now().toString(),
+        type: 'success',
+        title: 'Caja cerrada',
+        message: 'La caja ha sido cerrada exitosamente'
+      })
+    } catch (error: any) {
+      addNotification({
+        id: Date.now().toString(),
+        type: 'error',
+        title: 'Error al cerrar caja',
+        message: error.message || 'Ocurrió un error inesperado'
+      })
+    }
+  }
+
+  const handleRefresh = () => {
+    fetchMovimientos()
+    fetchVentas()
+  }
+
+  // Calcular estadísticas
+  const movimientosHoy = movimientos.filter(m => {
+    const hoy = new Date().toDateString()
+    return new Date(m.fecha).toDateString() === hoy
+  })
+
+  const ingresosHoy = movimientosHoy
+    .filter(m => m.tipo === 'ingreso')
+    .reduce((sum, m) => sum + m.monto, 0)
+
+  const egresosHoy = movimientosHoy
+    .filter(m => m.tipo === 'egreso')
+    .reduce((sum, m) => sum + m.monto, 0)
+
+  // Calcular estadísticas de ventas
+  const ventasHoy = (ventas || []).filter(v => {
+    const hoy = new Date().toDateString()
+    return new Date(v.fecha).toDateString() === hoy
+  })
+
+  const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0)
+  const ventasPorMetodo = ventasHoy.reduce((acc, v) => {
+    const metodo = v.metodo_pago || 'efectivo'
+    acc[metodo] = (acc[metodo] || 0) + (v.total || 0)
+    return acc
+  }, {} as Record<string, number>)
+
+  // Obtener icono para método de pago
+  const getMetodoPagoIcon = (metodo: string) => {
+    switch (metodo) {
+      case 'efectivo': return <DollarSign className="w-4 h-4" />
+      case 'tarjeta': return <CreditCard className="w-4 h-4" />
+      case 'transferencia': return <DollarSign className="w-4 h-4" />
+      case 'cuenta_corriente': return <Receipt className="w-4 h-4" />
+      default: return <DollarSign className="w-4 h-4" />
+    }
+  }
+
+  // Obtener color para método de pago
+  const getMetodoPagoColor = (metodo: string) => {
+    switch (metodo) {
+      case 'efectivo': return 'text-green-600 bg-green-100'
+      case 'tarjeta': return 'text-blue-600 bg-blue-100'
+      case 'transferencia': return 'text-purple-600 bg-purple-100'
+      case 'cuenta_corriente': return 'text-orange-600 bg-orange-100'
+      default: return 'text-gray-600 bg-gray-100'
+    }
   }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Caja</h1>
-          <p className="text-gray-600">Gestiona los movimientos de caja</p>
+          <p className="text-gray-600">Gestión de efectivo y movimientos</p>
         </div>
-        <div className="flex space-x-3">
-          {!cajaAbierta ? (
+        <div className="flex gap-2">
+          <Button
+            onClick={handleRefresh}
+            variant="outline"
+            size="sm"
+            disabled={loading}
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Actualizar
+          </Button>
+          {cajaAbierta ? (
+            <Button
+              onClick={handleCerrarCaja}
+              variant="outline"
+              size="sm"
+              className="text-red-600 border-red-200 hover:bg-red-50"
+            >
+              <Lock className="w-4 h-4 mr-2" />
+              Cerrar Caja
+            </Button>
+          ) : (
             <Button
               onClick={handleAbrirCaja}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+              size="sm"
+              className="bg-green-600 hover:bg-green-700"
             >
               <Unlock className="w-4 h-4 mr-2" />
               Abrir Caja
             </Button>
-          ) : (
-            <>
-              <Button
-                onClick={handleNuevoIngreso}
-                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Nuevo Ingreso
-              </Button>
-              <Button
-                onClick={handleNuevoEgreso}
-                className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Nuevo Egreso
-              </Button>
-            </>
           )}
         </div>
       </div>
 
-      {/* Resumen de saldo */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Estado de Caja */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center">
                 <DollarSign className="w-5 h-5 text-white" />
               </div>
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Saldo Actual</p>
-              <p className={`text-2xl font-bold ${saldo >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                ${saldo.toFixed(2)}
+              <p className="text-2xl font-bold text-gray-900">
+                ${saldo.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
               </p>
             </div>
           </div>
@@ -109,12 +224,9 @@ export const CajaTable: React.FC = () => {
               </div>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Ingresos del Día</p>
+              <p className="text-sm font-medium text-gray-500">Ingresos Hoy</p>
               <p className="text-2xl font-bold text-green-600">
-                ${movimientos
-                  .filter(m => m.tipo === 'ingreso' && new Date(m.fecha).toDateString() === new Date().toDateString())
-                  .reduce((sum, m) => sum + m.monto, 0)
-                  .toFixed(2)}
+                ${ingresosHoy.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
               </p>
             </div>
           </div>
@@ -128,17 +240,106 @@ export const CajaTable: React.FC = () => {
               </div>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Egresos del Día</p>
+              <p className="text-sm font-medium text-gray-500">Egresos Hoy</p>
               <p className="text-2xl font-bold text-red-600">
-                ${movimientos
-                  .filter(m => m.tipo === 'egreso' && new Date(m.fecha).toDateString() === new Date().toDateString())
-                  .reduce((sum, m) => sum + m.monto, 0)
-                  .toFixed(2)}
+                ${egresosHoy.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+                <ShoppingCart className="w-5 h-5 text-white" />
+              </div>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">Ventas Hoy</p>
+              <p className="text-2xl font-bold text-blue-600">
+                ${totalVentasHoy.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
               </p>
             </div>
           </div>
         </Card>
       </div>
+
+      {/* Ventas por Método de Pago */}
+      {ventasHoy.length > 0 && (
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium text-gray-900">Ventas por Método de Pago (Hoy)</h3>
+            <span className="text-sm text-gray-500">{ventasHoy.length} ventas</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {Object.entries(ventasPorMetodo).map(([metodo, total]) => (
+              <div key={metodo} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                <div className="flex-shrink-0 mr-3">
+                  {getMetodoPagoIcon(metodo)}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900 capitalize">
+                    {metodo.replace('_', ' ')}
+                  </p>
+                  <p className="text-lg font-bold text-green-600">
+                    ${total.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Botones de Acción */}
+      {cajaAbierta && (
+        <Card className="p-4">
+          <div className="flex flex-wrap gap-3">
+            <Button
+              onClick={handleNuevoIngreso}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo Ingreso
+            </Button>
+            <Button
+              onClick={handleNuevoGasto}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              <Minus className="w-4 h-4 mr-2" />
+              Nuevo Gasto
+            </Button>
+            <Button
+              onClick={handleNuevoEgreso}
+              variant="outline"
+            >
+              <TrendingDown className="w-4 h-4 mr-2" />
+              Otro Egreso
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* Estado de Caja */}
+      {!cajaAbierta && (
+        <Card className="p-6">
+          <div className="text-center">
+            <Lock className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Caja Cerrada</h3>
+            <p className="text-gray-500 mb-4">
+              Para realizar movimientos, primero debes abrir la caja
+            </p>
+            <Button
+              onClick={handleAbrirCaja}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Unlock className="w-4 h-4 mr-2" />
+              Abrir Caja
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* Tabla de movimientos */}
       <Card className="overflow-hidden">
@@ -146,9 +347,12 @@ export const CajaTable: React.FC = () => {
           <h3 className="text-lg font-medium">Movimientos Recientes</h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Fecha
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tipo
                 </th>
@@ -161,64 +365,168 @@ export const CajaTable: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Empleado
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Fecha
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {movimientos.map((movimiento) => (
-                <tr key={movimiento.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      movimiento.tipo === 'ingreso' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {movimiento.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{movimiento.concepto}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`text-sm font-medium ${
-                      movimiento.tipo === 'ingreso' ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {movimiento.tipo === 'ingreso' ? '+' : '-'}${movimiento.monto.toFixed(2)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <User className="w-4 h-4 mr-2 text-gray-400" />
-                      <span className="text-sm text-gray-900">{movimiento.empleado?.nombre}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                      <span className="text-sm text-gray-900">
-                        {new Date(movimiento.fecha).toLocaleDateString()}
-                      </span>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <div className="flex items-center justify-center">
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Cargando movimientos...
                     </div>
                   </td>
                 </tr>
-              ))}
+              ) : movimientos.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    No hay movimientos registrados
+                  </td>
+                </tr>
+              ) : (
+                movimientos.map((movimiento) => (
+                  <tr key={movimiento.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+                        {new Date(movimiento.fecha).toLocaleDateString('es-ES', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        movimiento.tipo === 'ingreso' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {movimiento.tipo === 'ingreso' ? (
+                          <TrendingUp className="w-3 h-3 mr-1" />
+                        ) : (
+                          <TrendingDown className="w-3 h-3 mr-1" />
+                        )}
+                        {movimiento.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {movimiento.concepto}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <span className={movimiento.tipo === 'ingreso' ? 'text-green-600' : 'text-red-600'}>
+                        {movimiento.tipo === 'ingreso' ? '+' : '-'}${movimiento.monto.toFixed(2)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <div className="flex items-center">
+                        <User className="w-4 h-4 mr-2 text-gray-400" />
+                        {movimiento.empleado?.nombre || 'N/A'}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </Card>
 
-      {showForm && (
+      {/* Tabla de ventas recientes */}
+      {ventasHoy.length > 0 && (
+        <Card className="overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-medium">Ventas Recientes (Hoy)</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Hora
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Método de Pago
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Empleado
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {ventasHoy.slice(0, 10).map((venta) => (
+                  <tr key={venta.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+                        {new Date(venta.fecha).toLocaleTimeString('es-ES', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getMetodoPagoColor(venta.metodo_pago || 'efectivo')}`}>
+                        {getMetodoPagoIcon(venta.metodo_pago || 'efectivo')}
+                        <span className="ml-1 capitalize">
+                          {(venta.metodo_pago || 'efectivo').replace('_', ' ')}
+                        </span>
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                      ${(venta.total || 0).toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <div className="flex items-center">
+                        <User className="w-4 h-4 mr-2 text-gray-400" />
+                        {venta.empleado?.nombre || 'N/A'}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+
+      {/* Modales */}
+      {showIngresoForm && (
         <MovimientoForm
-          tipo={tipoMovimiento}
+          isOpen={showIngresoForm}
           onClose={handleFormClose}
+          tipo={tipoMovimiento}
+          onSuccess={() => {
+            handleFormClose()
+            fetchMovimientos()
+          }}
         />
       )}
 
       {showAbrirCaja && (
         <AbrirCajaForm
+          isOpen={showAbrirCaja}
           onClose={handleCerrarAbrirCaja}
+          onSuccess={() => {
+            handleCerrarAbrirCaja()
+            fetchMovimientos()
+          }}
+        />
+      )}
+
+      {showGastosForm && (
+        <GastosForm
+          isOpen={showGastosForm}
+          onClose={handleCerrarGastosForm}
+          onSuccess={() => {
+            handleCerrarGastosForm()
+            fetchMovimientos()
+          }}
         />
       )}
     </div>

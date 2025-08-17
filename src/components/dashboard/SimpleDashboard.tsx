@@ -3,7 +3,7 @@ import { useAppStore } from '../../store'
 
 export const SimpleDashboard: React.FC = () => {
   const ventas = useAppStore((state) => state.ventas.ventas)
-  const productos = useAppStore((state) => state.productos.productos)
+  const productos = useAppStore((state) => state.productos)
   const clientes = useAppStore((state) => state.clientes.clientes)
   const caja = useAppStore((state) => state.caja)
   const fetchVentas = useAppStore((state) => state.fetchVentas)
@@ -27,166 +27,101 @@ export const SimpleDashboard: React.FC = () => {
   })
 
   const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + v.total, 0)
-  const productosStockBajo = productos.filter(p => p.stock < 10)
+  const productosStockBajo = (productos || []).filter(p => p.stock < 10)
   const clientesActivos = clientes.filter(c => c.activo)
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'Arial, sans-serif' }}>
-      <h1 style={{ 
-        fontSize: '2rem', 
-        fontWeight: 'bold', 
-        color: '#333',
-        marginBottom: '2rem',
-        textAlign: 'center'
-      }}>
-        Dashboard - Motorepuestos F.L.
+    <div style={{ padding: '1rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <h1 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1rem' }}>
+        Dashboard Simple
       </h1>
       
-      {/* KPIs */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '2rem'
-      }}>
-        <div style={{
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          padding: '1.5rem',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          border: '1px solid #e0e0e0'
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        <div style={{ 
+          backgroundColor: 'white', 
+          padding: '1rem', 
+          borderRadius: '0.5rem', 
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #e2e8f0'
         }}>
-          <h3 style={{ fontSize: '1rem', color: '#666', marginBottom: '0.5rem' }}>Ventas Hoy</h3>
-          <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#333' }}>
+          <div style={{ fontSize: '0.875rem', color: '#666', marginBottom: '0.5rem' }}>
+            Ventas Hoy
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: '600', color: '#667eea' }}>
             ${totalVentasHoy.toFixed(2)}
           </div>
-          <p style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.25rem' }}>
-            {ventasHoy.length} ventas realizadas
-          </p>
         </div>
 
-        <div style={{
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          padding: '1.5rem',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          border: '1px solid #e0e0e0'
+        <div style={{ 
+          backgroundColor: 'white', 
+          padding: '1rem', 
+          borderRadius: '0.5rem', 
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #e2e8f0'
         }}>
-          <h3 style={{ fontSize: '1rem', color: '#666', marginBottom: '0.5rem' }}>Saldo Caja</h3>
-          <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#333' }}>
-            ${caja.saldo.toFixed(2)}
+          <div style={{ fontSize: '0.875rem', color: '#666', marginBottom: '0.5rem' }}>
+            Productos Stock Bajo
           </div>
-          <p style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.25rem' }}>
-            Balance actual
-          </p>
-        </div>
-
-        <div style={{
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          padding: '1.5rem',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          border: '1px solid #e0e0e0'
-        }}>
-          <h3 style={{ fontSize: '1rem', color: '#666', marginBottom: '0.5rem' }}>Productos Stock Bajo</h3>
-          <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#333' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: '600', color: '#f59e0b' }}>
             {productosStockBajo.length}
           </div>
-          <p style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.25rem' }}>
-            Menos de 10 unidades
-          </p>
         </div>
 
-        <div style={{
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          padding: '1.5rem',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          border: '1px solid #e0e0e0'
+        <div style={{ 
+          backgroundColor: 'white', 
+          padding: '1rem', 
+          borderRadius: '0.5rem', 
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #e2e8f0'
         }}>
-          <h3 style={{ fontSize: '1rem', color: '#666', marginBottom: '0.5rem' }}>Clientes Activos</h3>
-          <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#333' }}>
+          <div style={{ fontSize: '0.875rem', color: '#666', marginBottom: '0.5rem' }}>
+            Clientes Activos
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: '600', color: '#10b981' }}>
             {clientesActivos.length}
           </div>
-          <p style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.25rem' }}>
-            Total de clientes
-          </p>
         </div>
       </div>
 
-      {/* Información de datos */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        padding: '1.5rem',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        border: '1px solid #e0e0e0'
+      <div style={{ 
+        backgroundColor: 'white', 
+        padding: '1rem', 
+        borderRadius: '0.5rem', 
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        border: '1px solid #e2e8f0'
       }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#333', marginBottom: '1rem' }}>
-          Información del Sistema
+        <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>
+          Resumen de Datos
         </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
           <div>
             <strong>Total Ventas:</strong> {ventas.length}
           </div>
           <div>
-            <strong>Total Productos:</strong> {productos.length}
+            <strong>Total Productos:</strong> {(productos || []).length}
           </div>
           <div>
             <strong>Total Clientes:</strong> {clientes.length}
           </div>
           <div>
-            <strong>Movimientos Caja:</strong> {caja.movimientos.length}
+            <strong>Total Movimientos:</strong> {caja.movimientos.length}
           </div>
         </div>
       </div>
 
-      {/* Productos con stock bajo */}
-      {productosStockBajo.length > 0 && (
-        <div style={{
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          padding: '1.5rem',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          border: '1px solid #e0e0e0',
-          marginTop: '1.5rem'
-        }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#333', marginBottom: '1rem' }}>
-            Productos con Stock Bajo
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {productosStockBajo.slice(0, 5).map((producto) => (
-              <div key={producto.id} style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '0.75rem',
-                backgroundColor: '#fff5f5',
-                borderRadius: '4px',
-                border: '1px solid #fed7d7'
-              }}>
-                <span style={{ fontWeight: '500', color: '#333' }}>{producto.nombre}</span>
-                <span style={{ color: '#e53e3e', fontWeight: 'bold' }}>{producto.stock} unidades</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Debug info */}
-      <div style={{
-        backgroundColor: '#f7fafc',
-        borderRadius: '8px',
-        padding: '1rem',
-        marginTop: '1.5rem',
+      <div style={{ 
+        backgroundColor: '#f8fafc', 
+        padding: '1rem', 
+        borderRadius: '0.5rem', 
+        marginTop: '1rem',
         border: '1px solid #e2e8f0'
       }}>
-        <h4 style={{ fontSize: '1rem', fontWeight: 'bold', color: '#333', marginBottom: '0.5rem' }}>
-          Debug Info
-        </h4>
+        <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem' }}>
+          Estado de Carga
+        </h3>
         <div style={{ fontSize: '0.875rem', color: '#666' }}>
           <div>Ventas cargadas: {ventas.length}</div>
-          <div>Productos cargados: {productos.length}</div>
+          <div>Productos cargados: {(productos || []).length}</div>
           <div>Clientes cargados: {clientes.length}</div>
           <div>Movimientos cargados: {caja.movimientos.length}</div>
         </div>

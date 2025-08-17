@@ -14,6 +14,8 @@ const productoSchema = z.object({
   codigo_sku: z.string().min(1, 'El código SKU es requerido'),
   precio_minorista: z.number().min(0, 'El precio minorista debe ser mayor a 0'),
   precio_mayorista: z.number().min(0, 'El precio mayorista debe ser mayor a 0'),
+  costo: z.number().min(0, 'El costo debe ser mayor o igual a 0'),
+  stock_minimo: z.number().min(0, 'El stock mínimo debe ser mayor o igual a 0'),
   stock: z.number().min(0, 'El stock debe ser mayor o igual a 0'),
   categoria: z.string().min(1, 'La categoría es requerida'),
   unidad_medida: z.string().min(1, 'La unidad de medida es requerida'),
@@ -41,14 +43,22 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
     defaultValues: producto ? {
       nombre: producto.nombre,
       descripcion: producto.descripcion || '',
-      precio: producto.precio,
-      stock: producto.stock,
-      categoria: producto.categoria,
-      unidad_medida: producto.unidad_medida,
+      codigo_sku: producto.codigo_sku || '',
+      precio_minorista: producto.precio_minorista || 0,
+      precio_mayorista: producto.precio_mayorista || 0,
+      costo: producto.costo || 0,
+      stock_minimo: producto.stock_minimo || 0,
+      stock: producto.stock || 0,
+      categoria: producto.categoria || '',
+      unidad_medida: producto.unidad_medida || '',
     } : {
       nombre: '',
       descripcion: '',
-      precio: 0,
+      codigo_sku: '',
+      precio_minorista: 0,
+      precio_mayorista: 0,
+      costo: 0,
+      stock_minimo: 0,
       stock: 0,
       categoria: '',
       unidad_medida: '',
@@ -165,8 +175,8 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
                />
              </div>
 
-                         {/* Campos Precios */}
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         {/* Campos Precios y Costo */}
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                <div className="space-y-2">
                  <label className="block text-sm font-semibold text-gray-700">
                    💰 Precio Minorista *
@@ -214,6 +224,51 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
                    </p>
                  )}
                </div>
+
+               <div className="space-y-2">
+                 <label className="block text-sm font-semibold text-gray-700">
+                   💸 Costo *
+                 </label>
+                 <div className="relative">
+                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                   <Input
+                     type="number"
+                     step="0.01"
+                     {...register('costo', { valueAsNumber: true })}
+                     placeholder="0.00"
+                     className={`w-full pl-8 pr-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                       errors.costo ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                     }`}
+                   />
+                 </div>
+                 {errors.costo && (
+                   <p className="text-red-500 text-sm flex items-center mt-1">
+                     <span className="mr-1">⚠️</span>
+                     {errors.costo.message}
+                   </p>
+                 )}
+               </div>
+             </div>
+
+             {/* Campo Stock Mínimo */}
+             <div className="space-y-2">
+               <label className="block text-sm font-semibold text-gray-700">
+                 ⚠️ Stock Mínimo *
+               </label>
+               <Input
+                 type="number"
+                 {...register('stock_minimo', { valueAsNumber: true })}
+                 placeholder="0"
+                 className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                   errors.stock_minimo ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                 }`}
+               />
+               {errors.stock_minimo && (
+                 <p className="text-red-500 text-sm flex items-center mt-1">
+                   <span className="mr-1">⚠️</span>
+                   {errors.stock_minimo.message}
+                 </p>
+               )}
              </div>
 
              {/* Campo Stock */}

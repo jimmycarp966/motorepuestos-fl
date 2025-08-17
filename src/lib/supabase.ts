@@ -22,11 +22,29 @@ const finalUrl = supabaseUrl || 'https://hsajhnxtlgfpkpzcrjyb.supabase.co'
 const finalKey = supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzYWpobnh0bGdmcGtwemNyanliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyNTc2NDUsImV4cCI6MjA3MDgzMzY0NX0.QAe7NTVEervkqmq2zFvCsABFulvEM2Q0UgZ4EntMoj4'
 
 // Cliente principal con anon key (para operaciones normales)
-export const supabase = createClient(finalUrl, finalKey)
+export const supabase = createClient(finalUrl, finalKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+})
 
 // Cliente con service role key para operaciones de administrador
 const serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzYWpobnh0bGdmcGtwemNyanliIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTI1NzY0NSwiZXhwIjoyMDcwODMzNjQ1fQ.Z_KzATN2NK9cvxAJMokNjtwhN1VWAUQH6Ezl_2-zFiU'
 export const supabaseAdmin = createClient(finalUrl, serviceRoleKey)
+
+// Función para verificar el estado de autenticación
+export async function checkAuthStatus() {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession()
+    console.log('🔍 [supabase] Estado de sesión:', { session: !!session, error })
+    return { session, error }
+  } catch (error) {
+    console.error('❌ [supabase] Error verificando sesión:', error)
+    return { session: null, error }
+  }
+}
 
 // Tipos para las tablas de Supabase
 export interface Database {
@@ -66,8 +84,12 @@ export interface Database {
           id: string
           nombre: string
           descripcion: string | null
-          precio: number
+          codigo_sku: string
+          precio_minorista: number
+          precio_mayorista: number
+          costo: number
           stock: number
+          stock_minimo: number
           categoria: string
           unidad_medida: string
           activo: boolean
@@ -78,8 +100,12 @@ export interface Database {
           id?: string
           nombre: string
           descripcion?: string | null
-          precio: number
+          codigo_sku: string
+          precio_minorista: number
+          precio_mayorista: number
+          costo: number
           stock?: number
+          stock_minimo?: number
           categoria: string
           unidad_medida: string
           activo?: boolean
@@ -90,8 +116,12 @@ export interface Database {
           id?: string
           nombre?: string
           descripcion?: string | null
-          precio?: number
+          codigo_sku?: string
+          precio_minorista?: number
+          precio_mayorista?: number
+          costo?: number
           stock?: number
+          stock_minimo?: number
           categoria?: string
           unidad_medida?: string
           activo?: boolean
@@ -137,24 +167,36 @@ export interface Database {
           cliente_id: string | null
           empleado_id: string
           total: number
+          metodo_pago: string
+          tipo_precio: string
+          estado: string
           fecha: string
           created_at: string
+          updated_at: string
         }
         Insert: {
           id?: string
           cliente_id?: string | null
           empleado_id: string
           total: number
+          metodo_pago?: string
+          tipo_precio?: string
+          estado?: string
           fecha?: string
           created_at?: string
+          updated_at?: string
         }
         Update: {
           id?: string
           cliente_id?: string | null
           empleado_id?: string
           total?: number
+          metodo_pago?: string
+          tipo_precio?: string
+          estado?: string
           fecha?: string
           created_at?: string
+          updated_at?: string
         }
       }
       venta_items: {
@@ -165,6 +207,8 @@ export interface Database {
           cantidad: number
           precio_unitario: number
           subtotal: number
+          tipo_precio: string
+          created_at: string
         }
         Insert: {
           id?: string
@@ -173,6 +217,8 @@ export interface Database {
           cantidad: number
           precio_unitario: number
           subtotal: number
+          tipo_precio?: string
+          created_at?: string
         }
         Update: {
           id?: string
@@ -181,9 +227,11 @@ export interface Database {
           cantidad?: number
           precio_unitario?: number
           subtotal?: number
+          tipo_precio?: string
+          created_at?: string
         }
       }
-      caja_movimientos: {
+      movimientos_caja: {
         Row: {
           id: string
           tipo: 'ingreso' | 'egreso'

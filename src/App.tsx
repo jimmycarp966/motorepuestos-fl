@@ -14,6 +14,8 @@ import { Calendario } from './components/calendario/Calendario'
 import { NotificationsContainer } from './components/ui/notifications'
 import { ConnectionError } from './components/ui/ConnectionError'
 import { DebugButton } from './components/ui/DebugButton'
+import { DebugVentasSimple } from './components/ui/DebugVentasSimple'
+import { DebugVentasCompleto } from './components/ui/DebugVentasCompleto'
 
 function App() {
   const user = useAppStore((state) => state.auth.user)
@@ -108,24 +110,37 @@ function App() {
 
   // Renderizar módulo correspondiente
   const renderModule = () => {
+    console.log('🎯 [App] Renderizando módulo:', currentModule)
+    
     switch (currentModule) {
       case 'dashboard':
+        console.log('🎯 [App] Renderizando Dashboard')
         return <Dashboard />
       case 'empleados':
+        console.log('🎯 [App] Renderizando EmpleadosTable')
         return <EmpleadosTable />
       case 'productos':
+        console.log('🎯 [App] Renderizando ProductosTable')
         return <ProductosTable />
       case 'clientes':
+        console.log('🎯 [App] Renderizando ClientesTable')
         return <ClientesTable />
       case 'ventas':
-        return <VentasTable />
+        console.log('🎯 [App] Renderizando VentasTable - INICIO')
+        const ventasComponent = <VentasTable />
+        console.log('🎯 [App] VentasTable creado:', ventasComponent)
+        return ventasComponent
       case 'caja':
+        console.log('🎯 [App] Renderizando CajaTable')
         return <CajaTable />
       case 'calendario':
+        console.log('🎯 [App] Renderizando Calendario')
         return <Calendario />
       case 'reportes':
+        console.log('🎯 [App] Renderizando ReportesTable')
         return <ReportesTable />
       default:
+        console.log('🎯 [App] Renderizando Dashboard (default)')
         return <Dashboard />
     }
   }
@@ -291,6 +306,14 @@ function App() {
           </div>
         </div>
       </main>
+      {/* Botón de debug */}
+      <DebugButton />
+      
+      {/* Debug de ventas */}
+      <DebugVentasSimple />
+      
+      {/* Debug completo de ventas */}
+      <DebugVentasCompleto />
     </div>
   )
 }

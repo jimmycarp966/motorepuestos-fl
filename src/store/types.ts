@@ -55,7 +55,9 @@ export interface Producto {
   codigo_sku: string
   precio_minorista: number
   precio_mayorista: number
+  costo: number
   stock: number
+  stock_minimo: number
   categoria: string
   unidad_medida: string
   activo: boolean
@@ -69,7 +71,9 @@ export interface CreateProductoData {
   codigo_sku: string
   precio_minorista: number
   precio_mayorista: number
+  costo: number
   stock: number
+  stock_minimo: number
   categoria: string
   unidad_medida: string
 }
@@ -80,7 +84,9 @@ export interface UpdateProductoData {
   codigo_sku?: string
   precio_minorista?: number
   precio_mayorista?: number
+  costo?: number
   stock?: number
+  stock_minimo?: number
   categoria?: string
   unidad_medida?: string
   activo?: boolean
@@ -122,6 +128,7 @@ export interface VentaItem {
   cantidad: number
   precio_unitario: number
   subtotal: number
+  tipo_precio: 'minorista' | 'mayorista'
   producto?: Producto
 }
 
@@ -131,6 +138,8 @@ export interface Venta {
   empleado_id: string
   total: number
   fecha: string
+  metodo_pago: 'efectivo' | 'tarjeta' | 'transferencia' | 'cuenta_corriente'
+  tipo_precio: 'minorista' | 'mayorista'
   created_at: string
   cliente?: Cliente
   empleado?: Empleado
@@ -138,11 +147,15 @@ export interface Venta {
 }
 
 export interface CreateVentaData {
-  cliente_id?: string
-  tipo_precio: 'minorista' | 'mayorista'
+  cliente_id?: string | null
+  metodo_pago: 'efectivo' | 'tarjeta' | 'transferencia' | 'cuenta_corriente'
+  tipo_precio?: 'minorista' | 'mayorista'
   items: Array<{
     producto_id: string
     cantidad: number
+    precio_unitario: number
+    subtotal: number
+    tipo_precio: 'minorista' | 'mayorista'
   }>
 }
 

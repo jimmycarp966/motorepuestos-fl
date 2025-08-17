@@ -53,18 +53,24 @@ export const MODULOS_DISPONIBLES: PermisosModulo[] = [
     nombre: 'Calendario',
     descripcion: 'Eventos y programación',
     roles_permitidos: ['Administrador', 'Gerente', 'Vendedor', 'Técnico', 'Almacén', 'Cajero']
+  },
+  {
+    modulo: 'reportes',
+    nombre: 'Reportes',
+    descripcion: 'Reportes y estadísticas del sistema',
+    roles_permitidos: ['Administrador', 'Gerente']
   }
 ]
 
 // Mapeo de roles a permisos de acceso (legacy - mantener para compatibilidad)
 export const ROLES_PERMISSIONS = {
   Administrador: {
-    canAccess: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'],
-    canManage: ['empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'],
+    canAccess: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario', 'reportes'],
+    canManage: ['empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario', 'reportes'],
   },
   Gerente: {
-    canAccess: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'],
-    canManage: ['productos', 'clientes', 'ventas', 'caja', 'calendario'],
+    canAccess: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario', 'reportes'],
+    canManage: ['productos', 'clientes', 'ventas', 'caja', 'calendario', 'reportes'],
   },
   Vendedor: {
     canAccess: ['dashboard', 'ventas', 'clientes', 'calendario'],
@@ -340,6 +346,8 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
       .filter(modulo => modulo.roles_permitidos.includes(rol))
       .map(modulo => modulo.modulo)
   },
+
+
 
   // Crear nuevo empleado (legacy - mantener para compatibilidad)
   createEmpleado: async (empleadoData: CreateEmpleadoData) => {

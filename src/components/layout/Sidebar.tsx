@@ -45,8 +45,14 @@ export const Sidebar: React.FC = () => {
   }
 
   const handleMenuClick = (moduleId: string) => {
+    console.log('🔍 [Sidebar] Click en módulo:', moduleId)
+    console.log('🔍 [Sidebar] Módulo actual:', currentModule)
+    console.log('🔍 [Sidebar] Cambiando de', currentModule, 'a', moduleId)
+    
     logInfo('Cambiando módulo', { from: currentModule, to: moduleId })
     setCurrentModule(moduleId)
+    
+    console.log('🔍 [Sidebar] setCurrentModule ejecutado')
   }
 
   if (!user) return null

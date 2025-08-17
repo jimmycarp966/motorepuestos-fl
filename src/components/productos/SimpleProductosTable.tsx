@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useAppStore } from '../../store'
 
 export const SimpleProductosTable: React.FC = () => {
-  const productos = useAppStore((state) => state.productos.productos)
+  const productos = useAppStore((state) => state.productos)
   const loading = useAppStore((state) => state.productos.loading)
   const fetchProductos = useAppStore((state) => state.fetchProductos)
 

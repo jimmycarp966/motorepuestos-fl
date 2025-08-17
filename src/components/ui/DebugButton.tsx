@@ -67,7 +67,6 @@ export const DebugButton: React.FC = () => {
   }
 
   // Mostrar siempre para debugging
-
   return (
     <>
       {/* Botón flotante */}
@@ -180,70 +179,70 @@ export const DebugButton: React.FC = () => {
             </div>
 
             {/* Contenido */}
-                         <div style={{ fontSize: '14px', lineHeight: '1.5' }}>
-               <div style={{ marginBottom: '16px' }}>
-                 <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600', color: '#1f2937' }}>
-                   👤 User Info
-                 </h3>
-                 <pre style={{
-                   background: '#1e293b',
-                   color: '#e2e8f0',
-                   padding: '12px',
-                   borderRadius: '6px',
-                   overflow: 'auto',
-                   fontSize: '12px',
-                   margin: 0,
-                   border: '1px solid #334155'
-                 }}>
-                   {JSON.stringify(user, null, 2)}
-                 </pre>
-               </div>
+            <div style={{ fontSize: '14px', lineHeight: '1.5' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600', color: '#1f2937' }}>
+                  👤 User Info
+                </h3>
+                <pre style={{
+                  background: '#1e293b',
+                  color: '#e2e8f0',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  overflow: 'auto',
+                  fontSize: '12px',
+                  margin: 0,
+                  border: '1px solid #334155'
+                }}>
+                  {JSON.stringify(user, null, 2)}
+                </pre>
+              </div>
 
-               <div style={{ marginBottom: '16px' }}>
-                 <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600', color: '#1f2937' }}>
-                   🏪 Store State
-                 </h3>
-                 <pre style={{
-                   background: '#1e293b',
-                   color: '#e2e8f0',
-                   padding: '12px',
-                   borderRadius: '6px',
-                   overflow: 'auto',
-                   fontSize: '12px',
-                   margin: 0,
-                   border: '1px solid #334155'
-                 }}>
-                   {JSON.stringify({
-                     currentModule,
-                     authLoading,
-                     authError
-                   }, null, 2)}
-                 </pre>
-               </div>
+              <div style={{ marginBottom: '16px' }}>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600', color: '#1f2937' }}>
+                  🏪 Store State
+                </h3>
+                <pre style={{
+                  background: '#1e293b',
+                  color: '#e2e8f0',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  overflow: 'auto',
+                  fontSize: '12px',
+                  margin: 0,
+                  border: '1px solid #334155'
+                }}>
+                  {JSON.stringify({
+                    currentModule,
+                    authLoading,
+                    authError
+                  }, null, 2)}
+                </pre>
+              </div>
 
-               <div style={{ marginBottom: '16px' }}>
-                 <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600', color: '#1f2937' }}>
-                   💻 System Info
-                 </h3>
-                 <pre style={{
-                   background: '#1e293b',
-                   color: '#e2e8f0',
-                   padding: '12px',
-                   borderRadius: '6px',
-                   overflow: 'auto',
-                   fontSize: '12px',
-                   margin: 0,
-                   border: '1px solid #334155'
-                 }}>
-                   {JSON.stringify({
-                     userAgent: navigator.userAgent,
-                     viewport: { width: window.innerWidth, height: window.innerHeight },
-                     url: window.location.href,
-                     timestamp: new Date().toISOString()
-                   }, null, 2)}
-                 </pre>
-               </div>
-             </div>
+              <div style={{ marginBottom: '16px' }}>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600', color: '#1f2937' }}>
+                  💻 System Info
+                </h3>
+                <pre style={{
+                  background: '#1e293b',
+                  color: '#e2e8f0',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  overflow: 'auto',
+                  fontSize: '12px',
+                  margin: 0,
+                  border: '1px solid #334155'
+                }}>
+                  {JSON.stringify({
+                    userAgent: navigator.userAgent,
+                    viewport: { width: window.innerWidth, height: window.innerHeight },
+                    url: window.location.href,
+                    timestamp: new Date().toISOString()
+                  }, null, 2)}
+                </pre>
+              </div>
+            </div>
           </div>
         </div>
       )}
