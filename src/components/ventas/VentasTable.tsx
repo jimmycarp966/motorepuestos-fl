@@ -131,9 +131,10 @@ export const VentasTable: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Button
-                      variant="outline"
                       size="sm"
                       onClick={() => handleViewDetails(venta)}
+                      className="!bg-blue-600 !hover:bg-blue-700 !text-white !border-0"
+                      style={{ backgroundColor: '#2563eb', color: 'white', border: 'none' }}
                     >
                       <Eye className="w-4 h-4" />
                     </Button>

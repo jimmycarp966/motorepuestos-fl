@@ -121,8 +121,8 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
               <Input
                 {...register('nombre')}
                 placeholder="Ingresa el nombre completo"
-                className={`w-full px-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-                  errors.nombre ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                  errors.nombre ? 'border-red-300 bg-red-50' : 'border-gray-200'
                 }`}
               />
               {errors.nombre && (
@@ -142,8 +142,8 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
                 type="email"
                 {...register('email')}
                 placeholder="cliente@ejemplo.com"
-                className={`w-full px-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-                  errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                  errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200'
                 }`}
               />
               {errors.email && (
@@ -162,7 +162,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
               <Input
                 {...register('telefono')}
                 placeholder="+1234567890"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:border-gray-300"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:border-gray-300 transition-all duration-200"
               />
             </div>
 
@@ -174,7 +174,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
               <textarea
                 {...register('direccion')}
                 placeholder="Ingresa la dirección completa..."
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:border-gray-300 resize-none"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:border-gray-300 resize-none transition-all duration-200"
                 rows={3}
               />
             </div>
@@ -191,8 +191,8 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
                   step="0.01"
                   {...register('limite_credito', { valueAsNumber: true })}
                   placeholder="0.00"
-                  className={`w-full pl-8 pr-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${
-                    errors.limite_credito ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                  className={`w-full pl-8 pr-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                    errors.limite_credito ? 'border-red-300 bg-red-50' : 'border-gray-200'
                   }`}
                 />
               </div>

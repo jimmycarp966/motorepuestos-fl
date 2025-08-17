@@ -153,8 +153,8 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
                 <Input
                   {...register('nombre')}
                   placeholder="Ingresa el nombre completo"
-                  className={`w-full px-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.nombre ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                  className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                    errors.nombre ? 'border-red-300 bg-red-50' : 'border-gray-200'
                   }`}
                 />
                 {errors.nombre && (
@@ -174,9 +174,10 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
                   {...register('email')}
                   type="email"
                   placeholder="ejemplo@motorepuestos.com"
-                  className={`w-full px-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                  className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                    errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200'
                   }`}
+                  style={{ backgroundColor: 'white', color: '#374151' }}
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm flex items-center mt-1">
@@ -197,9 +198,10 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
                   {...register('password')}
                   type={showPassword ? 'text' : 'password'}
                   placeholder={empleado ? 'Nueva contraseña (opcional)' : 'Ingresa la contraseña'}
-                  className={`w-full px-4 py-3 pr-12 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.password ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                  className={`w-full px-4 py-3 pr-12 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                    errors.password ? 'border-red-300 bg-red-50' : 'border-gray-200'
                   }`}
+                  style={{ backgroundColor: 'white', color: '#374151' }}
                 />
                 <button
                   type="button"
@@ -227,6 +229,7 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
                 <select
                   {...register('rol')}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-300 transition-all duration-200"
+                  style={{ backgroundColor: 'white', color: '#374151' }}
                 >
                   <option value="">Selecciona un rol</option>
                   <option value="Administrador">👑 Administrador</option>
@@ -253,9 +256,10 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
                   {...register('salario', { valueAsNumber: true })}
                   type="number"
                   placeholder="0.00"
-                  className={`w-full px-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.salario ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                  className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                    errors.salario ? 'border-red-300 bg-red-50' : 'border-gray-200'
                   }`}
+                  style={{ backgroundColor: 'white', color: '#374151' }}
                 />
                 {errors.salario && (
                   <p className="text-red-500 text-sm flex items-center mt-1">

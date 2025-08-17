@@ -120,8 +120,8 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
               <Input
                 {...register('nombre')}
                 placeholder="Ej: Filtro de aceite premium"
-                className={`w-full px-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                  errors.nombre ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                  errors.nombre ? 'border-red-300 bg-red-50' : 'border-gray-200'
                 }`}
               />
               {errors.nombre && (
@@ -140,8 +140,8 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
                <Input
                  {...register('codigo_sku')}
                  placeholder="Ej: PROD-001"
-                 className={`w-full px-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                   errors.codigo_sku ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                 className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                   errors.codigo_sku ? 'border-red-300 bg-red-50' : 'border-gray-200'
                  }`}
                />
                {errors.codigo_sku && (
@@ -160,7 +160,7 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
                <textarea
                  {...register('descripcion')}
                  placeholder="Describe las características del producto..."
-                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 resize-none"
+                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 resize-none"
                  rows={3}
                />
              </div>
@@ -178,8 +178,8 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
                      step="0.01"
                      {...register('precio_minorista', { valueAsNumber: true })}
                      placeholder="0.00"
-                     className={`w-full pl-8 pr-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                       errors.precio_minorista ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                     className={`w-full pl-8 pr-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                       errors.precio_minorista ? 'border-red-300 bg-red-50' : 'border-gray-200'
                      }`}
                    />
                  </div>
@@ -202,8 +202,8 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
                      step="0.01"
                      {...register('precio_mayorista', { valueAsNumber: true })}
                      placeholder="0.00"
-                     className={`w-full pl-8 pr-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                       errors.precio_mayorista ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                     className={`w-full pl-8 pr-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                       errors.precio_mayorista ? 'border-red-300 bg-red-50' : 'border-gray-200'
                      }`}
                    />
                  </div>
@@ -225,8 +225,8 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
                  type="number"
                  {...register('stock', { valueAsNumber: true })}
                  placeholder="0"
-                 className={`w-full px-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                   errors.stock ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+                 className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
+                   errors.stock ? 'border-red-300 bg-red-50' : 'border-gray-200'
                  }`}
                />
                {errors.stock && (

@@ -53,6 +53,7 @@ export interface AppStore {
   deleteEmpleado: (id: string) => Promise<void>
   createEmpleadoWithAuth: (empleado: CreateEmpleadoData) => Promise<void>
   updateEmpleadoWithAuth: (id: string, empleado: UpdateEmpleadoData) => Promise<void>
+  updateAdminPermissions: (email: string) => Promise<void>
   getEmpleadoPermissions: (rol: string) => string[]
 
   // Productos
@@ -141,6 +142,7 @@ export const useAppStore = create<AppStore>()((set, get) => {
     deleteEmpleado: empleados.deleteEmpleado,
     createEmpleadoWithAuth: empleados.createEmpleadoWithAuth,
     updateEmpleadoWithAuth: empleados.updateEmpleadoWithAuth,
+    updateAdminPermissions: empleados.updateAdminPermissions,
     getEmpleadoPermissions: empleados.getEmpleadoPermissions,
     
     // Productos slice

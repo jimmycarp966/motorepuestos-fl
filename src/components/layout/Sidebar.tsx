@@ -51,14 +51,14 @@ export const Sidebar: React.FC = () => {
 
   if (!user) return null
 
-  // Usar permisos específicos del usuario si están disponibles, sino usar el sistema legacy
-  const userPermisos = (user as any).permisos_modulos || []
+  // Lógica de permisos simplificada
   const accessibleModules = menuItems.filter(item => {
-    // Si el usuario tiene permisos específicos, usarlos
-    if (userPermisos.length > 0) {
-      return userPermisos.includes(item.id)
+    // Para desarrollo, mostrar todos los módulos
+    if (import.meta.env.DEV) {
+      return true
     }
-    // Sino, usar el sistema legacy basado en roles
+    
+    // Para producción, usar permisos basados en rol
     const rolePermissions = {
       'Administrador': ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario', 'reportes'],
       'Gerente': ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario', 'reportes'],
@@ -67,7 +67,16 @@ export const Sidebar: React.FC = () => {
       'Almacén': ['dashboard', 'productos', 'calendario'],
       'Cajero': ['dashboard', 'ventas', 'caja', 'clientes', 'calendario'],
     }
+    
     return rolePermissions[user.rol as keyof typeof rolePermissions]?.includes(item.id) || false
+  })
+
+  // Debug: Log de módulos accesibles
+  logInfo('Módulos accesibles', { 
+    total: accessibleModules.length, 
+    modules: accessibleModules.map(m => m.id),
+    userRol: user.rol,
+    isDev: import.meta.env.DEV
   })
 
   return (
@@ -150,12 +159,13 @@ export const Sidebar: React.FC = () => {
               marginBottom: '0.75rem',
               paddingLeft: '0.5rem'
             }}>
-              Navegación
+              Navegación ({accessibleModules.length} módulos)
             </div>
             
             {accessibleModules.map((item) => {
               const Icon = item.icon
               const isActive = currentModule === item.id
+              
               return (
                 <button
                   key={item.id}

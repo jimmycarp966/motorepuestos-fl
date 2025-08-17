@@ -18,7 +18,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error('Missing Supabase environment variables. Please check your .env file.')
   }
 } else {
-  console.log('✅ Supabase configurado correctamente')
+  if (import.meta.env.DEV) {
+    console.log('✅ Supabase configurado correctamente')
+  }
 }
 
 // Configuración final con fallbacks

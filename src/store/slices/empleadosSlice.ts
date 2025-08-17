@@ -101,10 +101,31 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
 
       if (error) throw error
 
+      // Procesar los datos para asegurar que los permisos estén correctos
+      const empleadosProcesados = (data || []).map(empleado => {
+        // Si el empleado es administrador y no tiene permisos específicos, asignar todos los módulos
+        if (empleado.rol === 'Administrador' && (!empleado.permisos_modulos || empleado.permisos_modulos.length === 0)) {
+          return {
+            ...empleado,
+            permisos_modulos: MODULOS_DISPONIBLES.map(modulo => modulo.modulo)
+          }
+        }
+        // Si tiene permisos pero no incluye los del rol, agregarlos
+        if (empleado.permisos_modulos && empleado.permisos_modulos.length > 0) {
+          const permisosDelRol = get().getEmpleadoPermissions(empleado.rol)
+          const permisosCompletos = [...new Set([...empleado.permisos_modulos, ...permisosDelRol])]
+          return {
+            ...empleado,
+            permisos_modulos: permisosCompletos
+          }
+        }
+        return empleado
+      })
+
       set((state) => ({
         empleados: {
           ...state.empleados,
-          empleados: data || [],
+          empleados: empleadosProcesados,
           loading: false,
         }
       }))
@@ -114,7 +135,7 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
         id: Date.now().toString(),
         type: 'success',
         title: 'Empleados cargados',
-        message: `Se cargaron ${data?.length || 0} empleados exitosamente`,
+        message: `Se cargaron ${empleadosProcesados.length} empleados exitosamente`,
       })
 
     } catch (error: any) {
@@ -156,7 +177,16 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
 
       if (authError) throw authError
 
-      // 2. Crear empleado en tabla empleados
+      // 2. Asegurar que los permisos estén completos según el rol
+      let permisosCompletos = empleadoData.permisos_modulos
+      if (empleadoData.rol === 'Administrador') {
+        permisosCompletos = MODULOS_DISPONIBLES.map(modulo => modulo.modulo)
+      } else {
+        const permisosDelRol = get().getEmpleadoPermissions(empleadoData.rol)
+        permisosCompletos = [...new Set([...empleadoData.permisos_modulos, ...permisosDelRol])]
+      }
+
+      // 3. Crear empleado en tabla empleados
       const { data: empleadoDataResult, error: empleadoError } = await supabase
         .from('empleados')
         .insert([{
@@ -165,7 +195,7 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
           email: empleadoData.email,
           rol: empleadoData.rol,
           salario: empleadoData.salario,
-          permisos_modulos: empleadoData.permisos_modulos,
+          permisos_modulos: permisosCompletos,
           activo: true,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -231,7 +261,16 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
         if (authError) throw authError
       }
 
-      // 2. Actualizar empleado en tabla empleados
+      // 2. Asegurar que los permisos estén completos según el rol
+      let permisosCompletos = empleadoData.permisos_modulos
+      if (empleadoData.rol === 'Administrador') {
+        permisosCompletos = MODULOS_DISPONIBLES.map(modulo => modulo.modulo)
+      } else if (empleadoData.permisos_modulos && empleadoData.rol) {
+        const permisosDelRol = get().getEmpleadoPermissions(empleadoData.rol)
+        permisosCompletos = [...new Set([...empleadoData.permisos_modulos, ...permisosDelRol])]
+      }
+
+      // 3. Actualizar empleado en tabla empleados
       const { data, error } = await supabase
         .from('empleados')
         .update({
@@ -239,7 +278,7 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
           email: empleadoData.email,
           rol: empleadoData.rol,
           salario: empleadoData.salario,
-          permisos_modulos: empleadoData.permisos_modulos,
+          permisos_modulos: permisosCompletos,
           activo: empleadoData.activo,
           updated_at: new Date().toISOString(),
         })
@@ -402,6 +441,64 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
         id: Date.now().toString(),
         type: 'error',
         title: 'Error al actualizar empleado',
+        message: error.message,
+      })
+    }
+  },
+
+  // Actualizar permisos de administrador específico
+  updateAdminPermissions: async (email: string) => {
+    set((state) => ({
+      empleados: { ...state.empleados, loading: true, error: null }
+    }))
+
+    try {
+      const { data, error } = await supabase
+        .from('empleados')
+        .update({
+          permisos_modulos: MODULOS_DISPONIBLES.map(modulo => modulo.modulo),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('email', email)
+        .eq('rol', 'Administrador')
+        .select()
+        .single()
+
+      if (error) throw error
+
+      // Actualizar estado local
+      set((state) => ({
+        empleados: {
+          ...state.empleados,
+          empleados: state.empleados.empleados.map(emp => 
+            emp.email === email ? data : emp
+          ),
+          loading: false,
+        }
+      }))
+
+      // Notificar éxito
+      get().addNotification({
+        id: Date.now().toString(),
+        type: 'success',
+        title: 'Permisos actualizados',
+        message: `Permisos de administrador actualizados para ${email}`,
+      })
+
+    } catch (error: any) {
+      set((state) => ({
+        empleados: {
+          ...state.empleados,
+          loading: false,
+          error: error.message,
+        }
+      }))
+
+      // Notificar error
+      get().addNotification({
+        id: Date.now().toString(),
+        type: 'error',
+        title: 'Error al actualizar permisos',
         message: error.message,
       })
     }

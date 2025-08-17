@@ -4,7 +4,7 @@ import type { AuthenticatedUser } from '../../store'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Input } from '../ui/input'
-import { Edit, Trash2, Plus, Search, Eye, EyeOff } from 'lucide-react'
+import { Edit, Trash2, Plus, Search } from 'lucide-react'
 import { canManageModule } from '../../store/slices/empleadosSlice'
 import { EmpleadoForm } from './EmpleadoForm'
 
@@ -18,7 +18,6 @@ export const EmpleadosTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [editingEmpleado, setEditingEmpleado] = useState<AuthenticatedUser | null>(null)
-  const [showSalarios, setShowSalarios] = useState(false)
 
   useEffect(() => {
     fetchEmpleados()
@@ -69,8 +68,18 @@ export const EmpleadosTable: React.FC = () => {
 
   const getModulosText = (permisos: string[]) => {
     if (!permisos || permisos.length === 0) return 'Sin permisos'
-    if (permisos.length <= 2) return permisos.join(', ')
-    return `${permisos.slice(0, 2).join(', ')} +${permisos.length - 2} más`
+    
+    // Si tiene todos los módulos disponibles (7 módulos), mostrar "Todos los módulos"
+    const todosLosModulos = ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario']
+    const tieneTodosLosModulos = todosLosModulos.every(modulo => permisos.includes(modulo))
+    
+    if (tieneTodosLosModulos) {
+      return 'Todos los módulos'
+    }
+    
+    // Para otros casos, mostrar todos los permisos si son pocos, o truncar si son muchos
+    if (permisos.length <= 4) return permisos.join(', ')
+    return `${permisos.slice(0, 3).join(', ')} +${permisos.length - 3} más`
   }
 
   if (showForm) {
@@ -88,16 +97,12 @@ export const EmpleadosTable: React.FC = () => {
         <div className="flex justify-between items-center">
           <CardTitle>Gestión de Empleados</CardTitle>
           <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowSalarios(!showSalarios)}
-              className="flex items-center space-x-2"
-            >
-              {showSalarios ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              <span>{showSalarios ? 'Ocultar' : 'Mostrar'} Salarios</span>
-            </Button>
             {canManage && (
-              <Button onClick={() => setShowForm(true)}>
+              <Button 
+                onClick={() => setShowForm(true)}
+                className="!bg-green-600 !hover:bg-green-700 !text-white !border-0"
+                style={{ backgroundColor: '#059669', color: 'white', border: 'none' }}
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Nuevo Empleado
               </Button>
@@ -122,34 +127,32 @@ export const EmpleadosTable: React.FC = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-2">Nombre</th>
-                  <th className="text-left p-2">Email</th>
-                  <th className="text-left p-2">Rol</th>
-                  {showSalarios && <th className="text-left p-2">Salario</th>}
-                  <th className="text-left p-2">Permisos</th>
-                  <th className="text-left p-2">Estado</th>
-                  {canManage && <th className="text-left p-2">Acciones</th>}
+                  <th className="text-left p-2 text-gray-900 font-semibold">Nombre</th>
+                  <th className="text-left p-2 text-gray-900 font-semibold">Email</th>
+                  <th className="text-left p-2 text-gray-900 font-semibold">Rol</th>
+                  <th className="text-left p-2 text-gray-900 font-semibold">Salario</th>
+                  <th className="text-left p-2 text-gray-900 font-semibold">Permisos</th>
+                  <th className="text-left p-2 text-gray-900 font-semibold">Estado</th>
+                  {canManage && <th className="text-left p-2 text-gray-900 font-semibold">Acciones</th>}
                 </tr>
               </thead>
               <tbody>
                 {filteredEmpleados.map((empleado) => (
                   <tr key={empleado.id} className="border-b hover:bg-gray-50">
-                    <td className="p-2 font-medium">{empleado.nombre}</td>
+                    <td className="p-2 font-medium text-gray-900">{empleado.nombre}</td>
                     <td className="p-2 text-gray-600">{empleado.email}</td>
+                                         <td className="p-2">
+                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRolBadgeColor(empleado.rol)}`}>
+                         {empleado.rol}
+                       </span>
+                     </td>
+                     <td className="p-2">
+                       <span className="font-mono text-sm text-gray-900">
+                         {formatSalario((empleado as any).salario || 0)}
+                       </span>
+                     </td>
                     <td className="p-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRolBadgeColor(empleado.rol)}`}>
-                        {empleado.rol}
-                      </span>
-                    </td>
-                    {showSalarios && (
-                      <td className="p-2">
-                        <span className="font-mono text-sm">
-                          {formatSalario((empleado as any).salario || 0)}
-                        </span>
-                      </td>
-                    )}
-                    <td className="p-2">
-                      <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                      <span className="text-xs text-gray-700 bg-gray-100 px-2 py-1 rounded font-medium">
                         {getModulosText((empleado as any).permisos_modulos || [])}
                       </span>
                     </td>
@@ -166,19 +169,19 @@ export const EmpleadosTable: React.FC = () => {
                       <td className="p-2">
                         <div className="flex space-x-2">
                           <Button
-                            variant="outline"
                             size="sm"
                             onClick={() => handleEdit(empleado)}
-                            className="text-blue-600 hover:text-blue-700"
+                            className="!bg-blue-600 !hover:bg-blue-700 !text-white !border-0"
+                            style={{ backgroundColor: '#2563eb', color: 'white', border: 'none' }}
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
                           <Button
-                            variant="outline"
                             size="sm"
                             onClick={() => handleDelete(empleado.id)}
                             disabled={empleado.id === user?.id}
-                            className="text-red-600 hover:text-red-700 disabled:opacity-50"
+                            className="!bg-red-600 !hover:bg-red-700 !text-white !border-0 disabled:opacity-50"
+                            style={{ backgroundColor: '#dc2626', color: 'white', border: 'none' }}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>

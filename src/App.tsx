@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useAppStore } from './store'
 import { LoginForm } from './components/auth/LoginForm'
 import { Sidebar } from './components/layout/Sidebar'
+
 import { Dashboard } from './components/dashboard/Dashboard'
 import { EmpleadosTable } from './components/empleados/EmpleadosTable'
 import { ProductosTable } from './components/productos/ProductosTable'
@@ -12,11 +13,7 @@ import { ReportesTable } from './components/reportes/ReportesTable'
 import { Calendario } from './components/calendario/Calendario'
 import { NotificationsContainer } from './components/ui/notifications'
 import { ConnectionError } from './components/ui/ConnectionError'
-import { performSimpleHealthCheck } from './utils/simpleHealthCheck'
-import { debugStore } from './utils/debugStore'
-import { testStore } from './utils/testStore'
-import { quickTest } from './utils/quickTest'
-import { SimpleDebugButton } from './components/ui/SimpleDebugButton'
+import { DebugButton } from './components/ui/DebugButton'
 
 function App() {
   const user = useAppStore((state) => state.auth.user)
@@ -40,37 +37,9 @@ function App() {
   const fetchMovimientos = useAppStore((state) => state.fetchMovimientos)
 
   useEffect(() => {
-    console.log('🔍 App: Iniciando verificación completa del sistema...')
-    
-    // Debug del store
-    debugStore()
-    
-    // Test del store
-    const storeTest = testStore()
-    console.log('🧪 Resultado del test del store:', storeTest)
-    
-    // Quick test
-    const quickTestResult = quickTest()
-    console.log('⚡ Quick test result:', quickTestResult)
-    
     const performSystemCheck = async () => {
       try {
-        // Realizar health check simplificado
-        const healthResult = await performSimpleHealthCheck()
-        console.log('🏥 App: Resultado del health check simplificado:', healthResult)
-        
-        if (!healthResult.canContinue) {
-          setDebugInfo(prev => ({ 
-            ...prev, 
-            authChecked: true, 
-            connectionError: healthResult.issues.join('; ') || 'Error en verificación del sistema'
-          }))
-          return
-        }
-        
         console.log('🔍 App: Iniciando verificación de autenticación...')
-        console.log('🔍 App: Estado inicial - loading:', loading, 'user:', user)
-        
         await checkAuth()
         setDebugInfo(prev => ({ ...prev, authChecked: true }))
         console.log('✅ App: Verificación de autenticación completada')
@@ -90,9 +59,11 @@ function App() {
     performSystemCheck()
   }, [checkAuth])
 
-  // Log del estado actual
+  // Log del estado actual (solo en desarrollo)
   useEffect(() => {
-    console.log('🔄 App: Estado actualizado - loading:', loading, 'user:', user)
+    if (import.meta.env.DEV) {
+      console.log('🔄 App: Estado actualizado - loading:', loading, 'user:', user)
+    }
     setDebugInfo(prev => ({ ...prev, storeState: { loading, user } }))
   }, [loading, user])
 
@@ -164,7 +135,9 @@ function App() {
 
   // Debug: Mostrar información de estado
   if (process.env.NODE_ENV === 'development') {
-    console.log('🎯 App: Renderizando con estado:', { loading, user, debugInfo })
+    if (import.meta.env.DEV) {
+      console.log('🎯 App: Renderizando con estado:', { loading, user, debugInfo })
+    }
   }
 
   // Mostrar error de conexión si existe
@@ -228,7 +201,7 @@ function App() {
     return (
       <>
         <LoginForm />
-        <SimpleDebugButton />
+        <DebugButton />
       </>
     )
   }
@@ -241,7 +214,7 @@ function App() {
       display: 'flex'
     }}>
       <NotificationsContainer />
-      <SimpleDebugButton />
+      <DebugButton />
       
       {/* Sidebar fijo */}
       <Sidebar />

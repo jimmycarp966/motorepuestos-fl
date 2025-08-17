@@ -11,9 +11,11 @@ interface DebugOptions {
 export const useDebug = (options: DebugOptions) => {
   const { componentName, logProps = true, logState = true, logErrors = true } = options
   
-  // Obtener estado relevante del store
-  const auth = useAppStore((state) => state.auth)
-  const ui = useAppStore((state) => state.ui)
+  // Obtener estado relevante del store (selectores específicos)
+  const user = useAppStore((state) => state.auth.user)
+  const authLoading = useAppStore((state) => state.auth.loading)
+  const currentModule = useAppStore((state) => state.ui.currentModule)
+  const sidebarOpen = useAppStore((state) => state.ui.sidebarOpen)
   const notifications = useAppStore((state) => state.notifications.notifications)
 
   // Función para registrar errores
@@ -46,8 +48,8 @@ export const useDebug = (options: DebugOptions) => {
     
     if (logState) {
       logStateInfo({
-        auth: { user: auth.user, loading: auth.loading },
-        ui: { currentModule: ui.currentModule, sidebarOpen: ui.sidebarOpen },
+        auth: { user, loading: authLoading },
+        ui: { currentModule, sidebarOpen },
         notifications: notifications.length
       }, 'Estado inicial')
     }
@@ -55,7 +57,7 @@ export const useDebug = (options: DebugOptions) => {
     return () => {
       logInfo('Componente desmontado')
     }
-  }, [componentName, logState, auth, ui, notifications, logInfo, logStateInfo])
+  }, [componentName, logState, user, authLoading, currentModule, sidebarOpen, notifications, logInfo, logStateInfo])
 
   // Capturar errores no manejados
   useEffect(() => {

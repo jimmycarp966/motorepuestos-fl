@@ -151,17 +151,18 @@ export const ProductosTable: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       <Button
-                        variant="outline"
                         size="sm"
                         onClick={() => handleEdit(producto)}
+                        className="!bg-blue-600 !hover:bg-blue-700 !text-white !border-0"
+                        style={{ backgroundColor: '#2563eb', color: 'white', border: 'none' }}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button
-                        variant="outline"
                         size="sm"
                         onClick={() => handleDelete(producto.id)}
-                        className="text-red-600 hover:text-red-700"
+                        className="!bg-red-600 !hover:bg-red-700 !text-white !border-0"
+                        style={{ backgroundColor: '#dc2626', color: 'white', border: 'none' }}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
