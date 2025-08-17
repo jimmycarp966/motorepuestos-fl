@@ -1,88 +1,79 @@
 -- Script para verificar la estructura actual de las tablas
--- Ejecutar en Supabase SQL Editor
+-- Verificar qué columnas existen actualmente
 
--- 1. Verificar estructura actual de ventas
+-- 1. Verificar estructura de la tabla ventas
 SELECT 
-    'ESTRUCTURA ACTUAL DE VENTAS' as info,
+    'ESTRUCTURA VENTAS' as tipo,
     column_name,
     data_type,
     is_nullable,
     column_default
-FROM information_schema.columns 
-WHERE table_name = 'ventas'
-ORDER BY ordinal_position;
-
--- 2. Verificar estructura actual de venta_items
-SELECT 
-    'ESTRUCTURA ACTUAL DE VENTA_ITEMS' as info,
-    column_name,
-    data_type,
-    is_nullable,
-    column_default
-FROM information_schema.columns 
-WHERE table_name = 'venta_items'
-ORDER BY ordinal_position;
-
--- 3. Verificar si las columnas problemáticas existen
-SELECT 
-    'COLUMNAS PROBLEMÁTICAS EN VENTAS' as info,
-    column_name,
-    CASE 
-        WHEN column_name = 'metodo_pago' THEN '❌ FALTA'
-        WHEN column_name = 'tipo_precio' THEN '❌ FALTA'
-        WHEN column_name = 'estado' THEN '❌ FALTA'
-        WHEN column_name = 'updated_at' THEN '❌ FALTA'
-        ELSE '✅ EXISTE'
-    END as estado
 FROM information_schema.columns 
 WHERE table_name = 'ventas' 
-    AND column_name IN ('metodo_pago', 'tipo_precio', 'estado', 'updated_at')
-UNION ALL
-SELECT 
-    'metodo_pago' as info,
-    'metodo_pago' as column_name,
-    'NO EXISTE' as estado
-WHERE NOT EXISTS (
-    SELECT 1 FROM information_schema.columns 
-    WHERE table_name = 'ventas' AND column_name = 'metodo_pago'
-)
-UNION ALL
-SELECT 
-    'tipo_precio' as info,
-    'tipo_precio' as column_name,
-    'NO EXISTE' as estado
-WHERE NOT EXISTS (
-    SELECT 1 FROM information_schema.columns 
-    WHERE table_name = 'ventas' AND column_name = 'tipo_precio'
-)
-UNION ALL
-SELECT 
-    'estado' as info,
-    'estado' as column_name,
-    'NO EXISTE' as estado
-WHERE NOT EXISTS (
-    SELECT 1 FROM information_schema.columns 
-    WHERE table_name = 'ventas' AND column_name = 'estado'
-)
-UNION ALL
-SELECT 
-    'updated_at' as info,
-    'updated_at' as column_name,
-    'NO EXISTE' as estado
-WHERE NOT EXISTS (
-    SELECT 1 FROM information_schema.columns 
-    WHERE table_name = 'ventas' AND column_name = 'updated_at'
-);
+ORDER BY ordinal_position;
 
--- 4. Verificar datos existentes
+-- 2. Verificar estructura de la tabla venta_items
 SELECT 
-    'DATOS EXISTENTES' as info,
-    'ventas' as tabla,
-    COUNT(*) as registros
-FROM ventas
+    'ESTRUCTURA VENTA_ITEMS' as tipo,
+    column_name,
+    data_type,
+    is_nullable,
+    column_default
+FROM information_schema.columns 
+WHERE table_name = 'venta_items' 
+ORDER BY ordinal_position;
+
+-- 3. Verificar estructura de la tabla movimientos_caja
+SELECT 
+    'ESTRUCTURA MOVIMIENTOS_CAJA' as tipo,
+    column_name,
+    data_type,
+    is_nullable,
+    column_default
+FROM information_schema.columns 
+WHERE table_name = 'movimientos_caja' 
+ORDER BY ordinal_position;
+
+-- 4. Verificar estructura de la tabla productos
+SELECT 
+    'ESTRUCTURA PRODUCTOS' as tipo,
+    column_name,
+    data_type,
+    is_nullable,
+    column_default
+FROM information_schema.columns 
+WHERE table_name = 'productos' 
+ORDER BY ordinal_position;
+
+-- 5. Verificar si existen las columnas que necesitamos
+SELECT 
+    'COLUMNAS FALTANTES' as tipo,
+    'ventas.metodo_pago' as columna,
+    EXISTS(
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'ventas' AND column_name = 'metodo_pago'
+    ) as existe
 UNION ALL
 SELECT 
-    'DATOS EXISTENTES' as info,
-    'venta_items' as tabla,
-    COUNT(*) as registros
-FROM venta_items;
+    'COLUMNAS FALTANTES' as tipo,
+    'ventas.tipo_precio' as columna,
+    EXISTS(
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'ventas' AND column_name = 'tipo_precio'
+    ) as existe
+UNION ALL
+SELECT 
+    'COLUMNAS FALTANTES' as tipo,
+    'ventas.estado' as columna,
+    EXISTS(
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'ventas' AND column_name = 'estado'
+    ) as existe
+UNION ALL
+SELECT 
+    'COLUMNAS FALTANTES' as tipo,
+    'venta_items.tipo_precio' as columna,
+    EXISTS(
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'venta_items' AND column_name = 'tipo_precio'
+    ) as existe;

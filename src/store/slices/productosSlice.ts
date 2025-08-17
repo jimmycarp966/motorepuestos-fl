@@ -22,6 +22,7 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
       const { data, error } = await supabase
         .from('productos')
         .select('*')
+        .eq('activo', true)
         .order('created_at', { ascending: false })
       
       console.log('🔍 [productosSlice] Respuesta de Supabase:', { data, error })
