@@ -1,6 +1,10 @@
 import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
 import { DateUtils } from '../../lib/dateUtils'
+import { AuditLogger } from '../../lib/auditLogger'
+import { BusinessRules } from '../../lib/businessRules'
+import { ErrorHandler } from '../../lib/errorHandler'
+import { createBusinessError, ERROR_CODES } from '../../lib/auditLogger'
 import type { AppStore } from '../index'
 import type { VentasState, CreateVentaData } from '../types'
 
@@ -68,147 +72,197 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
        }
      },
 
-         // Acción compuesta: Registrar venta completa
-     registrarVenta: async (ventaData: CreateVentaData) => {
-       set((state) => ({ loading: true, error: null }))
-      
-      try {
-        // Verificar si el arqueo está completado para hoy
-        const fechaHoy = DateUtils.getCurrentDate()
-        const empleadoId = get().auth.session?.user?.id
-        
-        if (empleadoId) {
-          const { data: arqueoHoy } = await supabase
-            .from('arqueos_caja')
-            .select('completado')
-            .eq('fecha', fechaHoy)
-            .eq('empleado_id', empleadoId)
-            .single()
+         // Acción compuesta mejorada: Registrar venta completa con atomicidad
+     registrarVenta: AuditLogger.withLogging(
+       'registrarVenta',
+       'ventas',
+       async (ventaData: CreateVentaData) => {
+         const startTime = Date.now()
+         set((state) => ({ loading: true, error: null }))
+         
+         return ErrorHandler.withErrorHandling(
+           async () => {
+             // 1. VALIDACIONES PREVIAS
+             const fechaHoy = DateUtils.getCurrentDate()
+             const empleadoId = get().auth.session?.user?.id || get().auth.user?.id
+             
+             if (!empleadoId) {
+               throw createBusinessError(ERROR_CODES.USUARIO_NO_AUTENTICADO)
+             }
 
-          if (arqueoHoy?.completado) {
-            throw new Error('No se pueden registrar ventas después del arqueo de caja. El sistema estará disponible mañana.')
-          }
-        }
+             // Validar reglas de negocio
+             const validation = await BusinessRules.validateVenta(ventaData)
+             if (!validation.isValid) {
+               throw createBusinessError(
+                 ERROR_CODES.VENTA_SIN_PRODUCTOS,
+                 validation.errors.join(', ')
+               )
+             }
 
-        // Validar que hay productos en la venta
-        if (!ventaData.items || ventaData.items.length === 0) {
-          throw new Error('La venta debe tener al menos un producto')
-        }
+             // Mostrar warnings si existen
+             if (validation.warnings.length > 0) {
+               validation.warnings.forEach(warning => {
+                 get().addNotification({
+                   id: Date.now().toString(),
+                   type: 'warning',
+                   title: 'Advertencia',
+                   message: warning,
+                 })
+               })
+             }
 
-        // Validar que el cliente existe si se proporciona
-        if (ventaData.cliente_id) {
-          const { data: cliente, error: errorCliente } = await supabase
-            .from('clientes')
-            .select('id')
-            .eq('id', ventaData.cliente_id)
-            .single()
+             // Verificar arqueo completado
+             const { data: arqueoHoy } = await supabase
+               .from('arqueos_caja')
+               .select('completado')
+               .eq('fecha', fechaHoy)
+               .eq('empleado_id', empleadoId)
+               .single()
 
-          if (errorCliente || !cliente) {
-            throw new Error('Cliente no encontrado')
-          }
-        }
+             if (arqueoHoy?.completado) {
+               throw createBusinessError(ERROR_CODES.ARQUEO_COMPLETADO)
+             }
 
-        // Calcular total de la venta
-        const total = ventaData.items.reduce((sum, item) => sum + item.subtotal, 0)
+             // 2. PREPARAR DATOS
+             const total = ventaData.items.reduce((sum, item) => sum + item.subtotal, 0)
+             const ventaCompleta = {
+               ...ventaData,
+               total,
+               fecha: fechaHoy,
+               estado: 'completada',
+               empleado_id: empleadoId,
+             }
 
-        // Crear la venta
-        const ventaCompleta = {
-          ...ventaData,
-          total,
-          fecha: fechaHoy,
-          estado: 'completada',
-          empleado_id: empleadoId,
-        }
+             // 3. TRANSACCIÓN ATÓMICA (simulada con compensación)
+             let ventaCreada: any = null
+             let stockActualizado: string[] = []
+             let cajaRegistrada = false
 
-                 const { data: venta, error: errorVenta } = await supabase
-           .from('ventas')
-           .insert([ventaCompleta])
-           .select()
-           .single()
+             try {
+               // Crear venta
+               const { data: venta, error: errorVenta } = await supabase
+                 .from('ventas')
+                 .insert([ventaCompleta])
+                 .select()
+                 .single()
 
-         if (errorVenta) {
-           throw errorVenta
-         }
+               if (errorVenta) throw errorVenta
+               ventaCreada = venta
 
-         // Crear los items de la venta
-         const itemsConVentaId = ventaData.items.map(item => ({
-           ...item,
-           venta_id: venta.id,
-         }))
+               // Crear items de venta
+               const itemsConVentaId = ventaData.items.map(item => ({
+                 ...item,
+                 venta_id: venta.id,
+               }))
 
-        const { error: errorItems } = await supabase
-          .from('venta_items')
-          .insert(itemsConVentaId)
+               const { error: errorItems } = await supabase
+                 .from('venta_items')
+                 .insert(itemsConVentaId)
 
-                 if (errorItems) {
-           throw errorItems
-         }
+               if (errorItems) throw errorItems
 
-        // Actualizar stock de productos
-        for (const item of ventaData.items) {
-          const { error: errorStock } = await supabase
-            .from('productos')
-            .update({ 
-              stock: supabase.rpc('decrement_stock', { 
-                product_id: item.producto_id, 
-                quantity: item.cantidad 
-              })
-            })
-            .eq('id', item.producto_id)
+               // Actualizar stock de productos (con compensación)
+               for (const item of ventaData.items) {
+                 try {
+                   const { error: errorStock } = await supabase.rpc('decrement_stock', {
+                     product_id: item.producto_id,
+                     quantity: item.cantidad
+                   })
 
-                     if (errorStock) {
-             // No lanzar error aquí, solo continuar
-           }
-        }
+                   if (errorStock) {
+                     console.warn(`⚠️ Stock no actualizado para producto ${item.producto_id}:`, errorStock)
+                     // Continuar - el stock negativo se permite
+                   } else {
+                     stockActualizado.push(item.producto_id)
+                   }
+                 } catch (stockError) {
+                   console.warn(`⚠️ Error actualizando stock:`, stockError)
+                 }
+               }
 
-        // Registrar ingreso en caja
-        const concepto = `Venta #${venta.id} - ${ventaData.cliente_id ? 'Con cliente' : 'Sin cliente'}`
-        
-        const { error: errorCaja } = await supabase
-          .from('movimientos_caja')
-          .insert([{
-            tipo: 'ingreso',
-            monto: total,
-            concepto,
-            empleado_id: empleadoId,
-            fecha: fechaHoy,
-          }])
+               // Registrar ingreso en caja
+               const concepto = `Venta #${venta.id}`
+               try {
+                 const { error: errorCaja } = await supabase
+                   .from('movimientos_caja')
+                   .insert([{
+                     tipo: 'ingreso',
+                     monto: total,
+                     concepto,
+                     empleado_id: empleadoId,
+                     fecha: fechaHoy,
+                     metodo_pago: ventaData.metodo_pago
+                   }])
 
                  if (errorCaja) {
-           // No lanzar error aquí, solo continuar
-         }
+                   console.warn(`⚠️ Movimiento de caja no registrado:`, errorCaja)
+                 } else {
+                   cajaRegistrada = true
+                 }
+               } catch (cajaError) {
+                 console.warn(`⚠️ Error registrando en caja:`, cajaError)
+               }
 
-        // Actualizar estado local
-        set((state) => ({ 
-          ventas: [venta, ...state.ventas], 
-          loading: false 
-        }))
+               // 4. ACTUALIZAR ESTADO LOCAL
+               set((state) => ({
+                 ventas: [venta, ...state.ventas],
+                 loading: false,
+                 error: null
+               }))
 
-                 // Notificar éxito
-        get().addNotification({
-          id: Date.now().toString(),
-          type: 'success',
-          title: 'Venta registrada',
-          message: `Venta #${venta.id} registrada por $${total.toLocaleString()}`,
-        })
+               // 5. REFRESCAR DATOS RELACIONADOS
+               get().fetchMovimientos?.()
+               get().fetchProductos?.()
 
-             } catch (error: any) {
-         const errorMessage = error?.message || 'Error desconocido al registrar venta'
-        set((state) => ({ 
-          loading: false, 
-          error: errorMessage 
-        }))
-        
-        // Notificar error
-        get().addNotification({
-          id: Date.now().toString(),
-          type: 'error',
-          title: 'Error al registrar venta',
-          message: errorMessage,
-        })
-        
-        throw error
-      }
-    }
+               // 6. NOTIFICAR ÉXITO
+               get().addNotification({
+                 id: Date.now().toString(),
+                 type: 'success',
+                 title: 'Venta registrada',
+                 message: `Venta #${venta.id} por $${total.toLocaleString()} registrada exitosamente`,
+               })
+
+               // Log de éxito con detalles
+               await AuditLogger.logSuccess('registrarVenta', 'ventas', {
+                 ventaId: venta.id,
+                 total,
+                 items: ventaData.items.length,
+                 metodoPago: ventaData.metodo_pago,
+                 stockActualizado: stockActualizado.length,
+                 cajaRegistrada
+               }, Date.now() - startTime)
+
+               return venta
+
+             } catch (transactionError) {
+               // COMPENSACIÓN: Rollback manual
+               console.error('❌ Error en transacción de venta, iniciando rollback:', transactionError)
+
+               if (ventaCreada) {
+                 try {
+                   // Eliminar venta e items creados
+                   await supabase.from('venta_items').delete().eq('venta_id', ventaCreada.id)
+                   await supabase.from('ventas').delete().eq('id', ventaCreada.id)
+                   console.log('✅ Rollback: Venta eliminada')
+                 } catch (rollbackError) {
+                   console.error('❌ Error en rollback de venta:', rollbackError)
+                 }
+               }
+
+               throw transactionError
+             }
+           },
+           {
+             action: 'registrarVenta',
+             module: 'ventas',
+             data: { items: ventaData.items.length, total: ventaData.items.reduce((s, i) => s + i.subtotal, 0) }
+           },
+           {
+             retryable: false, // Ventas no son retriables automáticamente
+             severity: 'high'
+           }
+         )
+       }
+     )
   }
 }

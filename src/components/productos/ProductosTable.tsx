@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from 'react'
 import { useAppStore } from '../../store'
+import { useProductosFiltered, useCategorias, useLoadingStates, useErrorStates } from '../../lib/selectors'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
-import { Plus, Edit, Trash2, Package, AlertTriangle, Filter } from 'lucide-react'
+import { Plus, Edit, Trash2, Package, AlertTriangle, Filter, RefreshCw } from 'lucide-react'
 import { ProductoForm } from './ProductoForm'
-import { useSearchFilter } from '../../hooks/useSearchFilter'
 
 
 export const ProductosTable: React.FC = () => {
-
-  
-  const productos = useAppStore((state) => state.productos)
-  const loading = useAppStore((state) => state.productosLoading)
-  const error = useAppStore((state) => state.productosError)
-  const fetchProductos = useAppStore((state) => state.fetchProductos)
-  const deleteProducto = useAppStore((state) => state.deleteProducto)
-  const addNotification = useAppStore((state) => state.addNotification)
+  // Estados locales
   const [showForm, setShowForm] = useState(false)
   const [editingProducto, setEditingProducto] = useState<any>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'out'>('all')
+  const [categoriaFilter, setCategoriaFilter] = useState('')
+
+  // Usar selectores optimizados
+  const productosData = useProductosFiltered(searchTerm, stockFilter, categoriaFilter)
+  const categorias = useCategorias()
+  const loadingStates = useLoadingStates()
+  const errorStates = useErrorStates()
+  
+  // Acciones del store
+  const fetchProductos = useAppStore((state) => state.fetchProductos)
+  const deleteProducto = useAppStore((state) => state.deleteProducto)
+  const addNotification = useAppStore((state) => state.addNotification)
 
 
 

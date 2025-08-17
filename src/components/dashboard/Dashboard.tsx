@@ -1,6 +1,13 @@
 import React, { useEffect } from 'react'
 import { useAppStore } from '../../store'
 import { 
+  useDashboardKPIs,
+  useVentasRecientes,
+  useMovimientosRecientes,
+  useLoadingStates,
+  useErrorStates
+} from '../../lib/selectors'
+import { 
   TrendingUp, 
   DollarSign, 
   Package, 
@@ -10,32 +17,33 @@ import {
   Calendar,
   Clock,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  AlertCircle
 } from 'lucide-react'
 
-import { DateUtils } from '../../lib/dateUtils'
-
 export const Dashboard: React.FC = () => {
-  // Registrar componente para debug
-
+  // Usar selectores optimizados
+  const kpis = useDashboardKPIs()
+  const ventasRecientes = useVentasRecientes(5)
+  const movimientosRecientes = useMovimientosRecientes(5)
+  const loadingStates = useLoadingStates()
+  const errorStates = useErrorStates()
   
-  const ventas = useAppStore((state) => state.ventas)
-  const productos = useAppStore((state) => state.productos)
-  const clientes = useAppStore((state) => state.clientes.clientes)
-  const caja = useAppStore((state) => state.caja)
+  // Acciones del store
   const fetchVentas = useAppStore((state) => state.fetchVentas)
   const fetchProductos = useAppStore((state) => state.fetchProductos)
   const fetchClientes = useAppStore((state) => state.fetchClientes)
   const fetchMovimientos = useAppStore((state) => state.fetchMovimientos)
 
   useEffect(() => {
+    // Cargar datos iniciales
     fetchVentas()
     fetchProductos()
     fetchClientes()
     fetchMovimientos()
   }, [fetchVentas, fetchProductos, fetchClientes, fetchMovimientos])
 
-  // Refrescar datos cuando cambien las ventas o movimientos
+  // Refrescar datos automáticamente
   useEffect(() => {
     const interval = setInterval(() => {
       fetchVentas()
@@ -45,55 +53,69 @@ export const Dashboard: React.FC = () => {
     return () => clearInterval(interval)
   }, [fetchVentas, fetchMovimientos])
 
-  // Calcular KPIs usando DateUtils
-  const ventasHoy = (ventas || []).filter(v => {
-    return DateUtils.isToday(v.fecha)
-  })
-  
-  const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0)
-  const saldoCaja = (caja.movimientos || []).reduce((sum, m) => sum + (m.monto || 0), 0)
-  const productosActivos = (productos || []).filter(p => p.activo).length
-  const clientesActivos = (clientes || []).filter(c => c.activo).length
+  // Indicadores de estado
+  const isLoading = loadingStates.ventas || loadingStates.productos || loadingStates.caja
+  const hasErrors = errorStates.ventas || errorStates.productos || errorStates.caja
 
-  // Obtener ventas de la semana pasada para comparación
-  const unaSemanaAtras = DateUtils.subtractDays(DateUtils.getCurrentDate(), 7)
-  const ventasSemanaPasada = (ventas || []).filter(v => v.fecha >= unaSemanaAtras)
-  const totalVentasSemana = ventasSemanaPasada.reduce((sum, v) => sum + (v.total || 0), 0)
+  // Mostrar loading si es necesario
+  if (isLoading) {
+    return (
+      <div style={{ padding: '2rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
+        <div style={{ textAlign: 'center', paddingTop: '4rem' }}>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p style={{ color: '#64748b' }}>Cargando dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Mostrar errores si existen
+  if (hasErrors) {
+    return (
+      <div style={{ padding: '2rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
+        <div style={{ textAlign: 'center', paddingTop: '4rem' }}>
+          <AlertCircle size={48} style={{ color: '#ef4444', margin: '0 auto 1rem' }} />
+          <h3 style={{ color: '#ef4444', marginBottom: '0.5rem' }}>Error en el Dashboard</h3>
+          <p style={{ color: '#64748b' }}>No se pudieron cargar los datos. Intente refrescar la página.</p>
+        </div>
+      </div>
+    )
+  }
 
   const kpiCards = [
     {
       title: 'Ventas Hoy',
-      value: `$${totalVentasHoy.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
-      subtitle: `${ventasHoy.length} ventas`,
+      value: `$${kpis.totalVentasHoy.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
+      subtitle: `${kpis.cantidadVentasHoy} ventas`,
       icon: TrendingUp,
       color: '#667eea',
       bgColor: '#f0f4ff',
-      trend: totalVentasHoy > 0 ? 'up' : 'neutral',
-      trendValue: totalVentasHoy > 0 ? '+12%' : '0%'
+      trend: kpis.totalVentasHoy > 0 ? 'up' : 'neutral',
+      trendValue: kpis.totalVentasHoy > 0 ? '+12%' : '0%'
     },
     {
       title: 'Saldo Caja',
-      value: `$${saldoCaja.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
+      value: `$${kpis.saldoCaja.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
       subtitle: 'Balance actual',
       icon: DollarSign,
       color: '#10b981',
       bgColor: '#f0fdf4',
-      trend: saldoCaja > 0 ? 'up' : 'down',
-      trendValue: saldoCaja > 0 ? '+5%' : '-2%'
+      trend: kpis.saldoCaja > 0 ? 'up' : 'down',
+      trendValue: kpis.saldoCaja > 0 ? '+5%' : '-2%'
     },
     {
       title: 'Productos',
-      value: productosActivos.toString(),
-      subtitle: 'En inventario',
+      value: kpis.productosActivos.toString(),
+      subtitle: `${kpis.productosStockBajo} con stock bajo`,
       icon: Package,
       color: '#f59e0b',
       bgColor: '#fffbeb',
-      trend: 'up',
-      trendValue: '+3%'
+      trend: kpis.productosStockBajo > 0 ? 'down' : 'up',
+      trendValue: kpis.productosStockBajo > 0 ? `⚠️ ${kpis.productosStockBajo}` : '✅'
     },
     {
       title: 'Clientes',
-      value: clientesActivos.toString(),
+      value: kpis.clientesActivos.toString(),
       subtitle: 'Activos',
       icon: Users,
       color: '#8b5cf6',
@@ -102,9 +124,6 @@ export const Dashboard: React.FC = () => {
       trendValue: '+8%'
     }
   ]
-
-  const recentVentas = (ventas || []).slice(0, 5)
-  const recentMovimientos = (caja.movimientos || []).slice(0, 5)
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -244,9 +263,9 @@ export const Dashboard: React.FC = () => {
             <ShoppingCart size={20} style={{ color: '#64748b' }} />
           </div>
 
-          {recentVentas.length > 0 ? (
+          {ventasRecientes.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {recentVentas.map((venta, index) => (
+              {ventasRecientes.map((venta, index) => (
                 <div key={index} style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -323,9 +342,9 @@ export const Dashboard: React.FC = () => {
             <DollarSign size={20} style={{ color: '#64748b' }} />
           </div>
 
-          {recentMovimientos.length > 0 ? (
+          {movimientosRecientes.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {recentMovimientos.map((movimiento, index) => (
+              {movimientosRecientes.map((movimiento, index) => (
                 <div key={index} style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -422,14 +441,14 @@ export const Dashboard: React.FC = () => {
               color: '#667eea',
               marginBottom: '0.5rem'
             }}>
-              {(ventas || []).length}
+              {kpis.cantidadVentasHoy}
             </div>
             <div style={{ 
               fontSize: '0.875rem', 
               color: '#64748b',
               fontWeight: '500'
             }}>
-              Total Ventas
+              Total Ventas Hoy
             </div>
           </div>
 
@@ -446,7 +465,7 @@ export const Dashboard: React.FC = () => {
               color: '#10b981',
               marginBottom: '0.5rem'
             }}>
-              ${totalVentasSemana.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+              ${kpis.ventasSemanaPasada.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
             </div>
             <div style={{ 
               fontSize: '0.875rem', 
@@ -470,14 +489,14 @@ export const Dashboard: React.FC = () => {
               color: '#f59e0b',
               marginBottom: '0.5rem'
             }}>
-              {(productos || []).length}
+              {kpis.productosActivos}
             </div>
             <div style={{ 
               fontSize: '0.875rem', 
               color: '#64748b',
               fontWeight: '500'
             }}>
-              Total Productos
+              Productos Activos
             </div>
           </div>
 
@@ -494,14 +513,14 @@ export const Dashboard: React.FC = () => {
               color: '#8b5cf6',
               marginBottom: '0.5rem'
             }}>
-              {(clientes || []).length}
+              {kpis.clientesActivos}
             </div>
             <div style={{ 
               fontSize: '0.875rem', 
               color: '#64748b',
               fontWeight: '500'
             }}>
-              Total Clientes
+              Clientes Activos
             </div>
           </div>
         </div>

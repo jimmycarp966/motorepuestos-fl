@@ -279,17 +279,14 @@ export interface NotificationsState {
   notifications: Notification[]
 }
 
-// Importar tipos del slice de historial de caja
-export type { CajaHistorialState, CajaDiaria } from './slices/cajaHistorialSlice'
-
 // Tipos para Caja Historial
 export interface CajaHistorialState {
-  cajasDiarias: CajaDiaria[];
+  cajasDiarias: CajaHistorialItem[];
   loading: boolean;
   error: string | null;
 }
 
-export interface CajaDiaria {
+export interface CajaHistorialItem {
   fecha: string;
   empleado: string;
   apertura: number;
@@ -428,6 +425,75 @@ export interface ArqueoActions {
 export type ArqueoSlice = ArqueoState & ArqueoActions;
 
 
+
+// Tipos para slices del store
+export interface AuthSlice {
+  auth: AuthState
+  login: (email: string, password: string) => Promise<void>
+  logout: () => Promise<void>
+  checkAuth: () => Promise<void>
+}
+
+export interface ProductosSlice {
+  productos: Producto[]
+  loading: boolean
+  error: string | null
+  fetchProductos: () => Promise<void>
+  createProducto: (data: CreateProductoData) => Promise<void>
+  updateProducto: (id: string, data: UpdateProductoData) => Promise<void>
+  deleteProducto: (id: string) => Promise<void>
+}
+
+export interface VentasSlice {
+  ventas: Venta[]
+  loading: boolean
+  error: string | null
+  fetchVentas: () => Promise<void>
+  registrarVenta: (data: CreateVentaData) => Promise<void>
+}
+
+export interface ClientesSlice {
+  clientes: ClientesState
+  fetchClientes: () => Promise<void>
+  createCliente: (data: CreateClienteData) => Promise<void>
+  updateCliente: (id: string, data: UpdateClienteData) => Promise<void>
+  deleteCliente: (id: string) => Promise<void>
+  actualizarCuentaCorriente: (id: string, monto: number) => Promise<void>
+}
+
+export interface EmpleadosSlice {
+  empleados: EmpleadosState
+  fetchEmpleados: () => Promise<void>
+  createEmpleado: (data: CreateEmpleadoData) => Promise<void>
+  updateEmpleado: (id: string, data: UpdateEmpleadoData) => Promise<void>
+  deleteEmpleado: (id: string) => Promise<void>
+}
+
+export interface CajaSlice {
+  caja: CajaState
+  fetchMovimientos: () => Promise<void>
+  registrarIngreso: (monto: number, concepto: string) => Promise<void>
+  registrarEgreso: (monto: number, concepto: string) => Promise<void>
+  abrirCaja: (saldoInicial: number) => Promise<void>
+  cerrarCaja: () => Promise<void>
+  realizarArqueo: (data: any) => Promise<void>
+  fetchCajasDiarias: () => Promise<void>
+  fetchArqueos: () => Promise<void>
+}
+
+export interface UISlice {
+  ui: UIState
+  setTheme: (theme: 'light' | 'dark') => void
+  setSidebarOpen: (open: boolean) => void
+  setCurrentModule: (module: string) => void
+}
+
+export interface NotificationsSlice {
+  notifications: NotificationsState
+  addNotification: (notification: Notification) => void
+  removeNotification: (id: string) => void
+  clearNotifications: () => void
+}
 
 export interface AppStore extends 
   AuthSlice, 

@@ -1,0 +1,442 @@
+import { useMemo, useCallback, useState } from 'react'
+import { shallow } from 'zustand/shallow'
+import { useAppStore } from '../store'
+import { DateUtils } from './dateUtils'
+import type { AppStore, Venta, Producto, Cliente, MovimientoCaja } from '../store/types'
+
+// Tipos para selectores optimizados
+export interface DashboardKPIs {
+  totalVentasHoy: number
+  cantidadVentasHoy: number
+  saldoCaja: number
+  productosActivos: number
+  productosStockBajo: number
+  clientesActivos: number
+  ventasSemanaPasada: number
+  ingresosMes: number
+}
+
+export interface ProductosFiltered {
+  productos: Producto[]
+  total: number
+  conStockBajo: number
+  sinStock: number
+  totalValue: number
+}
+
+export interface VentasStats {
+  ventasHoy: Venta[]
+  ventasSemana: Venta[]
+  ventasMes: Venta[]
+  totalHoy: number
+  totalSemana: number
+  totalMes: number
+  promedioVenta: number
+}
+
+// ================================
+// SELECTORES PARA DASHBOARD
+// ================================
+
+// Selector optimizado para KPIs del dashboard
+export const useDashboardKPIs = (): DashboardKPIs => {
+  return useAppStore(
+    useCallback((state: AppStore) => {
+      const fechaHoy = DateUtils.getCurrentDate()
+      const unaSemanaPasada = DateUtils.subtractDays(fechaHoy, 7)
+      const unMesPasado = DateUtils.subtractDays(fechaHoy, 30)
+
+      // Filtrar ventas de hoy
+      const ventasHoy = state.ventas.filter(v => DateUtils.isToday(v.fecha))
+      
+      // Filtrar ventas de la semana
+      const ventasSemanaPasada = state.ventas.filter(v => v.fecha >= unaSemanaPasada)
+      
+      // Filtrar ventas del mes
+      const ventasMes = state.ventas.filter(v => v.fecha >= unMesPasado)
+
+      // Calcular saldo de caja
+      const saldoCaja = state.caja.movimientos.reduce((sum, m) => {
+        return m.tipo === 'ingreso' ? sum + m.monto : sum - m.monto
+      }, 0)
+
+      // Productos con stock bajo
+      const productosStockBajo = state.productos.filter(p => 
+        p.activo && p.stock <= p.stock_minimo && p.stock > 0
+      ).length
+
+      return {
+        totalVentasHoy: ventasHoy.reduce((sum, v) => sum + v.total, 0),
+        cantidadVentasHoy: ventasHoy.length,
+        saldoCaja,
+        productosActivos: state.productos.filter(p => p.activo).length,
+        productosStockBajo,
+        clientesActivos: state.clientes.clientes.filter(c => c.activo).length,
+        ventasSemanaPasada: ventasSemanaPasada.reduce((sum, v) => sum + v.total, 0),
+        ingresosMes: ventasMes.reduce((sum, v) => sum + v.total, 0)
+      }
+    }, []),
+    shallow
+  )
+}
+
+// Selector para ventas recientes optimizado
+export const useVentasRecientes = (limit: number = 5) => {
+  return useAppStore(
+    useCallback((state: AppStore) => 
+      state.ventas
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, limit)
+    , [limit]),
+    shallow
+  )
+}
+
+// Selector para movimientos de caja recientes
+export const useMovimientosRecientes = (limit: number = 5) => {
+  return useAppStore(
+    useCallback((state: AppStore) =>
+      state.caja.movimientos
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, limit)
+    , [limit]),
+    shallow
+  )
+}
+
+// ================================
+// SELECTORES PARA PRODUCTOS
+// ================================
+
+// Selector de productos con filtros optimizado
+export const useProductosFiltered = (
+  searchTerm: string = '',
+  stockFilter: 'all' | 'low' | 'out' = 'all',
+  categoria: string = ''
+): ProductosFiltered => {
+  return useAppStore(
+    useCallback((state: AppStore) => {
+      let productos = state.productos.filter(p => p.activo)
+
+      // Filtro de búsqueda
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase()
+        productos = productos.filter(p =>
+          p.nombre.toLowerCase().includes(term) ||
+          p.codigo_sku.toLowerCase().includes(term) ||
+          p.categoria.toLowerCase().includes(term) ||
+          (p.descripcion && p.descripcion.toLowerCase().includes(term))
+        )
+      }
+
+      // Filtro por categoría
+      if (categoria) {
+        productos = productos.filter(p => p.categoria === categoria)
+      }
+
+      // Filtro de stock
+      if (stockFilter === 'low') {
+        productos = productos.filter(p => p.stock <= p.stock_minimo && p.stock > 0)
+      } else if (stockFilter === 'out') {
+        productos = productos.filter(p => p.stock <= 0)
+      }
+
+      // Estadísticas
+      const conStockBajo = state.productos.filter(p => 
+        p.activo && p.stock <= p.stock_minimo && p.stock > 0
+      ).length
+      
+      const sinStock = state.productos.filter(p => 
+        p.activo && p.stock <= 0
+      ).length
+
+      const totalValue = productos.reduce((sum, p) => 
+        sum + (p.stock * p.precio_minorista), 0
+      )
+
+      return {
+        productos,
+        total: productos.length,
+        conStockBajo,
+        sinStock,
+        totalValue
+      }
+    }, [searchTerm, stockFilter, categoria]),
+    shallow
+  )
+}
+
+// Selector para categorías únicas
+export const useCategorias = () => {
+  return useAppStore(
+    useCallback((state: AppStore) => {
+      const categorias = [...new Set(
+        state.productos
+          .filter(p => p.activo)
+          .map(p => p.categoria)
+      )]
+      return categorias.sort()
+    }, []),
+    shallow
+  )
+}
+
+// Selector para productos con stock crítico
+export const useProductosStockCritico = () => {
+  return useAppStore(
+    useCallback((state: AppStore) =>
+      state.productos.filter(p => 
+        p.activo && p.stock <= p.stock_minimo
+      ).sort((a, b) => a.stock - b.stock)
+    , []),
+    shallow
+  )
+}
+
+// ================================
+// SELECTORES PARA VENTAS
+// ================================
+
+// Selector de estadísticas de ventas optimizado
+export const useVentasStats = (): VentasStats => {
+  return useAppStore(
+    useCallback((state: AppStore) => {
+      const fechaHoy = DateUtils.getCurrentDate()
+      const inicioSemana = DateUtils.subtractDays(fechaHoy, 7)
+      const inicioMes = DateUtils.subtractDays(fechaHoy, 30)
+
+      const ventasHoy = state.ventas.filter(v => DateUtils.isToday(v.fecha))
+      const ventasSemana = state.ventas.filter(v => v.fecha >= inicioSemana)
+      const ventasMes = state.ventas.filter(v => v.fecha >= inicioMes)
+
+      const totalHoy = ventasHoy.reduce((sum, v) => sum + v.total, 0)
+      const totalSemana = ventasSemana.reduce((sum, v) => sum + v.total, 0)
+      const totalMes = ventasMes.reduce((sum, v) => sum + v.total, 0)
+
+      return {
+        ventasHoy,
+        ventasSemana,
+        ventasMes,
+        totalHoy,
+        totalSemana,
+        totalMes,
+        promedioVenta: ventasMes.length > 0 ? totalMes / ventasMes.length : 0
+      }
+    }, []),
+    shallow
+  )
+}
+
+// Selector para top productos más vendidos
+export const useTopProductosVendidos = (limit: number = 10) => {
+  return useAppStore(
+    useCallback((state: AppStore) => {
+      const productosVendidos = new Map<string, { producto: Producto, cantidad: number, ingresos: number }>()
+
+      // Procesar todas las ventas
+      state.ventas.forEach(venta => {
+        venta.items?.forEach(item => {
+          const existing = productosVendidos.get(item.producto_id)
+          const producto = state.productos.find(p => p.id === item.producto_id)
+          
+          if (producto) {
+            if (existing) {
+              existing.cantidad += item.cantidad
+              existing.ingresos += item.subtotal
+            } else {
+              productosVendidos.set(item.producto_id, {
+                producto,
+                cantidad: item.cantidad,
+                ingresos: item.subtotal
+              })
+            }
+          }
+        })
+      })
+
+      return Array.from(productosVendidos.values())
+        .sort((a, b) => b.cantidad - a.cantidad)
+        .slice(0, limit)
+    }, [limit]),
+    shallow
+  )
+}
+
+// ================================
+// SELECTORES PARA CLIENTES
+// ================================
+
+// Selector de clientes filtrados
+export const useClientesFiltered = (
+  searchTerm: string = '',
+  soloActivos: boolean = true
+) => {
+  return useAppStore(
+    useCallback((state: AppStore) => {
+      let clientes = state.clientes.clientes
+
+      if (soloActivos) {
+        clientes = clientes.filter(c => c.activo)
+      }
+
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase()
+        clientes = clientes.filter(c =>
+          c.nombre.toLowerCase().includes(term) ||
+          (c.email && c.email.toLowerCase().includes(term)) ||
+          (c.telefono && c.telefono.includes(term))
+        )
+      }
+
+      return clientes
+    }, [searchTerm, soloActivos]),
+    shallow
+  )
+}
+
+// Selector para clientes con cuenta corriente
+export const useClientesCuentaCorriente = () => {
+  return useAppStore(
+    useCallback((state: AppStore) =>
+      state.clientes.clientes
+        .filter(c => c.activo && c.limite_credito > 0)
+        .sort((a, b) => b.saldo_cuenta_corriente - a.saldo_cuenta_corriente)
+    , []),
+    shallow
+  )
+}
+
+// ================================
+// SELECTORES PARA CAJA
+// ================================
+
+// Selector de estado de caja optimizado
+export const useEstadoCaja = () => {
+  return useAppStore(
+    useCallback((state: AppStore) => {
+      const fechaHoy = DateUtils.getCurrentDate()
+      const movimientosHoy = state.caja.movimientos.filter(m => 
+        DateUtils.isToday(m.fecha)
+      )
+
+      const ingresosDia = movimientosHoy
+        .filter(m => m.tipo === 'ingreso')
+        .reduce((sum, m) => sum + m.monto, 0)
+
+      const egresosDia = movimientosHoy
+        .filter(m => m.tipo === 'egreso')
+        .reduce((sum, m) => sum + m.monto, 0)
+
+      const saldoTotal = state.caja.movimientos.reduce((sum, m) => {
+        return m.tipo === 'ingreso' ? sum + m.monto : sum - m.monto
+      }, 0)
+
+      return {
+        cajaAbierta: state.caja.cajaAbierta,
+        saldoTotal,
+        ingresosDia,
+        egresosDia,
+        saldoDia: ingresosDia - egresosDia,
+        movimientosHoy: movimientosHoy.length
+      }
+    }, []),
+    shallow
+  )
+}
+
+// ================================
+// SELECTORES PARA UI
+// ================================
+
+// Selector de loading states
+export const useLoadingStates = () => {
+  return useAppStore(
+    useCallback((state: AppStore) => ({
+      productos: state.loading || false,
+      ventas: state.loading || false,
+      clientes: state.clientes.loading,
+      empleados: state.empleados?.loading || false,
+      caja: state.caja.loading
+    }), []),
+    shallow
+  )
+}
+
+// Selector de errores
+export const useErrorStates = () => {
+  return useAppStore(
+    useCallback((state: AppStore) => ({
+      productos: state.error,
+      ventas: state.error,
+      clientes: state.clientes.error,
+      empleados: state.empleados?.error || null,
+      caja: state.caja.error
+    }), []),
+    shallow
+  )
+}
+
+// ================================
+// SELECTORES PARA NOTIFICACIONES
+// ================================
+
+// Selector de notificaciones por tipo
+export const useNotificationsByType = (type?: 'success' | 'error' | 'warning' | 'info') => {
+  return useAppStore(
+    useCallback((state: AppStore) => {
+      const notifications = state.notifications.notifications
+      return type 
+        ? notifications.filter(n => n.type === type)
+        : notifications
+    }, [type]),
+    shallow
+  )
+}
+
+// ================================
+// HOOK PERSONALIZADO PARA PAGINACIÓN
+// ================================
+
+export const usePagination = <T>(
+  data: T[],
+  pageSize: number = 50
+) => {
+  const [currentPage, setCurrentPage] = useState(0)
+  
+  const paginatedData = useMemo(() => {
+    const startIndex = currentPage * pageSize
+    return data.slice(startIndex, startIndex + pageSize)
+  }, [data, currentPage, pageSize])
+
+  const totalPages = Math.ceil(data.length / pageSize)
+  
+  const goToPage = useCallback((page: number) => {
+    setCurrentPage(Math.max(0, Math.min(page, totalPages - 1)))
+  }, [totalPages])
+
+  const nextPage = useCallback(() => {
+    goToPage(currentPage + 1)
+  }, [currentPage, goToPage])
+
+  const prevPage = useCallback(() => {
+    goToPage(currentPage - 1)
+  }, [currentPage, goToPage])
+
+  return {
+    data: paginatedData,
+    currentPage,
+    totalPages,
+    pageSize,
+    total: data.length,
+    goToPage,
+    nextPage,
+    prevPage,
+    hasNext: currentPage < totalPages - 1,
+    hasPrev: currentPage > 0
+  }
+}
+
+// ================================
+// EXPORT DE TODOS LOS SELECTORES
+// ================================
+// Los selectores ya están exportados individualmente arriba
