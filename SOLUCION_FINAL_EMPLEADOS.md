@@ -42,7 +42,7 @@ createEmpleadoWithAuth: async (empleadoData: CreateEmpleadoData) => {
 1. Ve a [https://supabase.com/dashboard](https://supabase.com/dashboard)
 2. Selecciona tu proyecto `motorepuestos-fl`
 3. Ve a **SQL Editor**
-4. Copia y pega el contenido de `fix-rls-complete.sql`
+4. Copia y pega el contenido de `fix-rls-simple.sql` (script corregido)
 5. Ejecuta el script
 
 ## 🧪 **TESTING COMPLETO:**

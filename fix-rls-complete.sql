@@ -4,14 +4,13 @@
 -- 1. Verificar estado actual de RLS
 SELECT schemaname, tablename, rowsecurity 
 FROM pg_tables 
-WHERE tablename IN ('empleados', 'productos', 'clientes', 'ventas', 'caja_movimientos');
+WHERE tablename IN ('empleados', 'productos', 'clientes', 'ventas');
 
--- 2. Habilitar RLS en todas las tablas principales
+-- 2. Habilitar RLS en las tablas que existen
 ALTER TABLE empleados ENABLE ROW LEVEL SECURITY;
 ALTER TABLE productos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE clientes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ventas ENABLE ROW LEVEL SECURITY;
-ALTER TABLE caja_movimientos ENABLE ROW LEVEL SECURITY;
 
 -- 3. Eliminar TODAS las políticas existentes que puedan causar conflictos
 -- Empleados
@@ -42,12 +41,6 @@ DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON ventas;
 DROP POLICY IF EXISTS "Enable update for users based on email" ON ventas;
 DROP POLICY IF EXISTS "Enable delete for users based on email" ON ventas;
 
--- Caja movimientos
-DROP POLICY IF EXISTS "Enable read access for all users" ON caja_movimientos;
-DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON caja_movimientos;
-DROP POLICY IF EXISTS "Enable update for users based on email" ON caja_movimientos;
-DROP POLICY IF EXISTS "Enable delete for users based on email" ON caja_movimientos;
-
 -- 4. Crear políticas permisivas para desarrollo/testing
 -- EMPLEADOS
 CREATE POLICY "Empleados - SELECT" ON empleados FOR SELECT USING (true);
@@ -73,12 +66,6 @@ CREATE POLICY "Ventas - INSERT" ON ventas FOR INSERT WITH CHECK (true);
 CREATE POLICY "Ventas - UPDATE" ON ventas FOR UPDATE USING (true) WITH CHECK (true);
 CREATE POLICY "Ventas - DELETE" ON ventas FOR DELETE USING (true);
 
--- CAJA MOVIMIENTOS
-CREATE POLICY "Caja - SELECT" ON caja_movimientos FOR SELECT USING (true);
-CREATE POLICY "Caja - INSERT" ON caja_movimientos FOR INSERT WITH CHECK (true);
-CREATE POLICY "Caja - UPDATE" ON caja_movimientos FOR UPDATE USING (true) WITH CHECK (true);
-CREATE POLICY "Caja - DELETE" ON caja_movimientos FOR DELETE USING (true);
-
 -- 5. Verificar que las políticas se crearon correctamente
 SELECT 
     schemaname,
@@ -90,7 +77,7 @@ SELECT
     qual,
     with_check
 FROM pg_policies 
-WHERE tablename IN ('empleados', 'productos', 'clientes', 'ventas', 'caja_movimientos')
+WHERE tablename IN ('empleados', 'productos', 'clientes', 'ventas')
 ORDER BY tablename, cmd;
 
 -- 6. Probar inserción de empleado completo
