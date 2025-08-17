@@ -51,24 +51,15 @@ export const Sidebar: React.FC = () => {
 
   if (!user) return null
 
-  // Lógica de permisos simplificada
+  // Lógica de permisos basada en permisos específicos del usuario
   const accessibleModules = menuItems.filter(item => {
     // Para desarrollo, mostrar todos los módulos
     if (import.meta.env.DEV) {
       return true
     }
     
-    // Para producción, usar permisos basados en rol
-    const rolePermissions = {
-      'Administrador': ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario', 'reportes'],
-      'Gerente': ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario', 'reportes'],
-      'Vendedor': ['dashboard', 'ventas', 'clientes', 'calendario'],
-      'Técnico': ['dashboard', 'productos', 'calendario'],
-      'Almacén': ['dashboard', 'productos', 'calendario'],
-      'Cajero': ['dashboard', 'ventas', 'caja', 'clientes', 'calendario'],
-    }
-    
-    return rolePermissions[user.rol as keyof typeof rolePermissions]?.includes(item.id) || false
+    // Usar los permisos específicos asignados al usuario
+    return user.permisos_modulos?.includes(item.id) || false
   })
 
   // Debug: Log de módulos accesibles

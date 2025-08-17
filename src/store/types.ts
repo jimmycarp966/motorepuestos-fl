@@ -224,6 +224,7 @@ export interface AuthenticatedUser {
   nombre: string
   email: string
   rol: 'Administrador' | 'Gerente' | 'Vendedor' | 'Técnico' | 'Almacén' | 'Cajero'
+  permisos_modulos: string[] // Permisos específicos del usuario
   activo: boolean
   created_at: string
   updated_at: string

@@ -43,9 +43,12 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
                 nombre: 'Usuario de Prueba',
                 email: email,
                 rol: 'Administrador',
-                activo: true
+                permisos_modulos: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'],
+                activo: true,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
               }])
-              .select()
+              .select('id, nombre, email, rol, permisos_modulos, activo, created_at, updated_at')
               .single()
 
             if (createError) {
@@ -65,6 +68,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
                 nombre: 'Usuario de Prueba',
                 email: email,
                 rol: 'Administrador',
+                permisos_modulos: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'], // Permisos por defecto
                 activo: true,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
@@ -86,14 +90,14 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
         throw error
       }
 
-      // Obtener datos del empleado
-      if (data.user) {
-        const { data: empleadoData, error: empleadoError } = await supabase
-          .from('empleados')
-          .select('*')
-          .eq('email', data.user.email)
-          .eq('activo', true)
-          .single()
+              // Obtener datos del empleado con permisos
+        if (data.user) {
+          const { data: empleadoData, error: empleadoError } = await supabase
+            .from('empleados')
+            .select('id, nombre, email, rol, permisos_modulos, activo, created_at, updated_at')
+            .eq('email', data.user.email)
+            .eq('activo', true)
+            .single()
 
         if (empleadoError) {
           // Si no existe el empleado, crearlo
@@ -103,9 +107,12 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
               nombre: 'Usuario de Prueba',
               email: data.user.email,
               rol: 'Administrador',
-              activo: true
+              permisos_modulos: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'],
+              activo: true,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
             }])
-            .select()
+            .select('id, nombre, email, rol, permisos_modulos, activo, created_at, updated_at')
             .single()
 
           if (createError) {
@@ -119,6 +126,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
                    nombre: data.user.user_metadata?.nombre || 'Usuario',
                    email: data.user.email || '',
                    rol: data.user.user_metadata?.rol || 'Administrador',
+                   permisos_modulos: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'], // Permisos por defecto
                    activo: true,
                    created_at: data.user.created_at,
                    updated_at: data.user.updated_at || data.user.created_at
