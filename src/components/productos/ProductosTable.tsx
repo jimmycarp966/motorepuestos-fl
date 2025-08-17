@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useAppStore } from '../../store'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
-import { Plus, Edit, Trash2, Package } from 'lucide-react'
+import { Plus, Edit, Trash2, Package, AlertTriangle, Filter } from 'lucide-react'
 import { ProductoForm } from './ProductoForm'
 import { useSearchFilter } from '../../hooks/useSearchFilter'
 
@@ -19,6 +19,7 @@ export const ProductosTable: React.FC = () => {
   const [showForm, setShowForm] = useState(false)
   const [editingProducto, setEditingProducto] = useState<any>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'out'>('all')
 
   console.log('🔍 [ProductosTable] Estado actual:', { 
     productos: productos?.length, 
@@ -51,6 +52,34 @@ export const ProductosTable: React.FC = () => {
       )
     }
   })
+
+  // Aplicar filtro de stock
+  const productosConFiltroStock = filteredProductos.filter(producto => {
+    switch (stockFilter) {
+      case 'low':
+        return producto.stock <= 10 && producto.stock > 0
+      case 'out':
+        return producto.stock <= 0
+      default:
+        return true
+    }
+  })
+
+  // Función para obtener el color del stock
+  const getStockColor = (stock: number) => {
+    if (stock <= 0) return 'text-red-600 bg-red-100'
+    if (stock <= 5) return 'text-orange-600 bg-orange-100'
+    if (stock <= 10) return 'text-yellow-600 bg-yellow-100'
+    return 'text-green-600 bg-green-100'
+  }
+
+  // Función para obtener el icono del stock
+  const getStockIcon = (stock: number) => {
+    if (stock <= 0) return <AlertTriangle className="w-4 h-4" />
+    if (stock <= 5) return <AlertTriangle className="w-4 h-4" />
+    if (stock <= 10) return <AlertTriangle className="w-4 h-4" />
+    return <Package className="w-4 h-4" />
+  }
 
   const handleDelete = async (id: string) => {
     try {
@@ -153,7 +182,7 @@ export const ProductosTable: React.FC = () => {
     )
   }
 
-  console.log('🔍 [ProductosTable] Renderizando tabla con productos:', filteredProductos?.length)
+  console.log('🔍 [ProductosTable] Renderizando tabla con productos:', productosConFiltroStock?.length)
 
   return (
     <div className="space-y-6">
@@ -171,31 +200,68 @@ export const ProductosTable: React.FC = () => {
         </Button>
       </div>
 
-      {/* Buscador */}
+      {/* Buscador y Filtros */}
       <Card className="p-4">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <input
-            type="text"
-            placeholder="Buscar productos por nombre, código, categoría..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        <div className="space-y-4">
+          {/* Buscador */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-            </button>
-          )}
+            </div>
+            <input
+              type="text"
+              placeholder="Buscar productos por nombre, código, categoría..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700"
+            />
+                         {searchTerm && (
+               <button
+                onClick={() => setSearchTerm('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Filtros de Stock */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">Filtrar por stock:</span>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant={stockFilter === 'all' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setStockFilter('all')}
+                className="text-xs"
+              >
+                Todos ({productos?.length || 0})
+              </Button>
+              <Button
+                variant={stockFilter === 'low' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setStockFilter('low')}
+                className="text-xs bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100"
+              >
+                Stock Bajo (≤10) ({productos?.filter(p => p.stock <= 10 && p.stock > 0).length || 0})
+              </Button>
+              <Button
+                variant={stockFilter === 'out' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setStockFilter('out')}
+                className="text-xs bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
+              >
+                Sin Stock (≤0) ({productos?.filter(p => p.stock <= 0).length || 0})
+              </Button>
+            </div>
+          </div>
         </div>
         {searchTerm && (
           <div className="mt-2 text-sm text-gray-600">
@@ -243,8 +309,8 @@ export const ProductosTable: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredProductos && filteredProductos.length > 0 ? (
-                filteredProductos.map((producto) => (
+              {productosConFiltroStock && productosConFiltroStock.length > 0 ? (
+                productosConFiltroStock.map((producto) => (
                   <tr key={producto.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
                       {producto.codigo_sku}
@@ -281,15 +347,17 @@ export const ProductosTable: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        producto.stock > 10 
-                          ? 'bg-green-100 text-green-800' 
-                          : producto.stock > 0 
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {producto.stock} {producto.unidad_medida}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${getStockColor(producto.stock)}`}>
+                          {getStockIcon(producto.stock)}
+                          <span className="ml-1">{producto.stock} {producto.unidad_medida}</span>
+                        </span>
+                        {producto.stock <= 10 && (
+                          <span className="text-xs text-gray-500">
+                            {producto.stock <= 0 ? 'Sin stock' : producto.stock <= 5 ? 'Crítico' : 'Bajo'}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
@@ -338,10 +406,20 @@ export const ProductosTable: React.FC = () => {
                     <div className="text-gray-500">
                       <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                       <p className="text-lg font-medium">
-                        {searchTerm ? 'No se encontraron productos' : 'No hay productos'}
+                        {stockFilter !== 'all' 
+                          ? `No se encontraron productos con ${stockFilter === 'low' ? 'stock bajo' : 'sin stock'}`
+                          : searchTerm 
+                          ? 'No se encontraron productos' 
+                          : 'No hay productos'
+                        }
                       </p>
                       <p className="text-sm">
-                        {searchTerm ? 'Intenta con otros términos de búsqueda' : 'Comienza agregando tu primer producto'}
+                        {stockFilter !== 'all' 
+                          ? 'Intenta cambiar los filtros o agregar más productos'
+                          : searchTerm 
+                          ? 'Intenta con otros términos de búsqueda' 
+                          : 'Comienza agregando tu primer producto'
+                        }
                       </p>
                     </div>
                   </td>

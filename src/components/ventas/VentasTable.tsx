@@ -106,25 +106,26 @@ export const VentasTable: React.FC = () => {
       item.producto.id === producto.id && item.tipo_precio === tipoPrecio
     )
     
-    if (existingItemIndex >= 0) {
-      // Actualizar cantidad del item existente
-      const updatedItems = [...cartItems]
-      const existingItem = updatedItems[existingItemIndex]
-      const newCantidad = existingItem.cantidad + cantidad
-      
-      if (newCantidad <= producto.stock) {
-        existingItem.cantidad = newCantidad
-        existingItem.subtotal = precio * newCantidad
-        setCartItems(updatedItems)
-      } else {
-        addNotification({
-          id: Date.now().toString(),
-          type: 'error',
-          title: 'Stock insuficiente',
-          message: `No hay suficiente stock para ${producto.nombre}`
-        })
-      }
-    } else {
+         if (existingItemIndex >= 0) {
+       // Actualizar cantidad del item existente
+       const updatedItems = [...cartItems]
+       const existingItem = updatedItems[existingItemIndex]
+       const newCantidad = existingItem.cantidad + cantidad
+       
+       // Permitir stock negativo - mostrar advertencia pero continuar
+       if (newCantidad > producto.stock) {
+         addNotification({
+           id: Date.now().toString(),
+           type: 'warning',
+           title: 'Stock bajo',
+           message: `${producto.nombre}: Stock ${producto.stock}, agregando ${cantidad} (total: ${newCantidad})`
+         })
+       }
+       
+       existingItem.cantidad = newCantidad
+       existingItem.subtotal = precio * newCantidad
+       setCartItems(updatedItems)
+     } else {
       // Agregar nuevo item
       const newItem: CartItem = {
         producto,
@@ -151,31 +152,32 @@ export const VentasTable: React.FC = () => {
     setCartItems(cartItems.filter((_, i) => i !== index))
   }
 
-  const handleUpdateQuantity = (index: number, newCantidad: number) => {
-    if (newCantidad <= 0) {
-      handleRemoveItem(index)
-      return
-    }
+     const handleUpdateQuantity = (index: number, newCantidad: number) => {
+     if (newCantidad <= 0) {
+       handleRemoveItem(index)
+       return
+     }
 
-    const item = cartItems[index]
-    if (newCantidad > item.producto.stock) {
-      addNotification({
-        id: Date.now().toString(),
-        type: 'error',
-        title: 'Stock insuficiente',
-        message: `No hay suficiente stock para ${item.producto.nombre}`
-      })
-      return
-    }
+     const item = cartItems[index]
+     
+     // Permitir stock negativo - mostrar advertencia pero continuar
+     if (newCantidad > item.producto.stock) {
+       addNotification({
+         id: Date.now().toString(),
+         type: 'warning',
+         title: 'Stock bajo',
+         message: `${item.producto.nombre}: Stock ${item.producto.stock}, solicitando ${newCantidad}`
+       })
+     }
 
-    const updatedItems = [...cartItems]
-    updatedItems[index] = {
-      ...item,
-      cantidad: newCantidad,
-      subtotal: item.precio_unitario * newCantidad
-    }
-    setCartItems(updatedItems)
-  }
+     const updatedItems = [...cartItems]
+     updatedItems[index] = {
+       ...item,
+       cantidad: newCantidad,
+       subtotal: item.precio_unitario * newCantidad
+     }
+     setCartItems(updatedItems)
+   }
 
   // Funciones de manejo de clientes
   const handleClientSelect = (cliente: any) => {
@@ -335,14 +337,24 @@ export const VentasTable: React.FC = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-bold text-green-600 text-sm">
-                            ${producto.precio_minorista?.toFixed(2)}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            Stock: {producto.stock}
-                          </p>
-                        </div>
+                                                 <div className="text-right">
+                           <p className="font-bold text-green-600 text-sm">
+                             ${producto.precio_minorista?.toFixed(2)}
+                           </p>
+                           <div className="flex items-center justify-end gap-1 mt-1">
+                             <span className={`text-xs px-1 py-0.5 rounded ${
+                               producto.stock <= 0 ? 'text-red-600 bg-red-100' :
+                               producto.stock <= 5 ? 'text-orange-600 bg-orange-100' :
+                               producto.stock <= 10 ? 'text-yellow-600 bg-yellow-100' :
+                               'text-gray-500'
+                             }`}>
+                               Stock: {producto.stock}
+                             </span>
+                             {producto.stock <= 10 && (
+                               <span className="text-xs text-red-500">⚠️</span>
+                             )}
+                           </div>
+                         </div>
                       </div>
                     </div>
                   ))}

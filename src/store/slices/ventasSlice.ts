@@ -129,28 +129,40 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
         let total = 0
         const itemsToInsert = []
 
-        for (const item of ventaData.items) {
-          const { data: producto } = await supabase
-            .from('productos')
-            .select('*')
-            .eq('id', item.producto_id)
-            .single()
+                 for (const item of ventaData.items) {
+           const { data: producto } = await supabase
+             .from('productos')
+             .select('*')
+             .eq('id', item.producto_id)
+             .single()
 
-          if (!producto) throw new Error(`Producto ${item.producto_id} no encontrado`)
-          if (producto.stock < item.cantidad) throw new Error(`Stock insuficiente para ${producto.nombre}`)
+           if (!producto) throw new Error(`Producto ${item.producto_id} no encontrado`)
+           
+           // Permitir venta sin stock - mostrar advertencia pero continuar
+           if (producto.stock < item.cantidad) {
+             console.warn(`⚠️ Stock insuficiente para ${producto.nombre}: ${producto.stock} disponible, ${item.cantidad} solicitado`)
+             
+             // Notificar advertencia de stock bajo
+             get().addNotification({
+               id: Date.now().toString(),
+               type: 'warning',
+               title: 'Stock bajo',
+               message: `${producto.nombre}: Stock ${producto.stock}, vendiendo ${item.cantidad} (quedará en ${producto.stock - item.cantidad})`
+             })
+           }
 
-          // Usar precio que viene en el item (ya calculado en el frontend)
-          const subtotal = item.precio_unitario * item.cantidad
-          total += subtotal
+           // Usar precio que viene en el item (ya calculado en el frontend)
+           const subtotal = item.precio_unitario * item.cantidad
+           total += subtotal
 
-          itemsToInsert.push({
-            producto_id: item.producto_id,
-            cantidad: item.cantidad,
-            precio_unitario: item.precio_unitario,
-            subtotal,
-            tipo_precio: item.tipo_precio || 'minorista'
-          })
-        }
+           itemsToInsert.push({
+             producto_id: item.producto_id,
+             cantidad: item.cantidad,
+             precio_unitario: item.precio_unitario,
+             subtotal,
+             tipo_precio: item.tipo_precio || 'minorista'
+           })
+         }
 
         // 2. Crear venta
         const { data: venta, error: ventaError } = await supabase
