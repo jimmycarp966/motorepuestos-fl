@@ -16,23 +16,30 @@ Value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhz
 Environment: Production, Preview, Development
 ```
 
+### **3. VITE_SUPABASE_SERVICE_ROLE_KEY**
+```
+Name: VITE_SUPABASE_SERVICE_ROLE_KEY
+Value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzYWpobnh0bGdmcGtwemNyanliIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTI1NzY0NSwiZXhwIjoyMDcwODMzNjQ1fQ.Z_KzATN2NK9cvxAJMokNjtwhN1VWAUQH6Ezl_2-zFiU
+Environment: Production, Preview, Development
+```
+
 ## 📋 Variables Recomendadas
 
-### **3. VITE_APP_NAME**
+### **4. VITE_APP_NAME**
 ```
 Name: VITE_APP_NAME
 Value: Motorepuestos FL
 Environment: Production, Preview, Development
 ```
 
-### **4. VITE_APP_VERSION**
+### **5. VITE_APP_VERSION**
 ```
 Name: VITE_APP_VERSION
 Value: 1.0.0
 Environment: Production, Preview, Development
 ```
 
-### **5. VITE_APP_ENV**
+### **6. VITE_APP_ENV**
 ```
 Name: VITE_APP_ENV
 Value: production
@@ -59,7 +66,7 @@ Para cada variable:
 4. Haz clic en **"Save"**
 
 ### **Paso 4: Verificar**
-1. Asegúrate de que tienes **5 variables** configuradas
+1. Asegúrate de que tienes **6 variables** configuradas
 2. Todas deben empezar con `VITE_` (NO `REACT_APP_`)
 3. Todas deben estar marcadas para todos los entornos
 
@@ -81,6 +88,7 @@ Si ves estas variables, **ELIMÍNALAS**:
 Estas son las que debes tener:
 - ✅ `VITE_SUPABASE_URL`
 - ✅ `VITE_SUPABASE_ANON_KEY`
+- ✅ `VITE_SUPABASE_SERVICE_ROLE_KEY`
 - ✅ `VITE_APP_NAME`
 - ✅ `VITE_APP_VERSION`
 - ✅ `VITE_APP_ENV`
@@ -113,6 +121,7 @@ Después del redeploy:
 **Variables obligatorias para que funcione:**
 1. `VITE_SUPABASE_URL`
 2. `VITE_SUPABASE_ANON_KEY`
+3. `VITE_SUPABASE_SERVICE_ROLE_KEY`
 
 **Después de configurar:**
 1. Redeploy en Vercel
