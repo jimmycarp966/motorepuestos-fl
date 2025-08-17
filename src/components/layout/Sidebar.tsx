@@ -11,7 +11,7 @@ import {
   BarChart3, 
   LogOut
 } from 'lucide-react'
-import { useDebug } from '../../hooks/useDebug'
+
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: '#667eea' },
@@ -25,7 +25,7 @@ const menuItems = [
 
 export const Sidebar: React.FC = () => {
   // Registrar componente para debug
-  const { logError, logInfo } = useDebug({ componentName: 'Sidebar' })
+
   
   const user = useAppStore((state) => state.auth.user)
   const logout = useAppStore((state) => state.logout)
@@ -34,23 +34,14 @@ export const Sidebar: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      logInfo('Intentando logout')
       await logout()
-      logInfo('Logout exitoso')
     } catch (error) {
-      logError(error, 'Error en logout')
+      // Error en logout
     }
   }
 
   const handleMenuClick = (moduleId: string) => {
-    console.log('🔍 [Sidebar] Click en módulo:', moduleId)
-    console.log('🔍 [Sidebar] Módulo actual:', currentModule)
-    console.log('🔍 [Sidebar] Cambiando de', currentModule, 'a', moduleId)
-    
-    logInfo('Cambiando módulo', { from: currentModule, to: moduleId })
     setCurrentModule(moduleId)
-    
-    console.log('🔍 [Sidebar] setCurrentModule ejecutado')
   }
 
   if (!user) return null
@@ -61,12 +52,7 @@ export const Sidebar: React.FC = () => {
     return user.permisos_modulos?.includes(item.id) || false
   })
 
-  // Debug: Log de módulos accesibles
-  logInfo('Módulos accesibles', { 
-    total: accessibleModules.length, 
-    modules: accessibleModules.map(m => m.id),
-    userRol: user.rol
-  })
+
 
   return (
     <div style={{

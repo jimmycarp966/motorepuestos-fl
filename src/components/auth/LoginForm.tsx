@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useAppStore } from '../../store'
 import { Eye, EyeOff, Lock, Mail, Loader2 } from 'lucide-react'
-import { useDebug } from '../../hooks/useDebug'
+
 
 export const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -10,7 +10,7 @@ export const LoginForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   
   // Registrar componente para debug
-  const { logError, logInfo } = useDebug({ componentName: 'LoginForm' })
+
   
   const login = useAppStore((state) => state.login)
   const loading = useAppStore((state) => state.auth.loading)
@@ -21,11 +21,9 @@ export const LoginForm: React.FC = () => {
     setIsLoading(true)
     
     try {
-      logInfo('Intentando login', { email })
       await login(email, password)
-      logInfo('Login exitoso')
     } catch (error) {
-      logError(error, 'Error en login')
+      // Error en login
     } finally {
       setIsLoading(false)
     }

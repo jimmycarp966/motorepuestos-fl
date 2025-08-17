@@ -12,12 +12,12 @@ import {
   ArrowUpRight,
   ArrowDownRight
 } from 'lucide-react'
-import { useDebug } from '../../hooks/useDebug'
+
 import { DateUtils } from '../../lib/dateUtils'
 
 export const Dashboard: React.FC = () => {
   // Registrar componente para debug
-  const { logError, logInfo } = useDebug({ componentName: 'Dashboard' })
+
   
   const ventas = useAppStore((state) => state.ventas)
   const productos = useAppStore((state) => state.productos)
@@ -29,12 +29,11 @@ export const Dashboard: React.FC = () => {
   const fetchMovimientos = useAppStore((state) => state.fetchMovimientos)
 
   useEffect(() => {
-    logInfo('Cargando datos del dashboard')
     fetchVentas()
     fetchProductos()
     fetchClientes()
     fetchMovimientos()
-  }, [fetchVentas, fetchProductos, fetchClientes, fetchMovimientos, logInfo])
+  }, [fetchVentas, fetchProductos, fetchClientes, fetchMovimientos])
 
   // Refrescar datos cuando cambien las ventas o movimientos
   useEffect(() => {
