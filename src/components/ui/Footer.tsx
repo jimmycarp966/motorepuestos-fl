@@ -15,15 +15,36 @@ export const Footer: React.FC = () => {
       boxShadow: '0 -1px 3px 0 rgba(0, 0, 0, 0.1)'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <img 
-          src="/LOGO SISTEMAS.png" 
-          alt="Sirius" 
-          style={{ 
-            height: '40px', 
-            width: 'auto',
-            objectFit: 'contain'
-          }} 
-        />
+        {/* Logo Sirius creado con CSS */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '40px',
+          height: '40px',
+          backgroundColor: '#3b82f6',
+          borderRadius: '8px',
+          position: 'relative',
+          boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)'
+        }}>
+          <span style={{
+            color: '#ffffff',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            fontFamily: 'Arial, sans-serif'
+          }}>
+            S
+          </span>
+        </div>
+        <span style={{
+          fontSize: '20px',
+          fontWeight: '600',
+          color: '#1f2937',
+          fontFamily: 'Arial, sans-serif',
+          letterSpacing: '0.5px'
+        }}>
+          Sirius
+        </span>
       </div>
     </footer>
   )
