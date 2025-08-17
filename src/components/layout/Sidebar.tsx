@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useAppStore } from '../../store'
 import { usePermissionGuard } from '../../hooks/usePermissionGuard'
 import { Button } from '../ui/button'
@@ -11,7 +11,9 @@ import {
   DollarSign, 
   BarChart3, 
   LogOut,
-  Shield
+  Shield,
+  Menu,
+  X
 } from 'lucide-react'
 
 
@@ -32,6 +34,9 @@ export const Sidebar: React.FC = () => {
   const currentModule = useAppStore((state) => state.ui.currentModule)
   const setCurrentModule = useAppStore((state) => state.setCurrentModule)
   const permissions = usePermissionGuard()
+  
+  // Estado para sidebar móvil
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
 
   const handleLogout = async () => {
     try {
@@ -50,6 +55,9 @@ export const Sidebar: React.FC = () => {
     if (navigationCheck.canNavigate) {
       // Navegación exitosa
       setCurrentModule(moduleId)
+      
+      // Cerrar sidebar móvil después de navegar
+      setIsMobileOpen(false)
       
       // Notificación de éxito (opcional, solo para debug)
       if (process.env.NODE_ENV === 'development') {
@@ -87,22 +95,44 @@ export const Sidebar: React.FC = () => {
     return permissions.canAccess(item.id as any)
   })
 
-
-
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      height: '100%',
-      backgroundColor: 'white',
-      borderRight: '1px solid #e2e8f0',
-      zIndex: 50,
-      width: '280px',
-      boxShadow: '4px 0 20px rgba(0, 0, 0, 0.1)',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
+    <>
+      {/* Botón de toggle para móviles */}
+      <button
+        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg border border-gray-200"
+        style={{ zIndex: 60 }}
+      >
+        {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Overlay para móviles */}
+      {isMobileOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        height: '100%',
+        backgroundColor: 'white',
+        borderRight: '1px solid #e2e8f0',
+        zIndex: 50,
+        width: '280px',
+        boxShadow: '4px 0 20px rgba(0, 0, 0, 0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+        transform: isMobileOpen ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform 0.3s ease-in-out',
+        '@media (min-width: 1024px)': {
+          transform: 'translateX(0)',
+        }
+      }}>
         {/* Header del sidebar */}
         <div style={{
           padding: '2rem 1.5rem 1.5rem',
@@ -301,5 +331,6 @@ export const Sidebar: React.FC = () => {
           </button>
         </div>
       </div>
+    </>
   )
 }

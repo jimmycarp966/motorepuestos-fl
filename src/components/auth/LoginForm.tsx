@@ -74,17 +74,26 @@ export const LoginForm: React.FC = () => {
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
           <div style={{
-            width: '80px',
-            height: '80px',
+            width: '100px',
+            height: '100px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'white',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             margin: '0 auto 1.5rem',
-            boxShadow: '0 10px 25px rgba(102, 126, 234, 0.3)'
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+            border: '3px solid #667eea'
           }}>
-            <Lock size={32} style={{ color: 'white' }} />
+            <img 
+              src="/LOGO SISTEMAS.png" 
+              alt="Sistemas Logo" 
+              style={{ 
+                width: '80px', 
+                height: '80px',
+                objectFit: 'contain'
+              }} 
+            />
           </div>
           
           <h1 style={{

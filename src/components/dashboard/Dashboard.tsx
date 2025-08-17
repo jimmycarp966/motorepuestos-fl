@@ -258,11 +258,11 @@ export const Dashboard: React.FC = () => {
   ]
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div style={{ padding: '1rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Header del Dashboard */}
-      <div style={{ marginBottom: '2rem' }}>
+      <div style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ 
-          fontSize: '2rem', 
+          fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
           fontWeight: '700', 
           color: '#1e293b',
           marginBottom: '0.5rem'
@@ -270,7 +270,7 @@ export const Dashboard: React.FC = () => {
           Dashboard
         </h1>
         <p style={{ 
-          fontSize: '1rem', 
+          fontSize: 'clamp(0.875rem, 2vw, 1rem)', 
           color: '#64748b',
           margin: 0
         }}>
@@ -281,9 +281,9 @@ export const Dashboard: React.FC = () => {
       {/* KPIs Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '2rem'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '1rem',
+        marginBottom: '1.5rem'
       }}>
         {kpiCards.map((card, index) => {
           const Icon = card.icon
@@ -291,7 +291,7 @@ export const Dashboard: React.FC = () => {
             <div key={index} style={{
               backgroundColor: 'white',
               borderRadius: '1rem',
-              padding: '1.5rem',
+              padding: '1rem',
               boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
               border: '1px solid #e2e8f0',
               position: 'relative',
@@ -302,8 +302,8 @@ export const Dashboard: React.FC = () => {
                 position: 'absolute',
                 top: '-10px',
                 right: '-10px',
-                width: '80px',
-                height: '80px',
+                width: '60px',
+                height: '60px',
                 borderRadius: '50%',
                 backgroundColor: card.bgColor,
                 display: 'flex',
@@ -311,7 +311,7 @@ export const Dashboard: React.FC = () => {
                 justifyContent: 'center',
                 opacity: 0.1
               }}>
-                <Icon size={40} style={{ color: card.color }} />
+                <Icon size={30} style={{ color: card.color }} />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
@@ -325,7 +325,7 @@ export const Dashboard: React.FC = () => {
                     {card.title}
                   </div>
                   <div style={{ 
-                    fontSize: '2rem', 
+                    fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
                     fontWeight: '700', 
                     color: '#1e293b',
                     marginBottom: '0.25rem'
@@ -356,7 +356,9 @@ export const Dashboard: React.FC = () => {
                 }}>
                   {card.trend === 'up' ? <ArrowUpRight size={12} /> : 
                    card.trend === 'down' ? <ArrowDownRight size={12} /> : null}
-                  {card.trendValue}
+                  <span style={{ display: 'none', '@media (min-width: 640px)': { display: 'inline' } }}>
+                    {card.trendValue}
+                  </span>
                 </div>
               </div>
             </div>
@@ -367,14 +369,18 @@ export const Dashboard: React.FC = () => {
       {/* Contenido en dos columnas */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-        gap: '2rem'
+        gridTemplateColumns: '1fr',
+        gap: '1.5rem',
+        '@media (min-width: 768px)': {
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gap: '2rem'
+        }
       }}>
         {/* Ventas Recientes */}
         <div style={{
           backgroundColor: 'white',
           borderRadius: '1rem',
-          padding: '1.5rem',
+          padding: '1rem',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           border: '1px solid #e2e8f0'
         }}>
@@ -382,10 +388,10 @@ export const Dashboard: React.FC = () => {
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'space-between',
-            marginBottom: '1.5rem'
+            marginBottom: '1rem'
           }}>
             <h3 style={{ 
-              fontSize: '1.25rem', 
+              fontSize: '1.125rem', 
               fontWeight: '600', 
               color: '#1e293b',
               margin: 0
@@ -396,13 +402,13 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {ventasRecientes.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {ventasRecientes.map((venta, index) => (
                 <div key={index} style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '1rem',
+                  padding: '0.75rem',
                   backgroundColor: '#f8fafc',
                   borderRadius: '0.75rem',
                   border: '1px solid #e2e8f0'
@@ -453,7 +459,7 @@ export const Dashboard: React.FC = () => {
         <div style={{
           backgroundColor: 'white',
           borderRadius: '1rem',
-          padding: '1.5rem',
+          padding: '1rem',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           border: '1px solid #e2e8f0'
         }}>
@@ -461,10 +467,10 @@ export const Dashboard: React.FC = () => {
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'space-between',
-            marginBottom: '1.5rem'
+            marginBottom: '1rem'
           }}>
             <h3 style={{ 
-              fontSize: '1.25rem', 
+              fontSize: '1.125rem', 
               fontWeight: '600', 
               color: '#1e293b',
               margin: 0
@@ -475,13 +481,13 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {movimientosRecientes.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {movimientosRecientes.map((movimiento, index) => (
                 <div key={index} style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '1rem',
+                  padding: '0.75rem',
                   backgroundColor: '#f8fafc',
                   borderRadius: '0.75rem',
                   border: '1px solid #e2e8f0'
@@ -509,9 +515,9 @@ export const Dashboard: React.FC = () => {
                   <div style={{ 
                     fontSize: '1rem', 
                     fontWeight: '700', 
-                                         color: movimiento.tipo === 'ingreso' ? '#10b981' : '#ef4444'
-                   }}>
-                     {movimiento.tipo === 'ingreso' ? '+' : '-'}${Math.abs(movimiento.monto || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                    color: movimiento.tipo === 'ingreso' ? '#10b981' : '#ef4444'
+                  }}>
+                    {movimiento.tipo === 'ingreso' ? '+' : '-'}${Math.abs(movimiento.monto || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                   </div>
                 </div>
               ))}
@@ -531,10 +537,10 @@ export const Dashboard: React.FC = () => {
 
       {/* Estadísticas adicionales */}
       <div style={{
-        marginTop: '2rem',
+        marginTop: '1.5rem',
         backgroundColor: 'white',
         borderRadius: '1rem',
-        padding: '1.5rem',
+        padding: '1rem',
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         border: '1px solid #e2e8f0'
       }}>
@@ -542,10 +548,10 @@ export const Dashboard: React.FC = () => {
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'space-between',
-          marginBottom: '1.5rem'
+          marginBottom: '1rem'
         }}>
           <h3 style={{ 
-            fontSize: '1.25rem', 
+            fontSize: '1.125rem', 
             fontWeight: '600', 
             color: '#1e293b',
             margin: 0
@@ -557,8 +563,8 @@ export const Dashboard: React.FC = () => {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '1.5rem'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+          gap: '1rem'
         }}>
           <div style={{
             textAlign: 'center',
@@ -568,7 +574,7 @@ export const Dashboard: React.FC = () => {
             border: '1px solid #e2e8f0'
           }}>
             <div style={{ 
-              fontSize: '2rem', 
+              fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
               fontWeight: '700', 
               color: '#667eea',
               marginBottom: '0.5rem'
@@ -592,7 +598,7 @@ export const Dashboard: React.FC = () => {
             border: '1px solid #e2e8f0'
           }}>
             <div style={{ 
-              fontSize: '2rem', 
+              fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
               fontWeight: '700', 
               color: '#10b981',
               marginBottom: '0.5rem'
@@ -616,7 +622,7 @@ export const Dashboard: React.FC = () => {
             border: '1px solid #e2e8f0'
           }}>
             <div style={{ 
-              fontSize: '2rem', 
+              fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
               fontWeight: '700', 
               color: '#f59e0b',
               marginBottom: '0.5rem'
@@ -640,7 +646,7 @@ export const Dashboard: React.FC = () => {
             border: '1px solid #e2e8f0'
           }}>
             <div style={{ 
-              fontSize: '2rem', 
+              fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
               fontWeight: '700', 
               color: '#8b5cf6',
               marginBottom: '0.5rem'

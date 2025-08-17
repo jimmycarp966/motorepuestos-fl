@@ -206,11 +206,14 @@ function App() {
              {/* Contenido principal */}
        <main style={{
          flex: 1,
-         marginLeft: '280px',
+         marginLeft: '0px',
          minHeight: '100vh',
          backgroundColor: '#f8fafc',
          display: 'flex',
-         flexDirection: 'column'
+         flexDirection: 'column',
+         '@media (min-width: 1024px)': {
+           marginLeft: '280px'
+         }
        }}>
         {/* Header moderno */}
         <header style={{

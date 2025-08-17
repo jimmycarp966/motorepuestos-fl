@@ -22,6 +22,7 @@ export interface TableColumn<T> {
   render?: (value: any, item: T, index: number) => ReactNode
   sortable?: boolean
   searchable?: boolean
+  mobilePriority?: boolean // Nueva propiedad para priorizar columnas en móvil
 }
 
 export interface TableAction<T> {
@@ -145,6 +146,9 @@ function TableBase<T>({
     }
   }
 
+  // Obtener columnas prioritarias para móvil
+  const mobileColumns = columns.filter(col => col.mobilePriority !== false)
+
   // Estados de carga y error
   if (loading) {
     return (
@@ -194,7 +198,7 @@ function TableBase<T>({
               className="flex items-center gap-2"
             >
               <RefreshCw className="w-4 h-4" />
-              Actualizar
+              <span className="hidden sm:inline">Actualizar</span>
             </Button>
           )}
           
@@ -259,124 +263,209 @@ function TableBase<T>({
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  {selectable && (
-                    <th className="w-12 px-4 py-3 text-left">
-                      <button
-                        onClick={handleSelectAll}
-                        className="flex items-center justify-center w-full"
+          <>
+            {/* Vista de escritorio - Tabla */}
+            <div className="hidden lg:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    {selectable && (
+                      <th className="w-12 px-4 py-3 text-left">
+                        <button
+                          onClick={handleSelectAll}
+                          className="flex items-center justify-center w-full"
+                        >
+                          {selectedItems.length === items.length ? (
+                            <CheckSquare className="w-4 h-4 text-blue-600" />
+                          ) : selectedItems.length > 0 ? (
+                            <div className="w-4 h-4 bg-blue-600 rounded border-2 border-blue-600 relative">
+                              <div className="w-2 h-0.5 bg-white absolute top-1.5 left-1"></div>
+                            </div>
+                          ) : (
+                            <Square className="w-4 h-4 text-gray-400" />
+                          )}
+                        </button>
+                      </th>
+                    )}
+                    
+                    {columns.map((column, index) => (
+                      <th
+                        key={index}
+                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        style={{ width: column.width }}
                       >
-                        {selectedItems.length === items.length ? (
-                          <CheckSquare className="w-4 h-4 text-blue-600" />
-                        ) : selectedItems.length > 0 ? (
-                          <div className="w-4 h-4 bg-blue-600 rounded border-2 border-blue-600 relative">
-                            <div className="w-2 h-0.5 bg-white absolute top-1.5 left-1"></div>
-                          </div>
-                        ) : (
-                          <Square className="w-4 h-4 text-gray-400" />
+                        {column.title}
+                      </th>
+                    ))}
+                    
+                    {actions.length > 0 && (
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Acciones
+                      </th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {items.map((item, index) => {
+                    const itemId = getItemId(item)
+                    const isSelected = selectedItems.includes(itemId)
+                    
+                    return (
+                      <tr
+                        key={itemId}
+                        className={`hover:bg-gray-50 transition-colors ${
+                          isSelected ? 'bg-blue-50' : ''
+                        }`}
+                      >
+                        {selectable && (
+                          <td className="w-12 px-4 py-3">
+                            <button
+                              onClick={() => handleItemSelection(item)}
+                              className="flex items-center justify-center w-full"
+                            >
+                              {isSelected ? (
+                                <CheckSquare className="w-4 h-4 text-blue-600" />
+                              ) : (
+                                <Square className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                              )}
+                            </button>
+                          </td>
                         )}
-                      </button>
-                    </th>
-                  )}
-                  
-                  {columns.map((column, index) => (
-                    <th
-                      key={index}
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      style={{ width: column.width }}
-                    >
-                      {column.title}
-                    </th>
-                  ))}
-                  
-                  {actions.length > 0 && (
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Acciones
-                    </th>
-                  )}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+                        
+                        {columns.map((column, colIndex) => (
+                          <td key={colIndex} className="px-4 py-3 text-sm text-gray-900">
+                            {column.render
+                              ? column.render(
+                                  typeof column.key === 'string' && column.key.includes('.')
+                                    ? column.key.split('.').reduce((obj, key) => obj?.[key], item)
+                                    : (item as any)[column.key],
+                                  item,
+                                  index
+                                )
+                              : typeof column.key === 'string' && column.key.includes('.')
+                              ? column.key.split('.').reduce((obj, key) => obj?.[key], item)
+                              : (item as any)[column.key]
+                            }
+                          </td>
+                        ))}
+                        
+                        {actions.length > 0 && (
+                          <td className="px-4 py-3 text-sm">
+                            <div className="flex items-center gap-2">
+                              {actions
+                                .filter(action => !action.hidden?.(item))
+                                .map((action, actionIndex) => (
+                                  <Button
+                                    key={actionIndex}
+                                    size="sm"
+                                    variant={action.variant || 'outline'}
+                                    onClick={() => action.onClick(item)}
+                                    disabled={action.disabled?.(item)}
+                                    className="h-8 px-3"
+                                  >
+                                    {action.icon && <span className="mr-1">{action.icon}</span>}
+                                    <span className="hidden sm:inline">{action.label}</span>
+                                  </Button>
+                                ))
+                              }
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Vista móvil - Cards */}
+            <div className="lg:hidden">
+              <div className="p-4 space-y-4">
                 {items.map((item, index) => {
                   const itemId = getItemId(item)
                   const isSelected = selectedItems.includes(itemId)
                   
                   return (
-                    <tr
+                    <div
                       key={itemId}
-                      className={`hover:bg-gray-50 transition-colors ${
-                        isSelected ? 'bg-blue-50' : ''
+                      className={`bg-white border rounded-lg p-4 shadow-sm ${
+                        isSelected ? 'border-blue-200 bg-blue-50' : 'border-gray-200'
                       }`}
                     >
+                      {/* Selección */}
                       {selectable && (
-                        <td className="w-12 px-4 py-3">
+                        <div className="flex justify-end mb-3">
                           <button
                             onClick={() => handleItemSelection(item)}
-                            className="flex items-center justify-center w-full"
+                            className="flex items-center justify-center"
                           >
                             {isSelected ? (
-                              <CheckSquare className="w-4 h-4 text-blue-600" />
+                              <CheckSquare className="w-5 h-5 text-blue-600" />
                             ) : (
-                              <Square className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                              <Square className="w-5 h-5 text-gray-400" />
                             )}
                           </button>
-                        </td>
+                        </div>
                       )}
-                      
-                      {columns.map((column, colIndex) => (
-                        <td key={colIndex} className="px-4 py-3 text-sm text-gray-900">
-                          {column.render
-                            ? column.render(
-                                typeof column.key === 'string' && column.key.includes('.')
-                                  ? column.key.split('.').reduce((obj, key) => obj?.[key], item)
-                                  : (item as any)[column.key],
-                                item,
-                                index
-                              )
-                            : typeof column.key === 'string' && column.key.includes('.')
-                            ? column.key.split('.').reduce((obj, key) => obj?.[key], item)
-                            : (item as any)[column.key]
-                          }
-                        </td>
-                      ))}
-                      
-                      {actions.length > 0 && (
-                        <td className="px-4 py-3 text-sm">
-                          <div className="flex items-center gap-2">
-                            {actions
-                              .filter(action => !action.hidden?.(item))
-                              .map((action, actionIndex) => (
-                                <Button
-                                  key={actionIndex}
-                                  size="sm"
-                                  variant={action.variant || 'outline'}
-                                  onClick={() => action.onClick(item)}
-                                  disabled={action.disabled?.(item)}
-                                  className="h-8 px-3"
-                                >
-                                  {action.icon && <span className="mr-1">{action.icon}</span>}
-                                  <span className="hidden sm:inline">{action.label}</span>
-                                </Button>
-                              ))
-                            }
+
+                      {/* Contenido de la card */}
+                      <div className="space-y-3">
+                        {mobileColumns.map((column, colIndex) => (
+                          <div key={colIndex} className="flex justify-between items-start">
+                            <span className="text-sm font-medium text-gray-500 min-w-0 flex-1">
+                              {column.title}:
+                            </span>
+                            <div className="text-sm text-gray-900 min-w-0 flex-1 text-right">
+                              {column.render
+                                ? column.render(
+                                    typeof column.key === 'string' && column.key.includes('.')
+                                      ? column.key.split('.').reduce((obj, key) => obj?.[key], item)
+                                      : (item as any)[column.key],
+                                    item,
+                                    index
+                                  )
+                                : typeof column.key === 'string' && column.key.includes('.')
+                                ? column.key.split('.').reduce((obj, key) => obj?.[key], item)
+                                : (item as any)[column.key]
+                              }
+                            </div>
                           </div>
-                        </td>
+                        ))}
+                      </div>
+
+                      {/* Acciones */}
+                      {actions.length > 0 && (
+                        <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100">
+                          {actions
+                            .filter(action => !action.hidden?.(item))
+                            .map((action, actionIndex) => (
+                              <Button
+                                key={actionIndex}
+                                size="sm"
+                                variant={action.variant || 'outline'}
+                                onClick={() => action.onClick(item)}
+                                disabled={action.disabled?.(item)}
+                                className="flex-1"
+                              >
+                                {action.icon && <span className="mr-1">{action.icon}</span>}
+                                {action.label}
+                              </Button>
+                            ))
+                          }
+                        </div>
                       )}
-                    </tr>
+                    </div>
                   )
                 })}
-              </tbody>
-            </table>
-          </div>
+              </div>
+            </div>
+          </>
         )}
 
         {/* Paginación */}
         {pagination && pagination.totalPages > 1 && (
           <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-sm text-gray-700">
                 Mostrando {pagination.start} a {pagination.end} de {pagination.totalItems} resultados
               </div>
@@ -389,7 +478,7 @@ function TableBase<T>({
                   disabled={!pagination.hasPrev}
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  Anterior
+                  <span className="hidden sm:inline">Anterior</span>
                 </Button>
                 
                 <span className="text-sm text-gray-700 px-3">
@@ -402,7 +491,7 @@ function TableBase<T>({
                   onClick={() => onPageChange?.(pagination.currentPage + 1)}
                   disabled={!pagination.hasNext}
                 >
-                  Siguiente
+                  <span className="hidden sm:inline">Siguiente</span>
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>

@@ -14,36 +14,24 @@ export const Footer: React.FC = () => {
       fontSize: '0.875rem',
       boxShadow: '0 -1px 3px 0 rgba(0, 0, 0, 0.1)'
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        {/* Logo Sirius creado con CSS */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '40px',
-          height: '40px',
-          backgroundColor: '#3b82f6',
-          borderRadius: '8px',
-          position: 'relative',
-          boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)'
-        }}>
-          <span style={{
-            color: '#ffffff',
-            fontSize: '18px',
-            fontWeight: 'bold',
-            fontFamily: 'Arial, sans-serif'
-          }}>
-            S
-          </span>
-        </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        {/* Logo SISTEMAS */}
+        <img 
+          src="/LOGO SISTEMAS.png" 
+          alt="Sistemas Logo" 
+          style={{ 
+            width: '40px', 
+            height: '40px',
+            objectFit: 'contain'
+          }} 
+        />
         <span style={{
-          fontSize: '20px',
-          fontWeight: '600',
-          color: '#1f2937',
-          fontFamily: 'Arial, sans-serif',
-          letterSpacing: '0.5px'
+          fontSize: '16px',
+          fontWeight: '500',
+          color: '#64748b',
+          fontFamily: 'Inter, system-ui, sans-serif'
         }}>
-          Sirius
+          Desarrollado por Sistemas
         </span>
       </div>
     </footer>
