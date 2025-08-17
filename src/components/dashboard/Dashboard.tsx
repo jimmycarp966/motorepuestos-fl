@@ -22,7 +22,7 @@ import {
 } from 'lucide-react'
 
 export const Dashboard: React.FC = () => {
-  // Usar selectores optimizados
+  // Usar selectores optimizados con validaciones
   const kpis = useDashboardKPIs()
   const ventasRecientes = useVentasRecientes(5)
   const movimientosRecientes = useMovimientosRecientes(5)
@@ -34,24 +34,101 @@ export const Dashboard: React.FC = () => {
   const fetchProductos = useAppStore((state) => state.fetchProductos)
   const fetchClientes = useAppStore((state) => state.fetchClientes)
   const fetchMovimientos = useAppStore((state) => state.fetchMovimientos)
+  const addNotification = useAppStore((state) => state.addNotification)
+
+  // Estado para retry automático
+  const [retryCount, setRetryCount] = React.useState(0)
+  const [lastErrorTime, setLastErrorTime] = React.useState<number | null>(null)
+
+  // Función para cargar datos con manejo de errores mejorado
+  const loadDashboardData = React.useCallback(async (isRetry = false) => {
+    try {
+      if (!isRetry) {
+        console.log('🔄 [Dashboard] Cargando datos...')
+      } else {
+        console.log(`🔄 [Dashboard] Reintentando carga (intento ${retryCount + 1})...`)
+      }
+
+      // Cargar datos en paralelo con timeout
+      await Promise.allSettled([
+        Promise.race([
+          fetchVentas(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout ventas')), 10000))
+        ]),
+        Promise.race([
+          fetchProductos(), 
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout productos')), 10000))
+        ]),
+        Promise.race([
+          fetchClientes(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout clientes')), 10000))
+        ]),
+        Promise.race([
+          fetchMovimientos(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout caja')), 10000))
+        ])
+      ])
+
+      // Resetear contador de retry si es exitoso
+      if (retryCount > 0) {
+        setRetryCount(0)
+        setLastErrorTime(null)
+        addNotification({
+          id: Date.now().toString(),
+          type: 'success',
+          title: 'Dashboard Recuperado',
+          message: 'Los datos se cargaron correctamente tras el reintento',
+          duration: 3000
+        })
+      }
+    } catch (error) {
+      console.error('❌ [Dashboard] Error cargando datos:', error)
+      setLastErrorTime(Date.now())
+      
+      if (!isRetry) {
+        addNotification({
+          id: Date.now().toString(),
+          type: 'warning',
+          title: 'Error de Carga',
+          message: 'Hubo un problema cargando algunos datos. Reintentando automáticamente...',
+          duration: 4000
+        })
+      }
+    }
+  }, [fetchVentas, fetchProductos, fetchClientes, fetchMovimientos, retryCount, addNotification])
 
   useEffect(() => {
-    // Cargar datos iniciales
-    fetchVentas()
-    fetchProductos()
-    fetchClientes()
-    fetchMovimientos()
-  }, [fetchVentas, fetchProductos, fetchClientes, fetchMovimientos])
+    loadDashboardData()
+  }, [loadDashboardData])
 
-  // Refrescar datos automáticamente
+  // Sistema de retry automático
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchVentas()
-      fetchMovimientos()
-    }, 30000) // Refrescar cada 30 segundos
+    if (lastErrorTime && retryCount < 3) {
+      const timeoutId = setTimeout(() => {
+        setRetryCount(prev => prev + 1)
+        loadDashboardData(true)
+      }, Math.min(2000 * Math.pow(2, retryCount), 10000)) // Backoff exponencial
 
-    return () => clearInterval(interval)
-  }, [fetchVentas, fetchMovimientos])
+      return () => clearTimeout(timeoutId)
+    }
+  }, [lastErrorTime, retryCount, loadDashboardData])
+
+  // Refrescar datos automáticamente (solo si no hay errores)
+  useEffect(() => {
+    if (!lastErrorTime || retryCount >= 3) {
+      const interval = setInterval(() => {
+        // Solo refrescar ventas y movimientos, que cambian más frecuentemente
+        Promise.allSettled([
+          fetchVentas(),
+          fetchMovimientos()
+        ]).catch(error => {
+          console.warn('⚠️ [Dashboard] Error en refresh automático:', error)
+        })
+      }, 30000) // Refrescar cada 30 segundos
+
+      return () => clearInterval(interval)
+    }
+  }, [fetchVentas, fetchMovimientos, lastErrorTime, retryCount])
 
   // Indicadores de estado
   const isLoading = loadingStates.ventas || loadingStates.productos || loadingStates.caja
@@ -69,14 +146,69 @@ export const Dashboard: React.FC = () => {
     )
   }
 
+  // Función para retry manual
+  const handleRetryManual = () => {
+    setRetryCount(0)
+    setLastErrorTime(null)
+    loadDashboardData()
+  }
+
   // Mostrar errores si existen
-  if (hasErrors) {
+  if (hasErrors && retryCount >= 3) {
     return (
       <div style={{ padding: '2rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
-        <div style={{ textAlign: 'center', paddingTop: '4rem' }}>
+        <div style={{ textAlign: 'center', paddingTop: '4rem', maxWidth: '500px', margin: '0 auto' }}>
           <AlertCircle size={48} style={{ color: '#ef4444', margin: '0 auto 1rem' }} />
-          <h3 style={{ color: '#ef4444', marginBottom: '0.5rem' }}>Error en el Dashboard</h3>
-          <p style={{ color: '#64748b' }}>No se pudieron cargar los datos. Intente refrescar la página.</p>
+          <h3 style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '1.5rem' }}>
+            Error en el Dashboard
+          </h3>
+          <p style={{ color: '#64748b', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+            No se pudieron cargar los datos después de varios intentos. Esto puede deberse a problemas de conexión o del servidor.
+          </p>
+          
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={handleRetryManual}
+              style={{
+                padding: '0.75rem 1.5rem',
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3b82f6'}
+            >
+              🔄 Reintentar Ahora
+            </button>
+            
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                padding: '0.75rem 1.5rem',
+                backgroundColor: '#6b7280',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4b5563'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6b7280'}
+            >
+              🔃 Refrescar Página
+            </button>
+          </div>
+
+          <p style={{ color: '#9ca3af', fontSize: '0.75rem', marginTop: '1.5rem' }}>
+            Si el problema persiste, contacte al administrador del sistema.
+          </p>
         </div>
       </div>
     )

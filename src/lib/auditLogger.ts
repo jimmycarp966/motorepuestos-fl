@@ -71,7 +71,20 @@ export class BusinessErrorClass extends Error implements BusinessError {
 
 // Sistema de logging centralizado
 export class AuditLogger {
-  private static sessionId = crypto.randomUUID()
+  private static sessionId: string = 'default-session'
+  
+  // Inicializar session ID de forma segura
+  static {
+    try {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        this.sessionId = crypto.randomUUID()
+      } else {
+        this.sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      }
+    } catch {
+      this.sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    }
+  }
   
   // Obtener información del usuario actual
   private static getCurrentUser() {
@@ -132,6 +145,13 @@ export class AuditLogger {
     await this.log(action, module, false, context, error)
   }
 
+  // Alias para compatibilidad (muchos archivos usan logAction)
+  static async logAction(action: string, data?: any): Promise<void> {
+    // Detectar el módulo del contexto o usar genérico
+    const module = data?.module || 'system'
+    await this.log(action, module, true, data)
+  }
+
   // Log específico para acciones de negocio
   static async logBusinessAction(
     action: string,
@@ -185,6 +205,15 @@ export class AuditLogger {
   static newSession(): void {
     this.sessionId = crypto.randomUUID()
   }
+
+  // Obtener estadísticas de la sesión actual
+  static getSessionStats(): { sessionId: string; actions: number; errors: number } {
+    return {
+      sessionId: this.sessionId,
+      actions: 0, // En una implementación real, mantener contador
+      errors: 0   // En una implementación real, mantener contador
+    }
+  }
 }
 
 // Función helper para crear errores de negocio
@@ -220,6 +249,34 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   USUARIO_NO_AUTENTICADO: 'Debes iniciar sesión para continuar',
   SESION_EXPIRADA: 'Tu sesión ha expirado, inicia sesión nuevamente',
   CONEXION_DB_ERROR: 'Error de conexión con la base de datos'
+}
+
+// Exportar también como función individual para compatibilidad
+export const logAction = (action: string, data?: any) => {
+  try {
+    return AuditLogger.logAction(action, data)
+  } catch (error) {
+    console.warn('⚠️ [Audit] Error en logAction:', error)
+    return Promise.resolve()
+  }
+}
+
+export const logSuccess = (action: string, module: string, data?: any) => {
+  try {
+    return AuditLogger.logSuccess(action, module, data)
+  } catch (error) {
+    console.warn('⚠️ [Audit] Error en logSuccess:', error)
+    return Promise.resolve()
+  }
+}
+
+export const logError = (action: string, module: string, error: Error, context?: any) => {
+  try {
+    return AuditLogger.logError(action, module, error, context)
+  } catch (logError) {
+    console.warn('⚠️ [Audit] Error en logError:', logError)
+    return Promise.resolve()
+  }
 }
 
 export default AuditLogger

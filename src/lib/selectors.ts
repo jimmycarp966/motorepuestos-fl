@@ -348,29 +348,29 @@ export const useEstadoCaja = () => {
 // SELECTORES PARA UI
 // ================================
 
-// Selector de loading states
+// Selector de loading states corregido
 export const useLoadingStates = () => {
   return useAppStore(
     useCallback((state: AppStore) => ({
-      productos: state.loading || false,
-      ventas: state.loading || false,
-      clientes: state.clientes.loading,
-      empleados: state.empleados?.loading || false,
-      caja: state.caja.loading
+      productos: state.loading || false, // ProductosSlice tiene loading en root
+      ventas: state.loading || false,    // VentasSlice tiene loading en root  
+      clientes: state.clientes?.loading || false, // ClientesSlice tiene state anidado
+      empleados: state.empleados?.loading || false, // EmpleadosSlice tiene state anidado
+      caja: state.caja?.loading || false  // CajaSlice tiene state anidado
     }), []),
     shallow
   )
 }
 
-// Selector de errores
+// Selector de errores corregido
 export const useErrorStates = () => {
   return useAppStore(
     useCallback((state: AppStore) => ({
-      productos: state.error,
-      ventas: state.error,
-      clientes: state.clientes.error,
-      empleados: state.empleados?.error || null,
-      caja: state.caja.error
+      productos: state.error || null,     // ProductosSlice tiene error en root
+      ventas: state.error || null,        // VentasSlice tiene error en root
+      clientes: state.clientes?.error || null, // ClientesSlice tiene state anidado
+      empleados: state.empleados?.error || null, // EmpleadosSlice tiene state anidado
+      caja: state.caja?.error || null     // CajaSlice tiene state anidado
     }), []),
     shallow
   )
