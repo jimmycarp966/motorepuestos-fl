@@ -300,3 +300,6 @@ export interface UIState {
 export interface NotificationsState {
   notifications: Notification[]
 }
+
+// Importar tipos del slice de historial de caja
+export type { CajaHistorialState, CajaDiaria } from './slices/cajaHistorialSlice'

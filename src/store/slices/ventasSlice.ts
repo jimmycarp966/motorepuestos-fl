@@ -1,5 +1,6 @@
 import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
+import { DateUtils } from '../../lib/dateUtils'
 import type { AppStore } from '../index'
 import type { VentasState, CreateVentaData } from '../types'
 
@@ -171,7 +172,7 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
             cliente_id: ventaData.cliente_id,
             empleado_id: currentUser.id,
             total,
-            fecha: new Date().toISOString(),
+            fecha: DateUtils.getCurrentDateTime(),
             metodo_pago: ventaData.metodo_pago || 'efectivo',
             tipo_precio: ventaData.tipo_precio || 'minorista'
           }])
@@ -218,6 +219,9 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
 
         // 8. Refrescar caja para actualizar saldo
         await get().fetchMovimientos()
+
+        // 9. Sincronizar ventas en tiempo real (Dashboard y Caja)
+        await get().fetchVentas()
 
         // Notificar éxito
         get().addNotification({

@@ -13,6 +13,7 @@ import {
   ArrowDownRight
 } from 'lucide-react'
 import { useDebug } from '../../hooks/useDebug'
+import { DateUtils } from '../../lib/dateUtils'
 
 export const Dashboard: React.FC = () => {
   // Registrar componente para debug
@@ -45,10 +46,9 @@ export const Dashboard: React.FC = () => {
     return () => clearInterval(interval)
   }, [fetchVentas, fetchMovimientos])
 
-  // Calcular KPIs
+  // Calcular KPIs usando DateUtils
   const ventasHoy = (ventas || []).filter(v => {
-    const hoy = new Date().toDateString()
-    return new Date(v.fecha).toDateString() === hoy
+    return DateUtils.isToday(v.fecha)
   })
   
   const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0)
@@ -57,9 +57,8 @@ export const Dashboard: React.FC = () => {
   const clientesActivos = (clientes || []).filter(c => c.activo).length
 
   // Obtener ventas de la semana pasada para comparación
-  const unaSemanaAtras = new Date()
-  unaSemanaAtras.setDate(unaSemanaAtras.getDate() - 7)
-  const ventasSemanaPasada = (ventas || []).filter(v => new Date(v.fecha) >= unaSemanaAtras)
+  const unaSemanaAtras = DateUtils.subtractDays(DateUtils.getCurrentDate(), 7)
+  const ventasSemanaPasada = (ventas || []).filter(v => v.fecha >= unaSemanaAtras)
   const totalVentasSemana = ventasSemanaPasada.reduce((sum, v) => sum + (v.total || 0), 0)
 
   const kpiCards = [

@@ -6,6 +6,7 @@ import { productosSlice } from './slices/productosSlice'
 import { clientesSlice } from './slices/clientesSlice'
 import { ventasSlice } from './slices/ventasSlice'
 import { cajaSlice } from './slices/cajaSlice'
+import { cajaHistorialSlice } from './slices/cajaHistorialSlice'
 import { calendarioSlice } from './slices/calendarioSlice'
 import { uiSlice } from './slices/uiSlice'
 import { notificationsSlice } from './slices/notificationsSlice'
@@ -98,6 +99,11 @@ export interface AppStore {
   fetchCajasDiarias: () => Promise<void>
   fetchArqueos: () => Promise<void>
 
+  // Caja Historial
+  cajaHistorial: CajaHistorialState
+  fetchHistorialCajas: (fechaInicio?: string, fechaFin?: string) => Promise<void>
+  obtenerResumenCaja: (fecha: string) => Promise<any>
+
   // Calendario
   calendario: CalendarioState
   fetchEventos: () => Promise<void>
@@ -126,6 +132,7 @@ export const useAppStore = create<AppStore>()((set, get) => {
   const clientes = clientesSlice(set, get, {})
   const ventas = ventasSlice(set, get, {})
   const caja = cajaSlice(set, get, {})
+  const cajaHistorial = cajaHistorialSlice(set, get, {})
   const calendario = calendarioSlice(set, get, {})
   const ui = uiSlice(set, get, {})
   const notifications = notificationsSlice(set, get, {})
@@ -183,6 +190,11 @@ export const useAppStore = create<AppStore>()((set, get) => {
     realizarArqueo: caja.realizarArqueo,
     fetchCajasDiarias: caja.fetchCajasDiarias,
     fetchArqueos: caja.fetchArqueos,
+    
+    // Caja Historial slice
+    cajaHistorial: cajaHistorial.cajaHistorial,
+    fetchHistorialCajas: cajaHistorial.fetchHistorialCajas,
+    obtenerResumenCaja: cajaHistorial.obtenerResumenCaja,
     
     // Calendario slice
     calendario: calendario.calendario,

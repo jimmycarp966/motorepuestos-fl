@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useAppStore } from '../../store'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
+import { DateUtils } from '../../lib/dateUtils'
 import { 
   Plus, 
   DollarSign, 
@@ -16,11 +17,14 @@ import {
   BarChart3,
   ShoppingCart,
   CreditCard,
-  Receipt
+  Receipt,
+  History,
+  X
 } from 'lucide-react'
 import { MovimientoForm } from './MovimientoForm'
 import { AbrirCajaForm } from './AbrirCajaForm'
 import { GastosForm } from './GastosForm'
+import { HistorialCajas } from './HistorialCajas'
 
 export const CajaTable: React.FC = () => {
   const movimientos = useAppStore((state) => state.caja.movimientos)
@@ -36,6 +40,7 @@ export const CajaTable: React.FC = () => {
   const [showIngresoForm, setShowIngresoForm] = useState(false)
   const [showAbrirCaja, setShowAbrirCaja] = useState(false)
   const [showGastosForm, setShowGastosForm] = useState(false)
+  const [showHistorial, setShowHistorial] = useState(false)
   const [tipoMovimiento, setTipoMovimiento] = useState<'ingreso' | 'egreso'>('ingreso')
 
   // Cargar datos al montar
@@ -84,6 +89,14 @@ export const CajaTable: React.FC = () => {
     setShowGastosForm(false)
   }
 
+  const handleVerHistorial = () => {
+    setShowHistorial(true)
+  }
+
+  const handleCerrarHistorial = () => {
+    setShowHistorial(false)
+  }
+
   const handleCerrarCaja = async () => {
     try {
       await cerrarCaja()
@@ -108,10 +121,9 @@ export const CajaTable: React.FC = () => {
     fetchVentas()
   }
 
-  // Calcular estadísticas
+  // Calcular estadísticas usando DateUtils
   const movimientosHoy = movimientos.filter(m => {
-    const hoy = new Date().toDateString()
-    return new Date(m.fecha).toDateString() === hoy
+    return DateUtils.isToday(m.fecha)
   })
 
   const ingresosHoy = movimientosHoy
@@ -124,8 +136,7 @@ export const CajaTable: React.FC = () => {
 
   // Calcular estadísticas de ventas
   const ventasHoy = (ventas || []).filter(v => {
-    const hoy = new Date().toDateString()
-    return new Date(v.fecha).toDateString() === hoy
+    return DateUtils.isToday(v.fecha)
   })
 
   const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0)
@@ -452,6 +463,14 @@ export const CajaTable: React.FC = () => {
               <TrendingDown className="w-4 h-4 mr-2" />
               Otro Egreso
             </Button>
+            <Button
+              onClick={handleVerHistorial}
+              variant="outline"
+              className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+            >
+              <History className="w-4 h-4 mr-2" />
+              Ver Historial
+            </Button>
           </div>
         </Card>
       )}
@@ -663,6 +682,29 @@ export const CajaTable: React.FC = () => {
             fetchMovimientos()
           }}
         />
+      )}
+
+      {/* Historial de Cajas */}
+      {showHistorial && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-7xl max-h-[90vh] overflow-hidden bg-white rounded-lg">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900">Historial de Cajas Diarias</h2>
+                <Button
+                  onClick={handleCerrarHistorial}
+                  variant="ghost"
+                  size="sm"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="max-h-[calc(90vh-120px)] overflow-y-auto">
+                <HistorialCajas />
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
