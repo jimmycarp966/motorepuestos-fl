@@ -16,6 +16,7 @@ import { ConnectionError } from './components/ui/ConnectionError'
 import { DebugButton } from './components/ui/DebugButton'
 import { DebugVentasSimple } from './components/ui/DebugVentasSimple'
 import { DebugVentasCompleto } from './components/ui/DebugVentasCompleto'
+import { Footer } from './components/ui/Footer'
 
 function App() {
   const user = useAppStore((state) => state.auth.user)
@@ -230,13 +231,15 @@ function App() {
       {/* Sidebar fijo */}
       <Sidebar />
       
-      {/* Contenido principal */}
-      <main style={{
-        flex: 1,
-        marginLeft: '280px',
-        minHeight: '100vh',
-        backgroundColor: '#f8fafc'
-      }}>
+             {/* Contenido principal */}
+       <main style={{
+         flex: 1,
+         marginLeft: '280px',
+         minHeight: '100vh',
+         backgroundColor: '#f8fafc',
+         display: 'flex',
+         flexDirection: 'column'
+       }}>
         {/* Header moderno */}
         <header style={{
           backgroundColor: 'white',
@@ -291,22 +294,26 @@ function App() {
           </div>
         </header>
 
-        {/* Contenido del módulo */}
-        <div style={{ 
-          padding: '2rem',
-          maxWidth: '100%',
-          overflowX: 'auto'
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '0.75rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            overflow: 'hidden'
-          }}>
-            {renderModule()}
-          </div>
-        </div>
-      </main>
+                 {/* Contenido del módulo */}
+         <div style={{ 
+           padding: '2rem',
+           maxWidth: '100%',
+           overflowX: 'auto',
+           flex: 1
+         }}>
+           <div style={{
+             backgroundColor: 'white',
+             borderRadius: '0.75rem',
+             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+             overflow: 'hidden'
+           }}>
+             {renderModule()}
+           </div>
+         </div>
+         
+         {/* Footer */}
+         <Footer />
+       </main>
       {/* Botón de debug */}
       <DebugButton />
       
