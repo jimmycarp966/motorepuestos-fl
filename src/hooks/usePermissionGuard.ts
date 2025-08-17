@@ -13,8 +13,8 @@ export type ModuleName =
   | 'clientes' 
   | 'ventas' 
   | 'caja' 
-  | 'calendario' 
-  | 'reportes'
+  | 'reportes' 
+  | 'calendario'
 
 export type Permission = 'read' | 'create' | 'update' | 'delete' | 'manage'
 
@@ -26,6 +26,7 @@ export interface PermissionCheck {
 
 export interface UserPermissions {
   canAccess: (module: ModuleName) => boolean
+  canNavigateTo: (module: ModuleName) => { canNavigate: boolean; reason?: string }
   canPerform: (module: ModuleName, permission: Permission) => boolean
   checkModuleAccess: (module: ModuleName) => PermissionCheck
   getAccessibleModules: () => ModuleName[]
@@ -114,7 +115,7 @@ export function usePermissionGuard(): UserPermissions {
     return ROLE_PERMISSIONS[user.rol] || {}
   }, [user, isAuthenticated])
 
-  // Verificar acceso a módulo
+  // Verificar acceso a módulo (función síncrona para navegación)
   const canAccess = useCallback((module: ModuleName): boolean => {
     if (!isAuthenticated || !user) return false
     
@@ -130,6 +131,27 @@ export function usePermissionGuard(): UserPermissions {
     
     return hasModuleInPermissions || hasRolePermissions
   }, [isAuthenticated, user, rolePermissions])
+
+  // Verificación de navegación rápida (síncrona) para sidebar
+  const canNavigateTo = useCallback((module: ModuleName): { canNavigate: boolean; reason?: string } => {
+    if (!isAuthenticated) {
+      return { canNavigate: false, reason: 'Usuario no autenticado' }
+    }
+
+    if (!user) {
+      return { canNavigate: false, reason: 'Datos de usuario no disponibles' }
+    }
+
+    if (!user.activo) {
+      return { canNavigate: false, reason: 'Usuario inactivo' }
+    }
+
+    if (!canAccess(module)) {
+      return { canNavigate: false, reason: `Sin permisos para acceder al módulo ${module}` }
+    }
+
+    return { canNavigate: true }
+  }, [isAuthenticated, user, canAccess])
 
   // Verificar permiso específico
   const canPerform = useCallback((module: ModuleName, permission: Permission): boolean => {
@@ -275,6 +297,7 @@ export function usePermissionGuard(): UserPermissions {
 
   return {
     canAccess,
+    canNavigateTo,
     canPerform,
     checkModuleAccess,
     getAccessibleModules,

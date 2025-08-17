@@ -8,6 +8,11 @@ import { vi } from 'vitest'
 import { useAppStore } from '../../store'
 import type { AuthenticatedUser } from '../../store/types'
 
+// Mock de useAppStore
+vi.mock('../../store', () => ({
+  useAppStore: vi.fn()
+}))
+
 // Mock del store para tests
 export const mockStore = {
   auth: {
@@ -76,7 +81,8 @@ export function setupAuthenticatedStore(user: AuthenticatedUser = mockUser) {
   }
   
   // Mock del hook useAppStore
-  vi.mocked(useAppStore).mockImplementation((selector: any) => {
+  const mockedUseAppStore = useAppStore as any
+  mockedUseAppStore.mockImplementation((selector: any) => {
     if (typeof selector === 'function') {
       return selector(initialStore)
     }
@@ -97,7 +103,8 @@ export function setupUnauthenticatedStore() {
     }
   }
   
-  vi.mocked(useAppStore).mockImplementation((selector: any) => {
+  const mockedUseAppStore = useAppStore as any
+  mockedUseAppStore.mockImplementation((selector: any) => {
     if (typeof selector === 'function') {
       return selector(initialStore)
     }

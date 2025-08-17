@@ -3,23 +3,22 @@
 // ================================================
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { BusinessRules } from '../../lib/businessRules'
-import { createBusinessError, ERROR_CODES } from '../../lib/auditLogger'
 
-// Mock de Supabase
-const mockSupabase = {
-  from: vi.fn(() => ({
-    select: vi.fn(() => ({
-      eq: vi.fn(() => ({
-        single: vi.fn()
+// Mock de Supabase (debe estar antes de los imports que lo usan)
+vi.mock('../../lib/supabase', () => ({
+  supabase: {
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          single: vi.fn()
+        }))
       }))
     }))
-  }))
-}
-
-vi.mock('../../lib/supabase', () => ({
-  supabase: mockSupabase
+  }
 }))
+
+import { BusinessRules } from '../../lib/businessRules'
+import { createBusinessError, ERROR_CODES } from '../../lib/auditLogger'
 
 describe('BusinessRules', () => {
   beforeEach(() => {

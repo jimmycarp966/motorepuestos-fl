@@ -41,11 +41,42 @@ export const Sidebar: React.FC = () => {
     }
   }
 
+  const addNotification = useAppStore((state) => state.addNotification)
+
   const handleMenuClick = (moduleId: string) => {
-    // Verificar acceso antes de cambiar módulo
-    const moduleCheck = permissions.checkModuleAccess(moduleId as any)
-    if (moduleCheck.hasPermission) {
+    // Verificar acceso antes de cambiar módulo (función síncrona)
+    const navigationCheck = permissions.canNavigateTo(moduleId as any)
+    
+    if (navigationCheck.canNavigate) {
+      // Navegación exitosa
       setCurrentModule(moduleId)
+      
+      // Notificación de éxito (opcional, solo para debug)
+      if (process.env.NODE_ENV === 'development') {
+        addNotification({
+          id: Date.now().toString(),
+          type: 'info',
+          title: 'Navegación',
+          message: `Accediendo a ${moduleId}`,
+          duration: 2000
+        })
+      }
+    } else {
+      // Navegación denegada - mostrar notificación
+      addNotification({
+        id: Date.now().toString(),
+        type: 'error',
+        title: 'Acceso Denegado',
+        message: navigationCheck.reason || `No tienes permisos para acceder a ${moduleId}`,
+        duration: 5000
+      })
+      
+      console.warn('Navegación denegada:', {
+        module: moduleId,
+        reason: navigationCheck.reason,
+        user: user?.nombre,
+        role: user?.rol
+      })
     }
   }
 
