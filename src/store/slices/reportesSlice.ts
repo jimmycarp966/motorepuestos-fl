@@ -1,5 +1,6 @@
-import { StateCreator } from 'zustand';
+import type { StateCreator } from 'zustand';
 import { supabase } from '../../lib/supabase';
+import type { AppStore } from '../index';
 
 export interface FiltrosReporte {
   fechaInicio: string;
@@ -97,7 +98,7 @@ const initialState: ReportesState = {
   error: null,
 };
 
-export const reportesSlice: StateCreator<ReportesSlice> = (set, get) => {
+export const reportesSlice: StateCreator<AppStore> = (set, get) => {
   const addNotification = (type: 'success' | 'error' | 'warning', message: string) => {
     const notification = {
       id: Date.now().toString(),
