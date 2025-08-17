@@ -10,7 +10,6 @@ import { ClientesTable } from './components/clientes/ClientesTable'
 import { VentasTable } from './components/ventas/VentasTable'
 import { CajaTable } from './components/caja/CajaTable'
 import ReportesTable from './components/reportes/ReportesTable'
-import { Calendario } from './components/calendario/Calendario'
 import { NotificationsContainer } from './components/ui/notifications'
 import { ConnectionError } from './components/ui/ConnectionError'
 import { DebugButton } from './components/ui/DebugButton'
@@ -132,13 +131,10 @@ function App() {
         const ventasComponent = <VentasTable />
         console.log('🎯 [App] VentasTable creado:', ventasComponent)
         return ventasComponent
-      case 'caja':
-        console.log('🎯 [App] Renderizando CajaTable')
-        return <CajaTable />
-      case 'calendario':
-        console.log('🎯 [App] Renderizando Calendario')
-        return <Calendario />
-      case 'reportes':
+             case 'caja':
+         console.log('🎯 [App] Renderizando CajaTable')
+         return <CajaTable />
+       case 'reportes':
         console.log('🎯 [App] Renderizando ReportesTable')
         return <ReportesTable />
       default:
@@ -263,7 +259,6 @@ function App() {
                 currentModule === 'clientes' ? 'Clientes' :
                 currentModule === 'ventas' ? 'Ventas' :
                 currentModule === 'caja' ? 'Caja' :
-                currentModule === 'calendario' ? 'Calendario' :
                 currentModule === 'reportes' ? 'Reportes' : 'Dashboard'}
             </h1>
           </div>

@@ -8,7 +8,6 @@ import {
   UserCheck, 
   ShoppingCart, 
   DollarSign, 
-  Calendar,
   BarChart3, 
   LogOut
 } from 'lucide-react'
@@ -21,7 +20,6 @@ const menuItems = [
   { id: 'clientes', label: 'Clientes', icon: UserCheck, color: '#43e97b' },
   { id: 'ventas', label: 'Ventas', icon: ShoppingCart, color: '#fa709a' },
   { id: 'caja', label: 'Caja', icon: DollarSign, color: '#ffecd2' },
-  { id: 'calendario', label: 'Calendario', icon: Calendar, color: '#a8edea' },
   { id: 'reportes', label: 'Reportes', icon: BarChart3, color: '#a8edea' },
 ]
 

@@ -211,25 +211,7 @@ export interface Notification {
   duration?: number
 }
 
-export interface EventoCalendario {
-  id: string
-  titulo: string
-  descripcion?: string
-  fecha_inicio: string
-  fecha_fin: string
-  tipo: 'venta' | 'compra' | 'mantenimiento' | 'reunion' | 'otro'
-  empleado_id: string
-  created_at: string
-  empleado?: Empleado
-}
 
-export interface CreateEventoData {
-  titulo: string
-  descripcion?: string
-  fecha_inicio: string
-  fecha_fin: string
-  tipo: 'venta' | 'compra' | 'mantenimiento' | 'reunion' | 'otro'
-}
 
 // Tipos para el usuario autenticado
 export interface AuthenticatedUser {
@@ -268,11 +250,7 @@ export interface ClientesState {
   error: string | null
 }
 
-export interface CalendarioState {
-  eventos: EventoCalendario[]
-  loading: boolean
-  error: string | null
-}
+
 
 export interface VentasState {
   ventas: Venta[]
@@ -449,14 +427,7 @@ export interface ArqueoActions {
 
 export type ArqueoSlice = ArqueoState & ArqueoActions;
 
-export interface CalendarioActions {
-  fetchEventos: () => Promise<void>
-  createEvento: (eventoData: CreateEventoData) => Promise<void>
-  updateEvento: (id: string, eventoData: Partial<CreateEventoData>) => Promise<void>
-  deleteEvento: (id: string) => Promise<void>
-}
 
-export type CalendarioSlice = CalendarioState & CalendarioActions;
 
 export interface AppStore extends 
   AuthSlice, 
@@ -467,6 +438,5 @@ export interface AppStore extends
   CajaSlice, 
   ReportesSlice,
   ArqueoSlice,
-  CalendarioSlice,
   UISlice, 
   NotificationsSlice {}
