@@ -33,33 +33,27 @@ export const ProductosTable: React.FC = () => {
     fetchProductos()
   }, [fetchProductos])
 
-  // Filtrar productos usando el hook personalizado
-  const filteredProductos = useSearchFilter({
-    data: productos || [],
-    searchTerm,
-    searchFields: ['nombre', 'descripcion', 'codigo_sku', 'categoria', 'unidad_medida'],
-    searchFunction: (producto, term) => {
-      return (
-        producto.nombre.toLowerCase().includes(term) ||
-        (producto.descripcion && producto.descripcion.toLowerCase().includes(term)) ||
-        producto.codigo_sku.toLowerCase().includes(term) ||
-        producto.categoria.toLowerCase().includes(term) ||
-        producto.unidad_medida.toLowerCase().includes(term)
-      )
-    }
-  })
+  // Handlers para los filtros
+  const handleStockFilterChange = (filter: 'all' | 'low' | 'out') => {
+    setStockFilter(filter)
+  }
 
-  // Aplicar filtro de stock
-  const productosConFiltroStock = filteredProductos.filter(producto => {
-    switch (stockFilter) {
-      case 'low':
-        return producto.stock <= 10 && producto.stock > 0
-      case 'out':
-        return producto.stock <= 0
-      default:
-        return true
-    }
-  })
+  const handleCategoriaChange = (categoria: string) => {
+    setCategoriaFilter(categoria)
+  }
+
+  const handleRefresh = () => {
+    fetchProductos()
+    addNotification({
+      id: Date.now().toString(),
+      type: 'info',
+      title: 'Actualizando',
+      message: 'Refrescando lista de productos...'
+    })
+  }
+
+  // Los productos ya están filtrados por el selector optimizado
+  const productosConFiltroStock = productosData.productos
 
   // Función para obtener el color del stock
   const getStockColor = (stock: number) => {
@@ -108,7 +102,7 @@ export const ProductosTable: React.FC = () => {
 
 
 
-  if (loading) {
+  if (loadingStates.productos) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
@@ -137,7 +131,7 @@ export const ProductosTable: React.FC = () => {
     )
   }
 
-  if (error) {
+  if (errorStates.productos) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
@@ -161,7 +155,7 @@ export const ProductosTable: React.FC = () => {
               <div className="text-red-500 mb-4">
                 <Package className="h-12 w-12 mx-auto text-red-400 mb-2" />
                 <p className="text-lg font-medium text-red-600">Error al cargar productos</p>
-                <p className="text-sm text-gray-600 mt-2">{error}</p>
+                <p className="text-sm text-gray-600 mt-2">{errorStates.productos}</p>
               </div>
               <Button
                 onClick={() => fetchProductos()}
@@ -223,47 +217,78 @@ export const ProductosTable: React.FC = () => {
             )}
           </div>
 
-          {/* Filtros de Stock */}
-          <div className="flex items-center gap-4">
+          {/* Filtros */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Filtro por Categoría */}
             <div className="flex items-center gap-2">
               <Filter className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Filtrar por stock:</span>
+              <span className="text-sm font-medium text-gray-700">Categoría:</span>
+              <select
+                value={categoriaFilter}
+                onChange={(e) => handleCategoriaChange(e.target.value)}
+                className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Todas las categorías</option>
+                {categorias.map(categoria => (
+                  <option key={categoria} value={categoria}>{categoria}</option>
+                ))}
+              </select>
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant={stockFilter === 'all' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setStockFilter('all')}
-                className="text-xs"
-              >
-                Todos ({productos?.length || 0})
-              </Button>
-              <Button
-                variant={stockFilter === 'low' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setStockFilter('low')}
-                className="text-xs bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100"
-              >
-                Stock Bajo (≤10) ({productos?.filter(p => p.stock <= 10 && p.stock > 0).length || 0})
-              </Button>
-              <Button
-                variant={stockFilter === 'out' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setStockFilter('out')}
-                className="text-xs bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
-              >
-                Sin Stock (≤0) ({productos?.filter(p => p.stock <= 0).length || 0})
-              </Button>
+
+            {/* Filtros de Stock */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Stock:</span>
+              <div className="flex gap-2">
+                <Button
+                  variant={stockFilter === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleStockFilterChange('all')}
+                  className="text-xs"
+                >
+                  Todos ({productosData.total})
+                </Button>
+                <Button
+                  variant={stockFilter === 'low' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleStockFilterChange('low')}
+                  className="text-xs bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100"
+                >
+                  Stock Bajo ({productosData.conStockBajo})
+                </Button>
+                <Button
+                  variant={stockFilter === 'out' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => handleStockFilterChange('out')}
+                  className="text-xs bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
+                >
+                  Sin Stock ({productosData.sinStock})
+                </Button>
+              </div>
             </div>
+
+            {/* Botón de Refresh */}
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Actualizar
+            </Button>
           </div>
         </div>
-        {searchTerm && (
-          <div className="mt-2 text-sm text-gray-600">
-            {filteredProductos?.length === productos?.length ? (
-              <span>Mostrando todos los productos</span>
-            ) : (
-              <span>Encontrados {filteredProductos?.length} de {productos?.length} productos</span>
-            )}
+        {(searchTerm || stockFilter !== 'all' || categoriaFilter) && (
+          <div className="mt-2 text-sm text-gray-600 flex items-center justify-between">
+            <span>
+              Mostrando {productosData.productos.length} productos
+              {searchTerm && ` para "${searchTerm}"`}
+              {categoriaFilter && ` en categoría "${categoriaFilter}"`}
+              {stockFilter !== 'all' && ` con filtro de stock "${stockFilter}"`}
+            </span>
+            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+              Valor total: ${productosData.totalValue.toLocaleString()}
+            </span>
           </div>
         )}
       </Card>
