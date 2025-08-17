@@ -26,7 +26,7 @@ export { AbrirCajaForm } from './caja/AbrirCajaForm'
 export { GastosForm } from './caja/GastosForm'
 
 // Reportes
-export { ReportesTable } from './reportes/ReportesTable'
+export { default as ReportesTable } from './reportes/ReportesTable';
 
 // Layout
 export { Sidebar } from './layout/Sidebar'

@@ -303,3 +303,106 @@ export interface NotificationsState {
 
 // Importar tipos del slice de historial de caja
 export type { CajaHistorialState, CajaDiaria } from './slices/cajaHistorialSlice'
+
+// Tipos para Caja Historial
+export interface CajaHistorialState {
+  cajasDiarias: CajaDiaria[];
+  loading: boolean;
+  error: string | null;
+}
+
+export interface CajaDiaria {
+  fecha: string;
+  empleado: string;
+  apertura: number;
+  cierre: number;
+  total_ingresos: number;
+  total_egresos: number;
+  total_ventas: number;
+  estado: 'abierta' | 'cerrada';
+}
+
+// Tipos para Reportes
+export interface FiltrosReporte {
+  fechaInicio: string;
+  fechaFin: string;
+  empleadoId?: string;
+  clienteId?: string;
+  metodoPago?: string;
+  tipoPrecio?: string;
+}
+
+export interface ReporteVentas {
+  id: string;
+  fecha: string;
+  total: number;
+  metodoPago: string;
+  tipoPrecio: string;
+  empleado: {
+    nombre: string;
+    email: string;
+  };
+  cliente?: {
+    nombre: string;
+    email: string;
+  };
+  items: Array<{
+    producto: {
+      nombre: string;
+      codigo: string;
+    };
+    cantidad: number;
+    precioUnitario: number;
+    subtotal: number;
+  }>;
+}
+
+export interface ReporteProductos {
+  id: string;
+  nombre: string;
+  codigo: string;
+  categoria: string;
+  stock: number;
+  precioMinorista: number;
+  precioMayorista: number;
+  totalVentas: number;
+  cantidadVendida: number;
+  ingresosGenerados: number;
+}
+
+export interface ReporteCaja {
+  fecha: string;
+  empleado: string;
+  apertura: number;
+  ingresos: number;
+  egresos: number;
+  ventas: number;
+  saldoFinal: number;
+  movimientos: Array<{
+    tipo: 'ingreso' | 'egreso';
+    concepto: string;
+    monto: number;
+    metodoPago: string;
+    fecha: string;
+  }>;
+}
+
+export interface ReportesState {
+  filtros: FiltrosReporte;
+  reporteVentas: ReporteVentas[];
+  reporteProductos: ReporteProductos[];
+  reporteCaja: ReporteCaja[];
+  loading: boolean;
+  error: string | null;
+}
+
+export interface ReportesActions {
+  setFiltros: (filtros: Partial<FiltrosReporte>) => void;
+  generarReporteVentas: () => Promise<void>;
+  generarReporteProductos: () => Promise<void>;
+  generarReporteCaja: () => Promise<void>;
+  exportarCSV: (tipo: 'ventas' | 'productos' | 'caja') => Promise<void>;
+  limpiarReportes: () => void;
+}
+
+export type ReportesSlice = ReportesState & ReportesActions;
