@@ -41,10 +41,8 @@ function App() {
   useEffect(() => {
     const performSystemCheck = async () => {
       try {
-        console.log('🔍 App: Iniciando verificación de autenticación...')
         await checkAuth()
         setDebugInfo(prev => ({ ...prev, authChecked: true }))
-        console.log('✅ App: Verificación de autenticación completada')
         
       } catch (error) {
         console.error('❌ App: Error en verificación del sistema:', error)
@@ -68,7 +66,6 @@ function App() {
 
   // Cargar datos según el módulo activo
   useEffect(() => {
-    console.log('🔄 [App] Módulo cambió a:', currentModule)
     if (!user) return
 
     const loadModuleData = async () => {
@@ -111,42 +108,27 @@ function App() {
 
   // Renderizar módulo correspondiente
   const renderModule = () => {
-    console.log('🎯 [App] Renderizando módulo:', currentModule, 'Usuario:', user?.nombre)
-    
     switch (currentModule) {
       case 'dashboard':
-        console.log('🎯 [App] Renderizando Dashboard')
         return <Dashboard />
       case 'empleados':
-        console.log('🎯 [App] Renderizando EmpleadosTable')
         return <EmpleadosTable />
       case 'productos':
-        console.log('🎯 [App] Renderizando ProductosTable')
         return <ProductosTable />
       case 'clientes':
-        console.log('🎯 [App] Renderizando ClientesTable')
         return <ClientesTable />
       case 'ventas':
-        console.log('🎯 [App] Renderizando VentasTable - INICIO')
-        const ventasComponent = <VentasTable />
-        console.log('🎯 [App] VentasTable creado:', ventasComponent)
-        return ventasComponent
-             case 'caja':
-         console.log('🎯 [App] Renderizando CajaTable')
-         return <CajaTable />
-       case 'reportes':
-        console.log('🎯 [App] Renderizando ReportesTable')
+        return <VentasTable />
+      case 'caja':
+        return <CajaTable />
+      case 'reportes':
         return <ReportesTable />
       default:
-        console.log('🎯 [App] Renderizando Dashboard (default)')
         return <Dashboard />
     }
   }
 
-  // Debug: Mostrar información de estado
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🎯 App: Renderizando con estado:', { loading, user, debugInfo })
-  }
+
 
   // Mostrar error de conexión si existe
   if (debugInfo.connectionError) {

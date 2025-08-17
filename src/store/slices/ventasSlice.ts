@@ -17,110 +17,60 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
     loading: initialState.loading,
     error: initialState.error,
 
-    fetchVentas: async () => {
-      console.log('🔍 [ventasSlice] Iniciando fetchVentas...')
-      set((state) => ({ loading: true, error: null }))
-      
-      try {
-        console.log('🔍 [ventasSlice] Ejecutando consulta simple a Supabase...')
-        
-        // Consulta simple sin relaciones primero
-        const { data, error } = await supabase
-          .from('ventas')
-          .select('*')
-          .order('created_at', { ascending: false })
-        
-        console.log('🔍 [ventasSlice] Respuesta simple de Supabase:', { 
-          data: data?.length, 
-          error,
-          dataType: typeof data,
-          isArray: Array.isArray(data),
-          sample: data?.[0],
-          errorDetails: error ? {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code
-          } : null
-        })
-        
-        if (error) {
-          console.error('❌ [ventasSlice] Error en consulta simple:', {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code
-          })
-          throw error
-        }
-        
-        // Verificar si tenemos datos
-        if (!data) {
-          console.warn('⚠️ [ventasSlice] No hay datos en la respuesta')
-          set((state) => ({ ventas: [], loading: false }))
-          return
-        }
-        
-        console.log('✅ [ventasSlice] Consulta simple exitosa, datos encontrados:', data.length)
-        
-        // Si la consulta simple funciona, intentar con relaciones
-        if (data.length > 0) {
-          console.log('🔍 [ventasSlice] Intentando consulta con relaciones...')
-          
-          try {
-            const { data: dataWithRelations, error: relationsError } = await supabase
-              .from('ventas')
-              .select(`
-                *,
-                cliente:clientes(*),
-                empleado:empleados(*),
-                items:venta_items(*)
-              `)
-              .order('created_at', { ascending: false })
-            
-            console.log('🔍 [ventasSlice] Respuesta con relaciones:', { 
-              data: dataWithRelations?.length, 
-              error: relationsError,
-              sample: dataWithRelations?.[0]
-            })
-            
-            if (relationsError) {
-              console.warn('⚠️ [ventasSlice] Error en relaciones, usando datos simples:', relationsError.message)
-              set((state) => ({ ventas: data || [], loading: false }))
-            } else {
-              console.log('✅ [ventasSlice] Consulta con relaciones exitosa')
-              set((state) => ({ ventas: dataWithRelations || [], loading: false }))
-            }
-          } catch (relationsError: any) {
-            console.warn('⚠️ [ventasSlice] Error en consulta con relaciones:', relationsError.message)
-            set((state) => ({ ventas: data || [], loading: false }))
-          }
-        } else {
-          console.log('ℹ️ [ventasSlice] No hay ventas en la base de datos')
-          set((state) => ({ ventas: [], loading: false }))
-        }
-        
-        console.log('✅ [ventasSlice] Ventas cargadas exitosamente')
-        
-      } catch (error: any) {
-        console.error('❌ [ventasSlice] Error general en fetchVentas:', {
-          message: error.message,
-          stack: error.stack,
-          error
-        })
-        
-        set((state) => ({ 
-          ventas: [], 
-          loading: false, 
-          error: error.message || 'Error desconocido al cargar ventas'
-        }))
-      }
-    },
+         fetchVentas: async () => {
+       set((state) => ({ loading: true, error: null }))
+       
+       try {
+         const { data, error } = await supabase
+           .from('ventas')
+           .select('*')
+           .order('created_at', { ascending: false })
+         
+         if (error) {
+           throw error
+         }
+         
+         if (!data) {
+           set((state) => ({ ventas: [], loading: false }))
+           return
+         }
+         
+         if (data.length > 0) {
+           try {
+             const { data: dataWithRelations, error: relationsError } = await supabase
+               .from('ventas')
+               .select(`
+                 *,
+                 cliente:clientes(*),
+                 empleado:empleados(*),
+                 items:venta_items(*)
+               `)
+               .order('created_at', { ascending: false })
+             
+             if (relationsError) {
+               set((state) => ({ ventas: data || [], loading: false }))
+             } else {
+               set((state) => ({ ventas: dataWithRelations || [], loading: false }))
+             }
+           } catch (relationsError: any) {
+             set((state) => ({ ventas: data || [], loading: false }))
+           }
+         } else {
+           set((state) => ({ ventas: [], loading: false }))
+         }
+         
+       } catch (error: any) {
+         set((state) => ({ 
+           ventas: [], 
+           loading: false, 
+           error: error.message || 'Error desconocido al cargar ventas'
+         }))
+       }
+     },
 
-    // Acción compuesta: Registrar venta completa
-    registrarVenta: async (ventaData: CreateVentaData) => {
-      console.log('🔍 [ventasSlice] Iniciando registro de venta...')
-      set((state) => ({ loading: true, error: null }))
+         // Acción compuesta: Registrar venta completa
+     registrarVenta: async (ventaData: CreateVentaData) => {
+       set((state) => ({ loading: true, error: null }))
       
       try {
         // Verificar si el arqueo está completado para hoy
@@ -170,37 +120,29 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
           empleado_id: empleadoId,
         }
 
-        console.log('🔍 [ventasSlice] Creando venta:', ventaCompleta)
+                 const { data: venta, error: errorVenta } = await supabase
+           .from('ventas')
+           .insert([ventaCompleta])
+           .select()
+           .single()
 
-        const { data: venta, error: errorVenta } = await supabase
-          .from('ventas')
-          .insert([ventaCompleta])
-          .select()
-          .single()
+         if (errorVenta) {
+           throw errorVenta
+         }
 
-        if (errorVenta) {
-          console.error('❌ [ventasSlice] Error creando venta:', errorVenta)
-          throw errorVenta
-        }
-
-        console.log('✅ [ventasSlice] Venta creada:', venta)
-
-        // Crear los items de la venta
-        const itemsConVentaId = ventaData.items.map(item => ({
-          ...item,
-          venta_id: venta.id,
-        }))
-
-        console.log('🔍 [ventasSlice] Creando items de venta:', itemsConVentaId)
+         // Crear los items de la venta
+         const itemsConVentaId = ventaData.items.map(item => ({
+           ...item,
+           venta_id: venta.id,
+         }))
 
         const { error: errorItems } = await supabase
           .from('venta_items')
           .insert(itemsConVentaId)
 
-        if (errorItems) {
-          console.error('❌ [ventasSlice] Error creando items:', errorItems)
-          throw errorItems
-        }
+                 if (errorItems) {
+           throw errorItems
+         }
 
         // Actualizar stock de productos
         for (const item of ventaData.items) {
@@ -214,10 +156,9 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
             })
             .eq('id', item.producto_id)
 
-          if (errorStock) {
-            console.error('❌ [ventasSlice] Error actualizando stock:', errorStock)
-            // No lanzar error aquí, solo log
-          }
+                     if (errorStock) {
+             // No lanzar error aquí, solo continuar
+           }
         }
 
         // Registrar ingreso en caja
@@ -233,10 +174,9 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
             fecha: fechaHoy,
           }])
 
-        if (errorCaja) {
-          console.error('❌ [ventasSlice] Error registrando en caja:', errorCaja)
-          // No lanzar error aquí, solo log
-        }
+                 if (errorCaja) {
+           // No lanzar error aquí, solo continuar
+         }
 
         // Actualizar estado local
         set((state) => ({ 
@@ -244,9 +184,7 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
           loading: false 
         }))
 
-        console.log('✅ [ventasSlice] Venta registrada exitosamente')
-
-        // Notificar éxito
+                 // Notificar éxito
         get().addNotification({
           id: Date.now().toString(),
           type: 'success',
@@ -254,9 +192,8 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
           message: `Venta #${venta.id} registrada por $${total.toLocaleString()}`,
         })
 
-      } catch (error: any) {
-        console.error('❌ [ventasSlice] Error registrando venta:', error)
-        const errorMessage = error?.message || 'Error desconocido al registrar venta'
+             } catch (error: any) {
+         const errorMessage = error?.message || 'Error desconocido al registrar venta'
         set((state) => ({ 
           loading: false, 
           error: errorMessage 
