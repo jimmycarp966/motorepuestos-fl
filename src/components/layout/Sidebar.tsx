@@ -1,5 +1,6 @@
 import React from 'react'
 import { useAppStore } from '../../store'
+import { usePermissionGuard } from '../../hooks/usePermissionGuard'
 import { Button } from '../ui/button'
 import { 
   LayoutDashboard, 
@@ -9,7 +10,8 @@ import {
   ShoppingCart, 
   DollarSign, 
   BarChart3, 
-  LogOut
+  LogOut,
+  Shield
 } from 'lucide-react'
 
 
@@ -24,13 +26,12 @@ const menuItems = [
 ]
 
 export const Sidebar: React.FC = () => {
-  // Registrar componente para debug
-
-  
+  // Hooks
   const user = useAppStore((state) => state.auth.user)
   const logout = useAppStore((state) => state.logout)
   const currentModule = useAppStore((state) => state.ui.currentModule)
   const setCurrentModule = useAppStore((state) => state.setCurrentModule)
+  const permissions = usePermissionGuard()
 
   const handleLogout = async () => {
     try {
@@ -41,15 +42,18 @@ export const Sidebar: React.FC = () => {
   }
 
   const handleMenuClick = (moduleId: string) => {
-    setCurrentModule(moduleId)
+    // Verificar acceso antes de cambiar módulo
+    const moduleCheck = permissions.checkModuleAccess(moduleId as any)
+    if (moduleCheck.hasPermission) {
+      setCurrentModule(moduleId)
+    }
   }
 
   if (!user) return null
 
-  // Lógica de permisos basada en permisos específicos del usuario
+  // Filtrar módulos accesibles usando el sistema de permisos
   const accessibleModules = menuItems.filter(item => {
-    // Usar los permisos específicos asignados al usuario (siempre)
-    return user.permisos_modulos?.includes(item.id) || false
+    return permissions.canAccess(item.id as any)
   })
 
 

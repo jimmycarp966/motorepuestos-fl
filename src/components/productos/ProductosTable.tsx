@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import { useAppStore } from '../../store'
 import { useProductosFiltered, useCategorias, useLoadingStates, useErrorStates } from '../../lib/selectors'
-import { Button } from '../ui/button'
-import { Card } from '../ui/card'
-import { Plus, Edit, Trash2, Package, AlertTriangle, Filter, RefreshCw } from 'lucide-react'
+import { usePagination, useTableLogic, useCRUDOperations } from '../../hooks/useTableLogic'
+import TableBase, { TableColumn, TableAction } from '../shared/TableBase'
+import { Edit, Trash2, Package, AlertTriangle, Tag, DollarSign, Filter } from 'lucide-react'
 import { ProductoForm } from './ProductoForm'
-
+import { Button } from '../ui/button'
+import type { Producto } from '../../store/types'
 
 export const ProductosTable: React.FC = () => {
-  // Estados locales
-  const [showForm, setShowForm] = useState(false)
-  const [editingProducto, setEditingProducto] = useState<any>(null)
-  const [searchTerm, setSearchTerm] = useState('')
+  // Estados locales con hooks optimizados
   const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'out'>('all')
   const [categoriaFilter, setCategoriaFilter] = useState('')
 
-  // Usar selectores optimizados
-  const productosData = useProductosFiltered(searchTerm, stockFilter, categoriaFilter)
+  // Hooks de tabla y CRUD
+  const { tableState, handlers, notifications } = useTableLogic<Producto>()
+  
+  // Selectores optimizados
+  const productosData = useProductosFiltered(tableState.searchTerm, stockFilter, categoriaFilter)
   const categorias = useCategorias()
   const loadingStates = useLoadingStates()
   const errorStates = useErrorStates()
@@ -24,16 +25,32 @@ export const ProductosTable: React.FC = () => {
   // Acciones del store
   const fetchProductos = useAppStore((state) => state.fetchProductos)
   const deleteProducto = useAppStore((state) => state.deleteProducto)
-  const addNotification = useAppStore((state) => state.addNotification)
+  const createProducto = useAppStore((state) => state.createProducto)
+  const updateProducto = useAppStore((state) => state.updateProducto)
 
+  // CRUD operations con notificaciones automáticas
+  const crudOps = useCRUDOperations(
+    fetchProductos,
+    createProducto,
+    updateProducto,
+    deleteProducto,
+    'Producto'
+  )
 
+  // Paginación
+  const pagination = usePagination(productosData.productos)
 
-  // Cargar productos al montar el componente
+  // Cargar datos al montar
   useEffect(() => {
     fetchProductos()
   }, [fetchProductos])
 
-  // Handlers para los filtros
+  // Reset paginación cuando cambian filtros
+  useEffect(() => {
+    pagination.resetPage()
+  }, [tableState.searchTerm, stockFilter, categoriaFilter])
+
+  // Handlers para filtros específicos
   const handleStockFilterChange = (filter: 'all' | 'low' | 'out') => {
     setStockFilter(filter)
   }
@@ -42,419 +59,217 @@ export const ProductosTable: React.FC = () => {
     setCategoriaFilter(categoria)
   }
 
-  const handleRefresh = () => {
-    fetchProductos()
-    addNotification({
-      id: Date.now().toString(),
-      type: 'info',
-      title: 'Actualizando',
-      message: 'Refrescando lista de productos...'
-    })
-  }
-
-  // Los productos ya están filtrados por el selector optimizado
-  const productosConFiltroStock = productosData.productos
-
-  // Función para obtener el color del stock
-  const getStockColor = (stock: number) => {
+  // Función para obtener color de stock
+  const getStockColor = (stock: number, stockMinimo: number) => {
     if (stock <= 0) return 'text-red-600 bg-red-100'
-    if (stock <= 5) return 'text-orange-600 bg-orange-100'
-    if (stock <= 10) return 'text-yellow-600 bg-yellow-100'
+    if (stock <= stockMinimo) return 'text-yellow-600 bg-yellow-100'
     return 'text-green-600 bg-green-100'
   }
 
-  // Función para obtener el icono del stock
-  const getStockIcon = (stock: number) => {
+  // Función para obtener icono de stock
+  const getStockIcon = (stock: number, stockMinimo: number) => {
     if (stock <= 0) return <AlertTriangle className="w-4 h-4" />
-    if (stock <= 5) return <AlertTriangle className="w-4 h-4" />
-    if (stock <= 10) return <AlertTriangle className="w-4 h-4" />
+    if (stock <= stockMinimo) return <AlertTriangle className="w-4 h-4" />
     return <Package className="w-4 h-4" />
   }
 
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteProducto(id)
-      addNotification({
-        id: Date.now().toString(),
-        type: 'success',
-        title: 'Producto eliminado',
-        message: 'El producto se eliminó correctamente'
-      })
-    } catch (error) {
-      addNotification({
-        id: Date.now().toString(),
-        type: 'error',
-        title: 'Error',
-        message: 'No se pudo eliminar el producto'
-      })
+  // Definición de columnas
+  const columns: TableColumn<Producto>[] = [
+    {
+      key: 'codigo_sku',
+      title: 'Código SKU',
+      width: '140px',
+      render: (value) => (
+        <div className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+          {value}
+        </div>
+      )
+    },
+    {
+      key: 'nombre',
+      title: 'Nombre',
+      render: (value, item) => (
+        <div>
+          <div className="font-medium text-gray-900">{value}</div>
+          {item.descripcion && (
+            <div className="text-sm text-gray-500 truncate max-w-xs">
+              {item.descripcion}
+            </div>
+          )}
+        </div>
+      )
+    },
+    {
+      key: 'categoria',
+      title: 'Categoría',
+      width: '120px',
+      render: (value) => (
+        <div className="flex items-center">
+          <Tag className="w-4 h-4 mr-2 text-gray-400" />
+          <span className="text-sm">{value}</span>
+        </div>
+      )
+    },
+    {
+      key: 'stock',
+      title: 'Stock',
+      width: '100px',
+      render: (value, item) => (
+        <div className={`flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium ${getStockColor(value, item.stock_minimo)}`}>
+          {getStockIcon(value, item.stock_minimo)}
+          <span>{value}</span>
+        </div>
+      )
+    },
+    {
+      key: 'precio_minorista',
+      title: 'Precio',
+      width: '100px',
+      render: (value) => (
+        <div className="flex items-center text-green-600 font-medium">
+          <DollarSign className="w-4 h-4 mr-1" />
+          {value.toLocaleString()}
+        </div>
+      )
+    },
+    {
+      key: 'unidad_medida',
+      title: 'Unidad',
+      width: '80px',
+      render: (value) => (
+        <span className="text-sm text-gray-600">{value}</span>
+      )
     }
+  ]
+
+  // Definición de acciones
+  const actions: TableAction<Producto>[] = [
+    {
+      label: 'Editar',
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (producto) => handlers.openEditForm(producto),
+      variant: 'outline'
+    },
+    {
+      label: 'Eliminar',
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: async (producto) => {
+        await crudOps.handleDelete(producto.id, producto.nombre)
+      },
+      variant: 'destructive',
+      disabled: (producto) => !producto.activo
+    }
+  ]
+
+  // Handler para cerrar formulario
+  const handleFormSuccess = () => {
+    handlers.closeForm()
+    crudOps.handleRefresh()
   }
-
-  const handleEdit = (producto: any) => {
-    setEditingProducto(producto)
-    setShowForm(true)
-  }
-
-  const handleFormClose = () => {
-    setShowForm(false)
-    setEditingProducto(null)
-  }
-
-
-
-  if (loadingStates.productos) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Productos</h1>
-            <p className="text-gray-600">Gestiona el catálogo de productos</p>
-          </div>
-          <Button
-            onClick={() => setShowForm(true)}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            disabled
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nuevo Producto
-          </Button>
-        </div>
-        <Card className="overflow-hidden">
-          <div className="flex items-center justify-center p-12">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Cargando productos...</p>
-            </div>
-          </div>
-        </Card>
-      </div>
-    )
-  }
-
-  if (errorStates.productos) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Productos</h1>
-            <p className="text-gray-600">Gestiona el catálogo de productos</p>
-          </div>
-          <Button
-            onClick={() => {
-              setShowForm(true)
-            }}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nuevo Producto
-          </Button>
-        </div>
-        <Card className="overflow-hidden">
-          <div className="flex items-center justify-center p-12">
-            <div className="text-center">
-              <div className="text-red-500 mb-4">
-                <Package className="h-12 w-12 mx-auto text-red-400 mb-2" />
-                <p className="text-lg font-medium text-red-600">Error al cargar productos</p>
-                <p className="text-sm text-gray-600 mt-2">{errorStates.productos}</p>
-              </div>
-              <Button
-                onClick={() => fetchProductos()}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                Reintentar
-              </Button>
-            </div>
-          </div>
-        </Card>
-      </div>
-    )
-  }
-
-  
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Productos</h1>
-          <p className="text-gray-600">Gestiona el catálogo de productos</p>
+    <div className="space-y-4">
+      {/* Filtros adicionales */}
+      <div className="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-lg border">
+        {/* Filtro por Categoría */}
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-gray-500" />
+          <span className="text-sm font-medium text-gray-700">Categoría:</span>
+          <select
+            value={categoriaFilter}
+            onChange={(e) => handleCategoriaChange(e.target.value)}
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">Todas las categorías</option>
+            {categorias.map(categoria => (
+              <option key={categoria} value={categoria}>{categoria}</option>
+            ))}
+          </select>
         </div>
-        <Button
-          onClick={() => setShowForm(true)}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Nuevo Producto
-        </Button>
-      </div>
 
-      {/* Buscador y Filtros */}
-      <Card className="p-4">
-        <div className="space-y-4">
-          {/* Buscador */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <input
-              type="text"
-              placeholder="Buscar productos por nombre, código, categoría..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-700"
-            />
-                         {searchTerm && (
-               <button
-                onClick={() => setSearchTerm('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-              >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
-
-          {/* Filtros */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Filtro por Categoría */}
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Categoría:</span>
-              <select
-                value={categoriaFilter}
-                onChange={(e) => handleCategoriaChange(e.target.value)}
-                className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="">Todas las categorías</option>
-                {categorias.map(categoria => (
-                  <option key={categoria} value={categoria}>{categoria}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Filtros de Stock */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-700">Stock:</span>
-              <div className="flex gap-2">
-                <Button
-                  variant={stockFilter === 'all' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleStockFilterChange('all')}
-                  className="text-xs"
-                >
-                  Todos ({productosData.total})
-                </Button>
-                <Button
-                  variant={stockFilter === 'low' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleStockFilterChange('low')}
-                  className="text-xs bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100"
-                >
-                  Stock Bajo ({productosData.conStockBajo})
-                </Button>
-                <Button
-                  variant={stockFilter === 'out' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => handleStockFilterChange('out')}
-                  className="text-xs bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
-                >
-                  Sin Stock ({productosData.sinStock})
-                </Button>
-              </div>
-            </div>
-
-            {/* Botón de Refresh */}
+        {/* Filtros de Stock */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">Stock:</span>
+          <div className="flex gap-2">
             <Button
-              onClick={handleRefresh}
-              variant="outline"
+              variant={stockFilter === 'all' ? 'default' : 'outline'}
               size="sm"
-              className="flex items-center gap-2"
+              onClick={() => handleStockFilterChange('all')}
+              className="text-xs"
             >
-              <RefreshCw className="w-4 h-4" />
-              Actualizar
+              Todos ({productosData.total})
+            </Button>
+            <Button
+              variant={stockFilter === 'low' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handleStockFilterChange('low')}
+              className="text-xs bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100"
+            >
+              Stock Bajo ({productosData.conStockBajo})
+            </Button>
+            <Button
+              variant={stockFilter === 'out' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handleStockFilterChange('out')}
+              className="text-xs bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
+            >
+              Sin Stock ({productosData.sinStock})
             </Button>
           </div>
         </div>
-        {(searchTerm || stockFilter !== 'all' || categoriaFilter) && (
-          <div className="mt-2 text-sm text-gray-600 flex items-center justify-between">
-            <span>
-              Mostrando {productosData.productos.length} productos
-              {searchTerm && ` para "${searchTerm}"`}
-              {categoriaFilter && ` en categoría "${categoriaFilter}"`}
-              {stockFilter !== 'all' && ` con filtro de stock "${stockFilter}"`}
-            </span>
-            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-              Valor total: ${productosData.totalValue.toLocaleString()}
-            </span>
-          </div>
-        )}
-      </Card>
 
-      <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  SKU
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Producto
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Costo
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Precios
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Stock
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Stock Mín.
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Categoría
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estado
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {productosConFiltroStock && productosConFiltroStock.length > 0 ? (
-                productosConFiltroStock.map((producto) => (
-                  <tr key={producto.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
-                      {producto.codigo_sku}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-                            <Package className="h-6 w-6 text-white" />
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {producto.nombre}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {producto.descripcion || 'Sin descripción'}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="space-y-1">
-                        <div className="text-xs text-red-600 font-medium">${producto.costo?.toFixed(2) || '0.00'}</div>
-                        <div className="text-xs text-green-600 font-medium">
-                          {producto.costo ? ((producto.precio_minorista - producto.costo) / producto.costo * 100).toFixed(1) : '0'}% margen
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="space-y-1">
-                        <div className="text-xs text-gray-500">Minorista: ${producto.precio_minorista.toFixed(2)}</div>
-                        <div className="text-xs text-gray-500">Mayorista: ${producto.precio_mayorista.toFixed(2)}</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${getStockColor(producto.stock)}`}>
-                          {getStockIcon(producto.stock)}
-                          <span className="ml-1">{producto.stock} {producto.unidad_medida}</span>
-                        </span>
-                        {producto.stock <= 10 && (
-                          <span className="text-xs text-gray-500">
-                            {producto.stock <= 0 ? 'Sin stock' : producto.stock <= 5 ? 'Crítico' : 'Bajo'}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                        {producto.stock_minimo || 0} {producto.unidad_medida}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {producto.categoria}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        producto.activo 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {producto.activo ? 'Activo' : 'Inactivo'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleEdit(producto)}
-                          className="!bg-blue-600 !hover:bg-blue-700 !text-white !border-0"
-                          style={{ backgroundColor: '#2563eb', color: 'white', border: 'none' }}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => handleDelete(producto.id)}
-                          className="!bg-red-600 !hover:bg-red-700 !text-white !border-0"
-                          style={{ backgroundColor: '#dc2626', color: 'white', border: 'none' }}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={9} className="px-6 py-12 text-center">
-                    <div className="text-gray-500">
-                      <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                      <p className="text-lg font-medium">
-                        {stockFilter !== 'all' 
-                          ? `No se encontraron productos con ${stockFilter === 'low' ? 'stock bajo' : 'sin stock'}`
-                          : searchTerm 
-                          ? 'No se encontraron productos' 
-                          : 'No hay productos'
-                        }
-                      </p>
-                      <p className="text-sm">
-                        {stockFilter !== 'all' 
-                          ? 'Intenta cambiar los filtros o agregar más productos'
-                          : searchTerm 
-                          ? 'Intenta con otros términos de búsqueda' 
-                          : 'Comienza agregando tu primer producto'
-                        }
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        {/* Información de valor total */}
+        <div className="flex items-center gap-2 ml-auto">
+          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+            Valor total: ${productosData.totalValue.toLocaleString()}
+          </span>
         </div>
-      </Card>
+      </div>
 
-      {showForm && (
+      {/* Tabla con paginación */}
+      <TableBase
+        title="Gestión de Productos"
+        subtitle="Administra el catálogo de productos y precios"
+        items={pagination.currentItems}
+        columns={columns}
+        actions={actions}
+        loading={loadingStates.productos}
+        error={errorStates.productos}
+        
+        searchable={true}
+        searchTerm={tableState.searchTerm}
+        onSearchChange={handlers.setSearchTerm}
+        searchPlaceholder="Buscar por nombre, SKU, categoría..."
+        
+        pagination={{
+          currentPage: pagination.currentPage,
+          totalPages: pagination.totalPages,
+          totalItems: pagination.totalItems,
+          pageSize: pagination.pageSize,
+          start: pagination.pageInfo.start,
+          end: pagination.pageInfo.end,
+          hasNext: pagination.hasNext,
+          hasPrev: pagination.hasPrev
+        }}
+        onPageChange={pagination.goToPage}
+        
+        onCreate={handlers.openCreateForm}
+        createLabel="Nuevo Producto"
+        onRefresh={crudOps.handleRefresh}
+        
+        emptyMessage="No hay productos que coincidan con los filtros seleccionados"
+      />
+
+      {/* Formulario de producto */}
+      {tableState.showForm && (
         <ProductoForm
-          producto={editingProducto}
-          onClose={handleFormClose}
+          producto={tableState.editingItem}
+          onClose={handlers.closeForm}
+          onSuccess={handleFormSuccess}
         />
       )}
     </div>
   )
 }
+
+export default ProductosTable

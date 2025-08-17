@@ -1,28 +1,27 @@
 import { createClient } from '@supabase/supabase-js'
+import { config, validateConfig } from './config'
 
-// Configuración robusta con fallbacks y validación
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-// Validación de variables de entorno
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ Variables de entorno de Supabase no encontradas:')
-  console.error('VITE_SUPABASE_URL:', supabaseUrl ? '✅' : '❌')
-  console.error('VITE_SUPABASE_ANON_KEY:', supabaseAnonKey ? '✅' : '❌')
-  console.error('Archivos .env disponibles:', import.meta.env)
-  
-  // Fallback para desarrollo
-  console.warn('⚠️ Usando configuración de fallback para desarrollo')
-} else {
-  
+// Validar configuración al inicio
+const configValidation = validateConfig()
+if (!configValidation.valid) {
+  console.error('❌ [Supabase] Configuración inválida:', configValidation.errors)
+  if (config.isProduction) {
+    throw new Error('Invalid configuration in production')
+  }
 }
 
-// Configuración final con fallbacks
-const finalUrl = supabaseUrl || 'https://hsajhnxtlgfpkpzcrjyb.supabase.co'
-const finalKey = supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzYWpobnh0bGdmcGtwemNyanliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyNTc2NDUsImV4cCI6MjA3MDgzMzY0NX0.QAe7NTVEervkqmq2zFvCsABFulvEM2Q0UgZ4EntMoj4'
+// Log de configuración en desarrollo
+if (config.debug) {
+  console.log('🔧 [Supabase] Configuración:', {
+    url: config.supabaseUrl ? '✅' : '❌',
+    anonKey: config.supabaseKey ? '✅' : '❌',
+    serviceKey: config.supabaseServiceKey ? '✅' : '❌',
+    environment: config.isProduction ? 'production' : 'development'
+  })
+}
 
 // Cliente principal con anon key (para operaciones normales)
-export const supabase = createClient(finalUrl, finalKey, {
+export const supabase = createClient(config.supabaseUrl, config.supabaseKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -31,8 +30,14 @@ export const supabase = createClient(finalUrl, finalKey, {
 })
 
 // Cliente con service role key para operaciones de administrador
-const serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzYWpobnh0bGdmcGtwemNyanliIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTI1NzY0NSwiZXhwIjoyMDcwODMzNjQ1fQ.Z_KzATN2NK9cvxAJMokNjtwhN1VWAUQH6Ezl_2-zFiU'
-export const supabaseAdmin = createClient(finalUrl, serviceRoleKey)
+export const supabaseAdmin = config.supabaseServiceKey 
+  ? createClient(config.supabaseUrl, config.supabaseServiceKey)
+  : null
+
+// Warning si no hay service key
+if (!supabaseAdmin && config.debug) {
+  console.warn('⚠️ [Supabase] Service role key no configurada - funciones admin limitadas')
+}
 
 // Función para verificar el estado de autenticación
 export async function checkAuthStatus() {
