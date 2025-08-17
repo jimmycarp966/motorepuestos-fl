@@ -1,6 +1,8 @@
 import { useCallback, useMemo } from 'react'
 import { useAppStore } from '../store'
 import { config } from '../lib/config'
+import { AuditLogger } from '../lib/auditLogger'
+import { supabase } from '../lib/supabase'
 import type { AuthenticatedUser } from '../store/types'
 
 // Tipos para sistema de permisos
@@ -141,9 +143,31 @@ export function usePermissionGuard(): UserPermissions {
     return permissions.includes(permission)
   }, [canAccess, rolePermissions])
 
-  // Verificación completa de acceso a módulo
-  const checkModuleAccess = useCallback((module: ModuleName): PermissionCheck => {
+  // Verificación completa de acceso a módulo con auditoría
+  const checkModuleAccess = useCallback(async (module: ModuleName): Promise<PermissionCheck> => {
+    // Log del intento de acceso
+    AuditLogger.logAction('module_access_attempt', {
+      module,
+      userId: user?.id,
+      userRole: user?.rol,
+      isAuthenticated
+    })
+
     if (!isAuthenticated) {
+      AuditLogger.logAction('access_denied_unauthenticated', { module })
+      
+      // Registrar en base de datos si es posible
+      try {
+        await supabase.rpc('audit_log_module_access', {
+          modulo_param: module,
+          accion_param: 'access',
+          resultado_param: 'denegado',
+          razon_denegacion_param: 'Usuario no autenticado'
+        })
+      } catch (error) {
+        console.warn('No se pudo registrar auditoría de acceso:', error)
+      }
+
       return {
         hasPermission: false,
         reason: 'Usuario no autenticado',
@@ -152,6 +176,7 @@ export function usePermissionGuard(): UserPermissions {
     }
 
     if (!user) {
+      AuditLogger.logAction('access_denied_no_user_data', { module })
       return {
         hasPermission: false,
         reason: 'Datos de usuario no disponibles',
@@ -160,6 +185,23 @@ export function usePermissionGuard(): UserPermissions {
     }
 
     if (!user.activo) {
+      AuditLogger.logAction('access_denied_inactive_user', { 
+        module, 
+        userId: user.id,
+        userRole: user.rol 
+      })
+      
+      try {
+        await supabase.rpc('audit_log_module_access', {
+          modulo_param: module,
+          accion_param: 'access',
+          resultado_param: 'denegado',
+          razon_denegacion_param: 'Usuario inactivo'
+        })
+      } catch (error) {
+        console.warn('No se pudo registrar auditoría de acceso:', error)
+      }
+
       return {
         hasPermission: false,
         reason: 'Usuario inactivo',
@@ -168,11 +210,46 @@ export function usePermissionGuard(): UserPermissions {
     }
 
     if (!canAccess(module)) {
+      AuditLogger.logAction('access_denied_insufficient_permissions', { 
+        module, 
+        userId: user.id,
+        userRole: user.rol,
+        userPermissions: user.permisos_modulos
+      })
+      
+      try {
+        await supabase.rpc('audit_log_module_access', {
+          modulo_param: module,
+          accion_param: 'access',
+          resultado_param: 'denegado',
+          razon_denegacion_param: `Sin permisos para módulo ${module}`
+        })
+      } catch (error) {
+        console.warn('No se pudo registrar auditoría de acceso:', error)
+      }
+
       return {
         hasPermission: false,
         reason: `Sin permisos para acceder al módulo ${module}`,
         redirectTo: '/dashboard'
       }
+    }
+
+    // Acceso permitido - registrar éxito
+    AuditLogger.logSuccess('module_access_granted', {
+      module,
+      userId: user.id,
+      userRole: user.rol
+    })
+
+    try {
+      await supabase.rpc('audit_log_module_access', {
+        modulo_param: module,
+        accion_param: 'access',
+        resultado_param: 'permitido'
+      })
+    } catch (error) {
+      console.warn('No se pudo registrar auditoría de acceso exitoso:', error)
     }
 
     return {
@@ -318,37 +395,10 @@ export function useActionGuard() {
   }
 }
 
-// Componente HOC para proteger rutas
-export function withPermissionGuard<P extends object>(
-  WrappedComponent: React.ComponentType<P>,
-  requiredModule: ModuleName,
-  requiredPermission?: Permission
-) {
-  return function ProtectedComponent(props: P) {
-    const { checkAccess } = useRouteGuard(requiredModule, requiredPermission)
-    
-    const accessCheck = checkAccess()
-    
-    if (!accessCheck.hasPermission) {
-      return (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="text-red-500 text-6xl mb-4">🚫</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Acceso Denegado</h2>
-            <p className="text-gray-600 mb-4">{accessCheck.reason}</p>
-            <button
-              onClick={() => window.history.back()}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Volver
-            </button>
-          </div>
-        </div>
-      )
-    }
-
-    return <WrappedComponent {...props} />
-  }
+// HOC para proteger rutas (debe usarse en componentes React)
+export function createPermissionGuard() {
+  // Esta función debe implementarse en un archivo .tsx separado
+  throw new Error('withPermissionGuard debe implementarse en componente React (.tsx)')
 }
 
 export default usePermissionGuard

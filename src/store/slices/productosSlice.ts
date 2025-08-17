@@ -1,5 +1,6 @@
 import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
+import { businessCache, invalidateRelatedCache } from '../../lib/cacheManager'
 import type { AppStore } from '../index'
 import type { ProductosState, CreateProductoData, UpdateProductoData } from '../types'
 
@@ -15,6 +16,13 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
   error: initialState.error,
 
   fetchProductos: async () => {
+    // Intentar obtener del cache primero
+    const cachedProductos = businessCache.productos.getAll()
+    if (cachedProductos) {
+      set({ productos: cachedProductos, loading: false, error: null })
+      return
+    }
+
     set((state) => ({ loading: true, error: null }))
     try {
 
@@ -44,6 +52,9 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
           hasMore = false
         }
       }
+      
+      // Guardar en cache
+      businessCache.productos.setAll(allProductos)
       
       set((state) => ({ 
         productos: allProductos, 
@@ -78,7 +89,8 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
       const { data, error } = await supabase.from('productos').insert([productoData]).select().single()
       if (error) throw error
       
-      // Actualizar estado local
+      // Invalidar cache y actualizar estado local
+      invalidateRelatedCache('create', 'productos')
       set((state) => ({ productos: [data, ...state.productos], loading: false }))
       
       // Notificar éxito
@@ -107,6 +119,9 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
     try {
       const { data, error } = await supabase.from('productos').update(productoData).eq('id', id).select().single()
       if (error) throw error
+      
+      // Invalidar cache y actualizar estado local
+      invalidateRelatedCache('update', 'productos')
       set((state) => ({ productos: state.productos.map(p => p.id === id ? data : p), loading: false }))
     } catch (error: any) {
       set((state) => ({ loading: false, error: error.message }))
@@ -118,6 +133,9 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
     try {
       const { error } = await supabase.from('productos').update({ activo: false }).eq('id', id)
       if (error) throw error
+      
+      // Invalidar cache y actualizar estado local
+      invalidateRelatedCache('delete', 'productos')
       set((state) => ({ productos: state.productos.map(p => p.id === id ? { ...p, activo: false } : p), loading: false }))
     } catch (error: any) {
       set((state) => ({ loading: false, error: error.message }))

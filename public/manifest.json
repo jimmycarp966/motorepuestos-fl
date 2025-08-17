@@ -1,15 +1,87 @@
 {
-  "short_name": "Motorepuestos F.L.",
-  "name": "Sistema de Gestión - Motorepuestos F.L.",
+  "short_name": "Motorepuestos FL",
+  "name": "Motorepuestos F.L. - Sistema de Gestión",
+  "description": "Sistema completo de gestión para motorepuestos con capacidades offline",
   "icons": [
     {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "logo-sistemas.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo-sistemas.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
-} 
+  "orientation": "portrait-primary",
+  "theme_color": "#667eea",
+  "background_color": "#ffffff",
+  "scope": "/",
+  "lang": "es-ES",
+  "dir": "ltr",
+  "categories": ["business", "productivity"],
+  "screenshots": [
+    {
+      "src": "logo-sistemas.png",
+      "type": "image/png",
+      "sizes": "720x1280",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nueva Venta",
+      "short_name": "Venta",
+      "description": "Registrar una nueva venta",
+      "url": "/?action=nueva-venta",
+      "icons": [
+        {
+          "src": "logo-sistemas.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Consultar Stock",
+      "short_name": "Stock",
+      "description": "Ver estado del inventario",
+      "url": "/?action=stock",
+      "icons": [
+        {
+          "src": "logo-sistemas.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Panel",
+      "description": "Ver resumen del negocio",
+      "url": "/?action=dashboard",
+      "icons": [
+        {
+          "src": "logo-sistemas.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "protocol_handlers": [],
+  "file_handlers": []
+}
