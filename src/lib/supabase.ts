@@ -27,7 +27,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const finalUrl = supabaseUrl || 'https://hsajhnxtlgfpkpzcrjyb.supabase.co'
 const finalKey = supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzYWpobnh0bGdmcGtwemNyanliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyNTc2NDUsImV4cCI6MjA3MDgzMzY0NX0.QAe7NTVEervkqmq2zFvCsABFulvEM2Q0UgZ4EntMoj4'
 
+// Cliente principal con anon key (para operaciones normales)
 export const supabase = createClient(finalUrl, finalKey)
+
+// Cliente con service role key para operaciones de administrador
+const serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzYWpobnh0bGdmcGtwemNyanliIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTI1NzY0NSwiZXhwIjoyMDcwODMzNjQ1fQ.Z_KzATN2NK9cvxAJMokNjtwhN1VWAUQH6Ezl_2-zFiU'
+export const supabaseAdmin = createClient(finalUrl, serviceRoleKey)
 
 // Tipos para las tablas de Supabase
 export interface Database {

@@ -1,5 +1,5 @@
 import type { StateCreator } from 'zustand'
-import { supabase } from '../../lib/supabase'
+import { supabase, supabaseAdmin } from '../../lib/supabase'
 import type { AppStore } from '../index'
 import type { EmpleadosState, CreateEmpleadoData, UpdateEmpleadoData, ModuloPermitido, PermisosModulo } from '../types'
 
@@ -164,8 +164,8 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
     }))
 
     try {
-      // 1. Crear usuario en auth.users
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      // 1. Crear usuario en auth.users usando service role key
+      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email: empleadoData.email,
         password: empleadoData.password,
         email_confirm: true,
@@ -186,7 +186,7 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
         permisosCompletos = [...new Set([...empleadoData.permisos_modulos, ...permisosDelRol])]
       }
 
-      // 3. Crear empleado en tabla empleados
+      // 3. Crear empleado en tabla empleados usando el ID del usuario auth
       const { data: empleadoDataResult, error: empleadoError } = await supabase
         .from('empleados')
         .insert([{
@@ -250,7 +250,7 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
     try {
       // 1. Actualizar datos de autenticación si se proporciona password
       if (empleadoData.password) {
-        const { error: authError } = await supabase.auth.admin.updateUserById(id, {
+        const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(id, {
           password: empleadoData.password,
           user_metadata: {
             nombre: empleadoData.nombre,
