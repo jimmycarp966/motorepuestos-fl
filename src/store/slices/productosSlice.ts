@@ -18,25 +18,56 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
     console.log('🔍 [productosSlice] Iniciando fetchProductos...')
     set((state) => ({ loading: true, error: null }))
     try {
-      console.log('🔍 [productosSlice] Ejecutando consulta a Supabase...')
-      const { data, error } = await supabase
-        .from('productos')
-        .select('*')
-        .eq('activo', true)
-        .order('created_at', { ascending: false })
+      console.log('🔍 [productosSlice] Ejecutando consulta paginada a Supabase...')
       
-      console.log('🔍 [productosSlice] Respuesta de Supabase:', { data, error })
+      let allProductos: any[] = []
+      let from = 0
+      const pageSize = 1000
+      let hasMore = true
       
-      if (error) {
-        console.error('❌ [productosSlice] Error de Supabase:', error)
-        throw error
+      while (hasMore) {
+        const { data, error, count } = await supabase
+          .from('productos')
+          .select('*', { count: 'exact' })
+          .eq('activo', true)
+          .order('created_at', { ascending: false })
+          .range(from, from + pageSize - 1)
+        
+        console.log(`🔍 [productosSlice] Página ${from/pageSize + 1}:`, { 
+          dataLength: data?.length, 
+          count, 
+          from, 
+          to: from + pageSize - 1,
+          error 
+        })
+        
+        if (error) {
+          console.error('❌ [productosSlice] Error de Supabase:', error)
+          throw error
+        }
+        
+        if (data && data.length > 0) {
+          allProductos = [...allProductos, ...data]
+          from += pageSize
+          hasMore = data.length === pageSize
+        } else {
+          hasMore = false
+        }
       }
       
-      console.log('✅ [productosSlice] Productos obtenidos:', data?.length)
-      console.log('✅ [productosSlice] Primer producto:', data?.[0])
+      console.log('✅ [productosSlice] Total de productos obtenidos:', allProductos.length)
+      console.log('✅ [productosSlice] Primer producto:', allProductos[0])
+      
+      // Verificar si la batería Moura está incluida
+      const mouraProduct = allProductos.find(p => p.nombre.toLowerCase().includes('moura'))
+      if (mouraProduct) {
+        console.log('✅ [productosSlice] Batería Moura encontrada:', mouraProduct)
+      } else {
+        console.log('⚠️ [productosSlice] Batería Moura NO encontrada en los productos')
+      }
       
       set((state) => ({ 
-        productos: data || [], 
+        productos: allProductos, 
         loading: false,
         error: null 
       }))

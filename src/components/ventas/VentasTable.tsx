@@ -34,6 +34,7 @@ export const VentasTable: React.FC = () => {
   // Estados del store
   const productos = useAppStore((state) => state.productos)
   const clientes = useAppStore((state) => state.clientes.clientes)
+  const arqueoCompletadoHoy = useAppStore((state) => state.arqueoCompletadoHoy)
   const fetchProductos = useAppStore((state) => state.fetchProductos)
   const fetchClientes = useAppStore((state) => state.fetchClientes)
   const registrarVenta = useAppStore((state) => state.registrarVenta)
@@ -58,7 +59,8 @@ export const VentasTable: React.FC = () => {
     productos: productos?.length,
     clientes: clientes?.length,
     cartItems: cartItems.length,
-    selectedCliente: selectedCliente?.nombre
+    selectedCliente: selectedCliente?.nombre,
+    arqueoCompletadoHoy
   })
 
   // Cargar datos al montar
@@ -67,6 +69,18 @@ export const VentasTable: React.FC = () => {
     fetchProductos()
     fetchClientes()
   }, [fetchProductos, fetchClientes])
+
+  // Mostrar advertencia si el arqueo está completado
+  useEffect(() => {
+    if (arqueoCompletadoHoy) {
+      addNotification({
+        id: Date.now().toString(),
+        type: 'warning',
+        title: 'Sistema bloqueado',
+        message: 'El arqueo de caja ha sido completado. No se pueden registrar nuevas ventas hasta mañana.',
+      })
+    }
+  }, [arqueoCompletadoHoy, addNotification])
 
   // Filtrar productos para autocompletado
   const filteredProductos = useSearchFilter({
@@ -297,6 +311,30 @@ export const VentasTable: React.FC = () => {
           <p className="text-gray-600">Agrega productos y finaliza la venta</p>
         </div>
       </div>
+
+      {/* Alerta de arqueo completado */}
+      {arqueoCompletadoHoy && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-yellow-800">
+                Sistema Bloqueado - Arqueo Completado
+              </h3>
+              <div className="mt-2 text-sm text-yellow-700">
+                <p>
+                  El arqueo de caja ha sido completado para el día de hoy. 
+                  No se pueden registrar nuevas ventas hasta mañana.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Panel izquierdo - Búsqueda y Carrito */}
@@ -606,11 +644,18 @@ export const VentasTable: React.FC = () => {
               <Button
                 type="button"
                 onClick={(e) => handleSubmit(e)}
-                disabled={cartItems.length === 0}
-                className="w-full bg-green-600 hover:bg-green-700"
+                disabled={cartItems.length === 0 || arqueoCompletadoHoy || isSubmitting}
+                className={`w-full ${
+                  arqueoCompletadoHoy 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-green-600 hover:bg-green-700'
+                }`}
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Finalizar Venta (${total.toFixed(2)})
+                {arqueoCompletadoHoy 
+                  ? 'Sistema Bloqueado (Arqueo Completado)' 
+                  : `Finalizar Venta (${total.toFixed(2)})`
+                }
               </Button>
               
               <Button

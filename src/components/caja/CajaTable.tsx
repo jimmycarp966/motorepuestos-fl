@@ -19,12 +19,14 @@ import {
   CreditCard,
   Receipt,
   History,
-  X
+  X,
+  Calculator
 } from 'lucide-react'
 import { MovimientoForm } from './MovimientoForm'
 import { AbrirCajaForm } from './AbrirCajaForm'
 import { GastosForm } from './GastosForm'
 import { HistorialCajas } from './HistorialCajas'
+import { ArqueoModal } from './ArqueoModal'
 
 export const CajaTable: React.FC = () => {
   const movimientos = useAppStore((state) => state.caja.movimientos)
@@ -32,9 +34,11 @@ export const CajaTable: React.FC = () => {
   const loading = useAppStore((state) => state.caja.loading)
   const cajaAbierta = useAppStore((state) => state.caja.cajaAbierta)
   const ventas = useAppStore((state) => state.ventas)
+  const arqueoCompletadoHoy = useAppStore((state) => state.arqueoCompletadoHoy)
   const fetchMovimientos = useAppStore((state) => state.fetchMovimientos)
   const fetchVentas = useAppStore((state) => state.fetchVentas)
-  const cerrarCaja = useAppStore((state) => state.cerrarCaja)
+  const iniciarArqueo = useAppStore((state) => state.iniciarArqueo)
+  const verificarArqueoCompletado = useAppStore((state) => state.verificarArqueoCompletado)
   const addNotification = useAppStore((state) => state.addNotification)
   
   const [showIngresoForm, setShowIngresoForm] = useState(false)
@@ -47,17 +51,19 @@ export const CajaTable: React.FC = () => {
   useEffect(() => {
     fetchMovimientos()
     fetchVentas()
-  }, [fetchMovimientos, fetchVentas])
+    verificarArqueoCompletado()
+  }, [fetchMovimientos, fetchVentas, verificarArqueoCompletado])
 
   // Refrescar datos cada 30 segundos
   useEffect(() => {
     const interval = setInterval(() => {
       fetchMovimientos()
       fetchVentas()
+      verificarArqueoCompletado()
     }, 30000)
 
     return () => clearInterval(interval)
-  }, [fetchMovimientos, fetchVentas])
+  }, [fetchMovimientos, fetchVentas, verificarArqueoCompletado])
 
   const handleFormClose = () => {
     setShowIngresoForm(false)
@@ -97,20 +103,14 @@ export const CajaTable: React.FC = () => {
     setShowHistorial(false)
   }
 
-  const handleCerrarCaja = async () => {
+  const handleIniciarArqueo = async () => {
     try {
-      await cerrarCaja()
-      addNotification({
-        id: Date.now().toString(),
-        type: 'success',
-        title: 'Caja cerrada',
-        message: 'La caja ha sido cerrada exitosamente'
-      })
+      await iniciarArqueo()
     } catch (error: any) {
       addNotification({
         id: Date.now().toString(),
         type: 'error',
-        title: 'Error al cerrar caja',
+        title: 'Error al iniciar arqueo',
         message: error.message || 'Ocurrió un error inesperado'
       })
     }
@@ -119,6 +119,7 @@ export const CajaTable: React.FC = () => {
   const handleRefresh = () => {
     fetchMovimientos()
     fetchVentas()
+    verificarArqueoCompletado()
   }
 
   // Calcular estadísticas usando DateUtils
@@ -188,13 +189,18 @@ export const CajaTable: React.FC = () => {
           </Button>
           {cajaAbierta ? (
             <Button
-              onClick={handleCerrarCaja}
+              onClick={handleIniciarArqueo}
               variant="outline"
               size="sm"
-              className="text-red-600 border-red-200 hover:bg-red-50"
+              disabled={arqueoCompletadoHoy}
+              className={`${
+                arqueoCompletadoHoy 
+                  ? 'text-gray-400 border-gray-200 cursor-not-allowed' 
+                  : 'text-red-600 border-red-200 hover:bg-red-50'
+              }`}
             >
-              <Lock className="w-4 h-4 mr-2" />
-              Cerrar Caja
+              <Calculator className="w-4 h-4 mr-2" />
+              {arqueoCompletadoHoy ? 'Arqueo Completado' : 'Iniciar Arqueo'}
             </Button>
           ) : (
             <Button
@@ -706,6 +712,9 @@ export const CajaTable: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de Arqueo */}
+      <ArqueoModal />
     </div>
   )
 }

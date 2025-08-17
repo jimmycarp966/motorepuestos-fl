@@ -406,3 +406,57 @@ export interface ReportesActions {
 }
 
 export type ReportesSlice = ReportesState & ReportesActions;
+
+// Tipos para arqueo de caja
+export interface ArqueoCajaData {
+  id?: string
+  fecha: string
+  efectivo_real: number
+  tarjeta_real: number
+  transferencia_real: number
+  efectivo_esperado: number
+  tarjeta_esperado: number
+  transferencia_esperado: number
+  efectivo_diferencia: number
+  tarjeta_diferencia: number
+  transferencia_diferencia: number
+  total_real: number
+  total_esperado: number
+  total_diferencia: number
+  observaciones?: string
+  empleado_id: string
+  completado: boolean
+  created_at?: string
+}
+
+export interface ArqueoState {
+  arqueoActual: ArqueoCajaData | null
+  arqueos: ArqueoCajaData[]
+  loading: boolean
+  error: string | null
+  modalArqueoAbierto: boolean
+  arqueoCompletadoHoy: boolean
+}
+
+export interface ArqueoActions {
+  iniciarArqueo: () => Promise<void>
+  finalizarArqueo: (arqueoData: Omit<ArqueoCajaData, 'id' | 'created_at'>) => Promise<void>
+  verificarArqueoCompletado: () => Promise<void>
+  abrirModalArqueo: () => void
+  cerrarModalArqueo: () => void
+  fetchArqueos: () => Promise<void>
+}
+
+export type ArqueoSlice = ArqueoState & ArqueoActions;
+
+export interface AppStore extends 
+  AuthSlice, 
+  ProductosSlice, 
+  VentasSlice, 
+  ClientesSlice, 
+  EmpleadosSlice, 
+  CajaSlice, 
+  ReportesSlice,
+  ArqueoSlice,
+  UISlice, 
+  NotificationsSlice {}

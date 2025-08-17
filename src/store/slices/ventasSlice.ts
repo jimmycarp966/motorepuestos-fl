@@ -120,130 +120,158 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
 
     // Acción compuesta: Registrar venta completa
     registrarVenta: async (ventaData: CreateVentaData) => {
+      console.log('🔍 [ventasSlice] Iniciando registro de venta...')
       set((state) => ({ loading: true, error: null }))
       
       try {
-        const currentUser = get().auth.user
-        if (!currentUser) throw new Error('Usuario no autenticado')
+        // Verificar si el arqueo está completado para hoy
+        const fechaHoy = DateUtils.getCurrentDate()
+        const empleadoId = get().auth.session?.user?.id
+        
+        if (empleadoId) {
+          const { data: arqueoHoy } = await supabase
+            .from('arqueos_caja')
+            .select('completado')
+            .eq('fecha', fechaHoy)
+            .eq('empleado_id', empleadoId)
+            .single()
 
-        // 1. Calcular total y validar stock
-        let total = 0
-        const itemsToInsert = []
+          if (arqueoHoy?.completado) {
+            throw new Error('No se pueden registrar ventas después del arqueo de caja. El sistema estará disponible mañana.')
+          }
+        }
 
-                 for (const item of ventaData.items) {
-           const { data: producto } = await supabase
-             .from('productos')
-             .select('*')
-             .eq('id', item.producto_id)
-             .single()
+        // Validar que hay productos en la venta
+        if (!ventaData.items || ventaData.items.length === 0) {
+          throw new Error('La venta debe tener al menos un producto')
+        }
 
-           if (!producto) throw new Error(`Producto ${item.producto_id} no encontrado`)
-           
-           // Permitir venta sin stock - mostrar advertencia pero continuar
-           if (producto.stock < item.cantidad) {
-             console.warn(`⚠️ Stock insuficiente para ${producto.nombre}: ${producto.stock} disponible, ${item.cantidad} solicitado`)
-             
-             // Notificar advertencia de stock bajo
-             get().addNotification({
-               id: Date.now().toString(),
-               type: 'warning',
-               title: 'Stock bajo',
-               message: `${producto.nombre}: Stock ${producto.stock}, vendiendo ${item.cantidad} (quedará en ${producto.stock - item.cantidad})`
-             })
-           }
+        // Validar que el cliente existe si se proporciona
+        if (ventaData.cliente_id) {
+          const { data: cliente, error: errorCliente } = await supabase
+            .from('clientes')
+            .select('id')
+            .eq('id', ventaData.cliente_id)
+            .single()
 
-           // Usar precio que viene en el item (ya calculado en el frontend)
-           const subtotal = item.precio_unitario * item.cantidad
-           total += subtotal
+          if (errorCliente || !cliente) {
+            throw new Error('Cliente no encontrado')
+          }
+        }
 
-           itemsToInsert.push({
-             producto_id: item.producto_id,
-             cantidad: item.cantidad,
-             precio_unitario: item.precio_unitario,
-             subtotal,
-             tipo_precio: item.tipo_precio || 'minorista'
-           })
-         }
+        // Calcular total de la venta
+        const total = ventaData.items.reduce((sum, item) => sum + item.subtotal, 0)
 
-        // 2. Crear venta
-        const { data: venta, error: ventaError } = await supabase
+        // Crear la venta
+        const ventaCompleta = {
+          ...ventaData,
+          total,
+          fecha: fechaHoy,
+          estado: 'completada',
+          empleado_id: empleadoId,
+        }
+
+        console.log('🔍 [ventasSlice] Creando venta:', ventaCompleta)
+
+        const { data: venta, error: errorVenta } = await supabase
           .from('ventas')
-          .insert([{
-            cliente_id: ventaData.cliente_id,
-            empleado_id: currentUser.id,
-            total,
-            fecha: DateUtils.getCurrentDateTime(),
-            metodo_pago: ventaData.metodo_pago || 'efectivo',
-            tipo_precio: ventaData.tipo_precio || 'minorista'
-          }])
+          .insert([ventaCompleta])
           .select()
           .single()
 
-        if (ventaError) throw ventaError
-
-        // 3. Crear items de venta
-        const { error: itemsError } = await supabase
-          .from('venta_items')
-          .insert(itemsToInsert.map(item => ({ ...item, venta_id: venta.id })))
-
-        if (itemsError) throw itemsError
-
-        // 4. Actualizar stock de productos
-        for (const item of ventaData.items) {
-          const { error: stockError } = await supabase.rpc('decrementar_stock', {
-            producto_id: item.producto_id,
-            cantidad: item.cantidad
-          })
-          if (stockError) throw stockError
+        if (errorVenta) {
+          console.error('❌ [ventasSlice] Error creando venta:', errorVenta)
+          throw errorVenta
         }
 
-        // 5. Registrar ingreso en caja (solo si no es cuenta corriente)
-        if (ventaData.metodo_pago !== 'cuenta_corriente') {
-          await get().registrarIngreso(total, `Venta #${venta.id} - ${ventaData.metodo_pago}`)
-        }
+        console.log('✅ [ventasSlice] Venta creada:', venta)
 
-        // 6. Actualizar estado local
-        const ventaCompleta = {
-          ...venta,
-          items: itemsToInsert,
-          empleado: currentUser,
-        }
-
-        set((state) => ({
-          ventas: [ventaCompleta, ...state.ventas],
-          loading: false,
+        // Crear los items de la venta
+        const itemsConVentaId = ventaData.items.map(item => ({
+          ...item,
+          venta_id: venta.id,
         }))
 
-        // 7. Refrescar productos para actualizar stock
-        await get().fetchProductos()
+        console.log('🔍 [ventasSlice] Creando items de venta:', itemsConVentaId)
 
-        // 8. Refrescar caja para actualizar saldo
-        await get().fetchMovimientos()
+        const { error: errorItems } = await supabase
+          .from('venta_items')
+          .insert(itemsConVentaId)
 
-        // 9. Sincronizar ventas en tiempo real (Dashboard y Caja)
-        await get().fetchVentas()
+        if (errorItems) {
+          console.error('❌ [ventasSlice] Error creando items:', errorItems)
+          throw errorItems
+        }
+
+        // Actualizar stock de productos
+        for (const item of ventaData.items) {
+          const { error: errorStock } = await supabase
+            .from('productos')
+            .update({ 
+              stock: supabase.rpc('decrement_stock', { 
+                product_id: item.producto_id, 
+                quantity: item.cantidad 
+              })
+            })
+            .eq('id', item.producto_id)
+
+          if (errorStock) {
+            console.error('❌ [ventasSlice] Error actualizando stock:', errorStock)
+            // No lanzar error aquí, solo log
+          }
+        }
+
+        // Registrar ingreso en caja
+        const concepto = `Venta #${venta.id} - ${ventaData.cliente_id ? 'Con cliente' : 'Sin cliente'}`
+        
+        const { error: errorCaja } = await supabase
+          .from('movimientos_caja')
+          .insert([{
+            tipo: 'ingreso',
+            monto: total,
+            concepto,
+            empleado_id: empleadoId,
+            fecha: fechaHoy,
+          }])
+
+        if (errorCaja) {
+          console.error('❌ [ventasSlice] Error registrando en caja:', errorCaja)
+          // No lanzar error aquí, solo log
+        }
+
+        // Actualizar estado local
+        set((state) => ({ 
+          ventas: [venta, ...state.ventas], 
+          loading: false 
+        }))
+
+        console.log('✅ [ventasSlice] Venta registrada exitosamente')
 
         // Notificar éxito
         get().addNotification({
           id: Date.now().toString(),
           type: 'success',
-          title: 'Venta registrada exitosamente',
-          message: `Venta #${venta.id} registrada por $${total.toFixed(2)} (${ventaData.metodo_pago}) - Ingreso en caja incluido`,
+          title: 'Venta registrada',
+          message: `Venta #${venta.id} registrada por $${total.toLocaleString()}`,
         })
 
       } catch (error: any) {
-        set((state) => ({
-          loading: false,
-          error: error.message,
+        console.error('❌ [ventasSlice] Error registrando venta:', error)
+        const errorMessage = error?.message || 'Error desconocido al registrar venta'
+        set((state) => ({ 
+          loading: false, 
+          error: errorMessage 
         }))
-
+        
         // Notificar error
         get().addNotification({
           id: Date.now().toString(),
           type: 'error',
           title: 'Error al registrar venta',
-          message: error.message,
+          message: errorMessage,
         })
+        
+        throw error
       }
     }
   }
