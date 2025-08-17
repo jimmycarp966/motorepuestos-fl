@@ -107,7 +107,7 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
       duration: 5000,
     };
     // Nota: Las notificaciones se manejarán desde el componente
-    console.log(`[${type.toUpperCase()}] ${message}`);
+    
   };
 
   return {

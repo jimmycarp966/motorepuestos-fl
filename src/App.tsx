@@ -12,9 +12,7 @@ import { CajaTable } from './components/caja/CajaTable'
 import ReportesTable from './components/reportes/ReportesTable'
 import { NotificationsContainer } from './components/ui/notifications'
 import { ConnectionError } from './components/ui/ConnectionError'
-import { DebugButton } from './components/ui/DebugButton'
-import { DebugVentasSimple } from './components/ui/DebugVentasSimple'
-import { DebugVentasCompleto } from './components/ui/DebugVentasCompleto'
+
 import { Footer } from './components/ui/Footer'
 
 function App() {
@@ -189,10 +187,7 @@ function App() {
 
   if (!user) {
     return (
-      <>
-        <LoginForm />
-        <DebugButton />
-      </>
+             <LoginForm />
     )
   }
 
@@ -204,7 +199,6 @@ function App() {
       display: 'flex'
     }}>
       <NotificationsContainer />
-      <DebugButton />
       
       {/* Sidebar fijo */}
       <Sidebar />
@@ -290,16 +284,8 @@ function App() {
          
          {/* Footer */}
          <Footer />
-       </main>
-      {/* Botón de debug */}
-      <DebugButton />
-      
-      {/* Debug de ventas */}
-      <DebugVentasSimple />
-      
-      {/* Debug completo de ventas */}
-      <DebugVentasCompleto />
-    </div>
+               </main>
+     </div>
   )
 }
 

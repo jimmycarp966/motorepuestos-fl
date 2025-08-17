@@ -14,7 +14,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   // Fallback para desarrollo
   console.warn('⚠️ Usando configuración de fallback para desarrollo')
 } else {
-  console.log('✅ Supabase configurado correctamente')
+  
 }
 
 // Configuración final con fallbacks
@@ -38,7 +38,7 @@ export const supabaseAdmin = createClient(finalUrl, serviceRoleKey)
 export async function checkAuthStatus() {
   try {
     const { data: { session }, error } = await supabase.auth.getSession()
-    console.log('🔍 [supabase] Estado de sesión:', { session: !!session, error })
+
     return { session, error }
   } catch (error) {
     console.error('❌ [supabase] Error verificando sesión:', error)

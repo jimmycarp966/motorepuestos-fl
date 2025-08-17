@@ -134,7 +134,7 @@ export const Sidebar: React.FC = () => {
               marginBottom: '0.75rem',
               paddingLeft: '0.5rem'
             }}>
-              Navegación ({accessibleModules.length} módulos)
+              Navegación
             </div>
             
             {accessibleModules.map((item) => {

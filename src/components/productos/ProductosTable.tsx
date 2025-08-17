@@ -8,7 +8,7 @@ import { useSearchFilter } from '../../hooks/useSearchFilter'
 
 
 export const ProductosTable: React.FC = () => {
-  console.log('🚀🚀🚀 [ProductosTable] COMPONENTE MONTADO - INICIO 🚀🚀🚀')
+
   
   const productos = useAppStore((state) => state.productos)
   const loading = useAppStore((state) => state.productosLoading)
@@ -21,19 +21,10 @@ export const ProductosTable: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [stockFilter, setStockFilter] = useState<'all' | 'low' | 'out'>('all')
 
-  console.log('🔍 [ProductosTable] Estado actual:', { 
-    productos: productos?.length, 
-    productosType: typeof productos,
-    productosIsArray: Array.isArray(productos),
-    loading, 
-    error,
-    showForm,
-    searchTerm
-  })
+
 
   // Cargar productos al montar el componente
   useEffect(() => {
-    console.log('🔍 [ProductosTable] Cargando productos...')
     fetchProductos()
   }, [fetchProductos])
 
@@ -113,7 +104,6 @@ export const ProductosTable: React.FC = () => {
 
 
   if (loading) {
-    console.log('🔍 [ProductosTable] Mostrando loading...')
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
@@ -143,7 +133,6 @@ export const ProductosTable: React.FC = () => {
   }
 
   if (error) {
-    console.log('🔍 [ProductosTable] Mostrando error:', error)
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
@@ -182,7 +171,7 @@ export const ProductosTable: React.FC = () => {
     )
   }
 
-  console.log('🔍 [ProductosTable] Renderizando tabla con productos:', productosConFiltroStock?.length)
+  
 
   return (
     <div className="space-y-6">

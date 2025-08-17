@@ -55,7 +55,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
               console.error('Error creando empleado:', createError)
               // Continuar con el login aunque no se pueda crear el empleado
             } else {
-              console.log('Empleado creado automáticamente:', newEmpleado)
+      
             }
           }
 
@@ -223,7 +223,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
     }))
 
     try {
-      console.log('🔍 Auth: Verificando sesión...')
+
       const { data: { session }, error } = await supabase.auth.getSession()
       
       if (error) {
@@ -232,7 +232,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
       }
 
       if (session?.user) {
-        console.log('✅ Auth: Sesión encontrada, obteniendo datos del empleado...')
+
         // Obtener datos del empleado
         const { data: empleadoData, error: empleadoError } = await supabase
           .from('empleados')
@@ -246,7 +246,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
           throw empleadoError
         }
 
-        console.log('✅ Auth: Empleado encontrado:', empleadoData)
+        
         set(() => ({
           auth: {
             session,
@@ -255,7 +255,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
           }
         }))
       } else {
-        console.log('ℹ️ Auth: No hay sesión activa')
+
         set(() => ({
           auth: {
             session: null,

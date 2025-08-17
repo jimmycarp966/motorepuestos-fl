@@ -29,7 +29,7 @@ interface CartItem {
 }
 
 export const VentasTable: React.FC = () => {
-  console.log('🚀 [VentasTable] COMPONENTE MONTADO')
+
   
   // Estados del store
   const productos = useAppStore((state) => state.productos)
@@ -55,17 +55,10 @@ export const VentasTable: React.FC = () => {
   // Refs
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  console.log('🔍 [VentasTable] Estado:', { 
-    productos: productos?.length,
-    clientes: clientes?.length,
-    cartItems: cartItems.length,
-    selectedCliente: selectedCliente?.nombre,
-    arqueoCompletadoHoy
-  })
+
 
   // Cargar datos al montar
   useEffect(() => {
-    console.log('🔍 [VentasTable] Cargando datos...')
     fetchProductos()
     fetchClientes()
   }, [fetchProductos, fetchClientes])
@@ -248,7 +241,6 @@ export const VentasTable: React.FC = () => {
   const handleFinalizarVenta = async (e?: React.MouseEvent) => {
     e?.preventDefault()
     e?.stopPropagation()
-    console.log('🚀 [VentasTable] Iniciando finalización de venta...')
     setIsSubmitting(true)
 
     try {
@@ -264,9 +256,7 @@ export const VentasTable: React.FC = () => {
         }))
       }
 
-      console.log('🚀 [VentasTable] Llamando registrarVenta...')
       await registrarVenta(ventaData)
-      console.log('✅ [VentasTable] Venta registrada exitosamente')
       
       // Nota: registrarVenta ya maneja el registro de ingreso en caja automáticamente
       // No es necesario llamar registrarIngreso aquí para evitar duplicación
@@ -276,7 +266,7 @@ export const VentasTable: React.FC = () => {
       setSelectedCliente(null)
       setMetodoPago('efectivo')
       setShowConfig(false)
-      console.log('✅ [VentasTable] Formulario limpiado, venta completada')
+
     } catch (error: any) {
       console.error('❌ [VentasTable] Error en finalización de venta:', error)
       addNotification({
@@ -287,7 +277,7 @@ export const VentasTable: React.FC = () => {
       })
     } finally {
       setIsSubmitting(false)
-      console.log('🏁 [VentasTable] Finalización de venta completada')
+
     }
   }
 
