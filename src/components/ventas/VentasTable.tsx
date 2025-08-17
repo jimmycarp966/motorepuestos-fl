@@ -37,7 +37,6 @@ export const VentasTable: React.FC = () => {
   const fetchProductos = useAppStore((state) => state.fetchProductos)
   const fetchClientes = useAppStore((state) => state.fetchClientes)
   const registrarVenta = useAppStore((state) => state.registrarVenta)
-  const registrarIngreso = useAppStore((state) => state.registrarIngreso)
   const addNotification = useAppStore((state) => state.addNotification)
   
   // Estados locales
@@ -246,16 +245,8 @@ export const VentasTable: React.FC = () => {
 
       await registrarVenta(ventaData)
       
-      // Registrar ingreso en caja
-      const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0)
-      await registrarIngreso(total, `Venta - ${selectedCliente ? selectedCliente.nombre : 'Cliente ocasional'}`)
-      
-      addNotification({
-        id: Date.now().toString(),
-        type: 'success',
-        title: 'Venta registrada',
-        message: `Venta registrada por $${total.toFixed(2)}`
-      })
+      // Nota: registrarVenta ya maneja el registro de ingreso en caja automáticamente
+      // No es necesario llamar registrarIngreso aquí para evitar duplicación
 
       // Limpiar formulario
       setCartItems([])

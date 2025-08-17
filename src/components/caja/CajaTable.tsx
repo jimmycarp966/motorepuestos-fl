@@ -265,29 +265,164 @@ export const CajaTable: React.FC = () => {
         </Card>
       </div>
 
-      {/* Ventas por Método de Pago */}
+      {/* Ventas por Método de Pago - Sección Mejorada */}
       {ventasHoy.length > 0 && (
         <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">Ventas por Método de Pago (Hoy)</h3>
-            <span className="text-sm text-gray-500">{ventasHoy.length} ventas</span>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {Object.entries(ventasPorMetodo).map(([metodo, total]) => (
-              <div key={metodo} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                <div className="flex-shrink-0 mr-3">
-                  {getMetodoPagoIcon(metodo)}
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900 capitalize">
-                    {metodo.replace('_', ' ')}
-                  </p>
-                  <p className="text-lg font-bold text-green-600">
-                    ${total.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                  </p>
-                </div>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                <BarChart3 className="w-5 h-5 mr-2 text-blue-600" />
+                Ventas por Modalidad de Pago
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">Desglose detallado de ventas del día</p>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-blue-600">
+                ${totalVentasHoy.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
               </div>
-            ))}
+              <div className="text-sm text-gray-500">{ventasHoy.length} ventas totales</div>
+            </div>
+          </div>
+          
+          {/* Grid de métodos de pago */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {Object.entries(ventasPorMetodo).map(([metodo, total]) => {
+              const porcentaje = totalVentasHoy > 0 ? ((total / totalVentasHoy) * 100).toFixed(1) : '0'
+              return (
+                <div key={metodo} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      <div className={`p-2 rounded-full ${getMetodoPagoColor(metodo)}`}>
+                        {getMetodoPagoIcon(metodo)}
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm font-semibold text-gray-900 capitalize">
+                          {metodo.replace('_', ' ')}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {porcentaje}% del total
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xl font-bold text-green-600">
+                      ${total.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {ventasHoy.filter(v => (v.metodo_pago || 'efectivo') === metodo).length} ventas
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Gráfico de barras simple */}
+          <div className="mt-6">
+            <h4 className="text-sm font-medium text-gray-700 mb-3">Distribución Visual</h4>
+            <div className="flex items-end space-x-2 h-8">
+              {Object.entries(ventasPorMetodo).map(([metodo, total]) => {
+                const porcentaje = totalVentasHoy > 0 ? (total / totalVentasHoy) * 100 : 0
+                return (
+                  <div key={metodo} className="flex-1 flex flex-col items-center">
+                    <div 
+                      className="w-full rounded-t"
+                      style={{
+                        height: `${Math.max(porcentaje, 5)}%`,
+                        backgroundColor: metodo === 'efectivo' ? '#10b981' :
+                                        metodo === 'tarjeta' ? '#3b82f6' :
+                                        metodo === 'transferencia' ? '#8b5cf6' :
+                                        metodo === 'cuenta_corriente' ? '#f59e0b' : '#6b7280'
+                      }}
+                    ></div>
+                    <div className="text-xs text-gray-500 mt-1 capitalize">
+                      {metodo.replace('_', ' ')}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Estadísticas Adicionales de Ventas */}
+      {ventasHoy.length > 0 && (
+        <Card className="p-6">
+          <div className="flex items-center mb-4">
+            <BarChart3 className="w-5 h-5 mr-2 text-purple-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Estadísticas Adicionales</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Promedio por venta */}
+            <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">
+                ${(totalVentasHoy / ventasHoy.length).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+              </div>
+              <div className="text-sm text-blue-700 font-medium">Promedio por Venta</div>
+              <div className="text-xs text-blue-600 mt-1">{ventasHoy.length} ventas</div>
+            </div>
+
+            {/* Método más usado */}
+            <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
+              <div className="text-2xl font-bold text-green-600">
+                {(() => {
+                  const metodoMasUsado = Object.entries(ventasPorMetodo)
+                    .sort(([,a], [,b]) => b - a)[0]
+                  return metodoMasUsado ? metodoMasUsado[0].replace('_', ' ').toUpperCase() : 'N/A'
+                })()}
+              </div>
+              <div className="text-sm text-green-700 font-medium">Método Más Usado</div>
+              <div className="text-xs text-green-600 mt-1">por monto</div>
+            </div>
+
+            {/* Ventas por hora */}
+            <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
+              <div className="text-2xl font-bold text-purple-600">
+                {(() => {
+                  const horas = ventasHoy.map(v => new Date(v.fecha).getHours())
+                  const horaMasActiva = horas.sort((a,b) => 
+                    horas.filter(h => h === a).length - horas.filter(h => h === b).length
+                  ).pop()
+                  return horaMasActiva !== undefined ? `${horaMasActiva}:00` : 'N/A'
+                })()}
+              </div>
+              <div className="text-sm text-purple-700 font-medium">Hora Más Activa</div>
+              <div className="text-xs text-purple-600 mt-1">del día</div>
+            </div>
+          </div>
+
+          {/* Resumen de métodos de pago */}
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <h4 className="text-sm font-medium text-gray-700 mb-3">Resumen por Método de Pago</h4>
+            <div className="space-y-2">
+              {Object.entries(ventasPorMetodo).map(([metodo, total]) => {
+                const cantidad = ventasHoy.filter(v => (v.metodo_pago || 'efectivo') === metodo).length
+                const porcentaje = totalVentasHoy > 0 ? ((total / totalVentasHoy) * 100).toFixed(1) : '0'
+                return (
+                  <div key={metodo} className="flex items-center justify-between p-2 bg-white rounded border">
+                    <div className="flex items-center">
+                      <div className={`p-1 rounded ${getMetodoPagoColor(metodo)}`}>
+                        {getMetodoPagoIcon(metodo)}
+                      </div>
+                      <span className="ml-2 text-sm font-medium capitalize">
+                        {metodo.replace('_', ' ')}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-semibold text-gray-900">
+                        ${total.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {cantidad} ventas ({porcentaje}%)
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </Card>
       )}

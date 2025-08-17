@@ -211,8 +211,8 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
         get().addNotification({
           id: Date.now().toString(),
           type: 'success',
-          title: 'Venta registrada',
-          message: `Venta #${venta.id} registrada por $${total.toFixed(2)} (${ventaData.metodo_pago})`,
+          title: 'Venta registrada exitosamente',
+          message: `Venta #${venta.id} registrada por $${total.toFixed(2)} (${ventaData.metodo_pago}) - Ingreso en caja incluido`,
         })
 
       } catch (error: any) {
