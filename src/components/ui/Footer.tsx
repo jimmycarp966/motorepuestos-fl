@@ -29,9 +29,9 @@ export const Footer: React.FC = () => {
          </span>
        </div>
        
-       <div style={{ textAlign: 'center' }}>
-         <span>© 2024 Sirius - Todos los derechos reservados</span>
-       </div>
+               <div style={{ textAlign: 'center' }}>
+          <span>© 2025 Sirius - Todos los derechos reservados</span>
+        </div>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <span>Desarrollado por</span>
