@@ -73,13 +73,13 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
     const todosLosModulos = modulosInfo.map(modulo => modulo.id)
     setAvailableModulos(todosLosModulos)
     
-    if (selectedRol && !empleado) {
-      // Para nuevos empleados, sugerir módulos del rol pero permitir cambio
+    // Solo sugerir módulos del rol si no hay módulos seleccionados previamente
+    if (selectedRol && !empleado && selectedModulos.length === 0) {
       const permisosSugeridos = getEmpleadoPermissions(selectedRol)
       setSelectedModulos(permisosSugeridos)
       setValue('permisos_modulos', permisosSugeridos)
     }
-  }, [selectedRol, getEmpleadoPermissions, setValue, empleado, modulosInfo])
+  }, [selectedRol, getEmpleadoPermissions, setValue, empleado, modulosInfo, selectedModulos.length])
 
   // Cargar datos del empleado si es edición
   useEffect(() => {
@@ -270,14 +270,26 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
               </div>
             </div>
 
-            {/* Permisos de Módulos */}
-            <div className="space-y-4">
-              <label className="block text-sm font-semibold text-gray-700">
-                🔐 Módulos Accesibles (Selección Libre)
-              </label>
-              <p className="text-sm text-gray-600 mb-3">
-                Selecciona libremente qué módulos puede acceder el empleado, independientemente del rol.
-              </p>
+                         {/* Permisos de Módulos */}
+             <div className="space-y-4">
+               <div className="flex justify-between items-center">
+                 <label className="block text-sm font-semibold text-gray-700">
+                   🔐 Módulos Accesibles (Selección Libre)
+                 </label>
+                 <button
+                   type="button"
+                   onClick={() => {
+                     setSelectedModulos([])
+                     setValue('permisos_modulos', [])
+                   }}
+                   className="text-sm text-blue-600 hover:text-blue-800 underline"
+                 >
+                   Limpiar selección
+                 </button>
+               </div>
+               <p className="text-sm text-gray-600 mb-3">
+                 Selecciona libremente qué módulos puede acceder el empleado, independientemente del rol.
+               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {modulosInfo.map((modulo) => {
                   const isSelected = selectedModulos.includes(modulo.id)
