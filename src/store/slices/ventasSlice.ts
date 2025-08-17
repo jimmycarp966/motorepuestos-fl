@@ -11,7 +11,6 @@ const initialState: VentasState = {
 }
 
 export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas' | 'ventasLoading' | 'ventasError' | 'fetchVentas' | 'registrarVenta'>> = (set, get) => {
-  console.log('🔧 [ventasSlice] Inicializando slice con estado:', initialState)
   
   return {
     ventas: initialState.ventas,

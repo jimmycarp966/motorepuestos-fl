@@ -24,9 +24,8 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
   modalArqueoAbierto: initialState.modalArqueoAbierto,
   arqueoCompletadoHoy: initialState.arqueoCompletadoHoy,
 
-  iniciarArqueo: async () => {
-    console.log('🔍 [arqueoSlice] Iniciando arqueo de caja...')
-    set((state) => ({ loading: true, error: null }))
+      iniciarArqueo: async () => {
+      set((state) => ({ loading: true, error: null }))
     
     try {
       const fechaHoy = DateUtils.getCurrentDate()
@@ -114,8 +113,6 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
         modalArqueoAbierto: true,
         loading: false 
       }))
-
-      console.log('✅ [arqueoSlice] Arqueo iniciado correctamente:', arqueoInicial)
       
       get().addNotification({
         id: Date.now().toString(),
@@ -140,9 +137,8 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
     }
   },
 
-  finalizarArqueo: async (arqueoData: Omit<ArqueoCajaData, 'id' | 'created_at'>) => {
-    console.log('🔍 [arqueoSlice] Finalizando arqueo...')
-    set((state) => ({ loading: true, error: null }))
+      finalizarArqueo: async (arqueoData: Omit<ArqueoCajaData, 'id' | 'created_at'>) => {
+      set((state) => ({ loading: true, error: null }))
     
     try {
       const empleadoId = get().auth.session?.user?.id
@@ -189,7 +185,7 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
         arqueos: [data, ...state.arqueos]
       }))
 
-      console.log('✅ [arqueoSlice] Arqueo finalizado correctamente:', data)
+
 
       // Notificar resultado
       const mensaje = totalDiferencia === 0 
@@ -220,7 +216,6 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
   },
 
   verificarArqueoCompletado: async () => {
-    console.log('🔍 [arqueoSlice] Verificando arqueo del día...')
     
     try {
       const fechaHoy = DateUtils.getCurrentDate()
@@ -252,7 +247,7 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
         }
       })
 
-      console.log('✅ [arqueoSlice] Arqueo del día:', arqueoCompletado ? 'Completado' : 'Pendiente')
+
 
     } catch (error) {
       console.error('❌ [arqueoSlice] Error verificando arqueo:', error)
@@ -260,12 +255,10 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
   },
 
   abrirModalArqueo: () => {
-    console.log('🔍 [arqueoSlice] Abriendo modal de arqueo...')
     set((state) => ({ modalArqueoAbierto: true }))
   },
 
   cerrarModalArqueo: () => {
-    console.log('🔍 [arqueoSlice] Cerrando modal de arqueo...')
     set((state) => ({ 
       modalArqueoAbierto: false,
       arqueoActual: null 
@@ -273,7 +266,6 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
   },
 
   fetchArqueos: async () => {
-    console.log('🔍 [arqueoSlice] Obteniendo historial de arqueos...')
     set((state) => ({ loading: true, error: null }))
     
     try {
@@ -293,7 +285,7 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
         loading: false 
       }))
 
-      console.log('✅ [arqueoSlice] Arqueos obtenidos:', data?.length)
+
 
     } catch (error: any) {
       console.error('❌ [arqueoSlice] Error fetching arqueos:', error)

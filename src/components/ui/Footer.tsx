@@ -15,7 +15,7 @@ export const Footer: React.FC = () => {
     }}>
              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
          <img 
-           src="/LOGO SISTEMAS.png" 
+           src="/logo-sistemas.png" 
            alt="Sirius" 
            style={{ 
              height: '28px', 

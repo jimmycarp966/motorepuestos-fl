@@ -15,10 +15,9 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
   error: initialState.error,
 
   fetchProductos: async () => {
-    console.log('🔍 [productosSlice] Iniciando fetchProductos...')
     set((state) => ({ loading: true, error: null }))
     try {
-      console.log('🔍 [productosSlice] Ejecutando consulta paginada a Supabase...')
+
       
       let allProductos: any[] = []
       let from = 0
@@ -33,16 +32,7 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
           .order('created_at', { ascending: false })
           .range(from, from + pageSize - 1)
         
-        console.log(`🔍 [productosSlice] Página ${from/pageSize + 1}:`, { 
-          dataLength: data?.length, 
-          count, 
-          from, 
-          to: from + pageSize - 1,
-          error 
-        })
-        
         if (error) {
-          console.error('❌ [productosSlice] Error de Supabase:', error)
           throw error
         }
         
@@ -55,24 +45,11 @@ export const productosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'prod
         }
       }
       
-      console.log('✅ [productosSlice] Total de productos obtenidos:', allProductos.length)
-      console.log('✅ [productosSlice] Primer producto:', allProductos[0])
-      
-      // Verificar si la batería Moura está incluida
-      const mouraProduct = allProductos.find(p => p.nombre.toLowerCase().includes('moura'))
-      if (mouraProduct) {
-        console.log('✅ [productosSlice] Batería Moura encontrada:', mouraProduct)
-      } else {
-        console.log('⚠️ [productosSlice] Batería Moura NO encontrada en los productos')
-      }
-      
       set((state) => ({ 
         productos: allProductos, 
         loading: false,
         error: null 
       }))
-      
-      console.log('✅ [productosSlice] Estado actualizado correctamente')
     } catch (error: any) {
       console.error('❌ [productosSlice] Error fetching productos:', error)
       const errorMessage = error?.message || 'Error desconocido al cargar productos'
