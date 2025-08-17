@@ -30,7 +30,7 @@ export const Footer: React.FC = () => {
        </div>
        
                <div style={{ textAlign: 'center' }}>
-          <span>© 2025 Sirius - Todos los derechos reservados</span>
+          <span>© 2025 Sirius - Todos los derechos reservados | Vercel Ready</span>
         </div>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
