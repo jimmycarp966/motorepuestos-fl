@@ -67,19 +67,19 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
 
   const selectedRol = watch('rol')
 
-  // Actualizar módulos disponibles cuando cambia el rol
+  // Permitir selección libre de todos los módulos (administrador puede elegir)
   useEffect(() => {
-    if (selectedRol) {
-      const permisos = getEmpleadoPermissions(selectedRol)
-      setAvailableModulos(permisos)
-      
-      // Si es edición, mantener los módulos existentes
-      if (!empleado) {
-        setSelectedModulos(permisos)
-        setValue('permisos_modulos', permisos)
-      }
+    // Hacer todos los módulos disponibles para selección libre
+    const todosLosModulos = modulosInfo.map(modulo => modulo.id)
+    setAvailableModulos(todosLosModulos)
+    
+    if (selectedRol && !empleado) {
+      // Para nuevos empleados, sugerir módulos del rol pero permitir cambio
+      const permisosSugeridos = getEmpleadoPermissions(selectedRol)
+      setSelectedModulos(permisosSugeridos)
+      setValue('permisos_modulos', permisosSugeridos)
     }
-  }, [selectedRol, getEmpleadoPermissions, setValue, empleado])
+  }, [selectedRol, getEmpleadoPermissions, setValue, empleado, modulosInfo])
 
   // Cargar datos del empleado si es edición
   useEffect(() => {
@@ -273,12 +273,14 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
             {/* Permisos de Módulos */}
             <div className="space-y-4">
               <label className="block text-sm font-semibold text-gray-700">
-                🔐 Módulos Accesibles
+                🔐 Módulos Accesibles (Selección Libre)
               </label>
+              <p className="text-sm text-gray-600 mb-3">
+                Selecciona libremente qué módulos puede acceder el empleado, independientemente del rol.
+              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {modulosInfo.map((modulo) => {
                   const isSelected = selectedModulos.includes(modulo.id)
-                                     const isAvailable = availableModulos.includes(modulo.id)
                   
                   return (
                     <div
@@ -286,11 +288,9 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
                       className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
                         isSelected
                           ? 'border-blue-500 bg-blue-50'
-                          : isAvailable
-                          ? 'border-gray-200 hover:border-gray-300 bg-white'
-                          : 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-50'
+                          : 'border-gray-200 hover:border-gray-300 bg-white'
                       }`}
-                      onClick={() => isAvailable && toggleModulo(modulo.id)}
+                      onClick={() => toggleModulo(modulo.id)}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
@@ -304,9 +304,6 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
                             <p className="text-sm text-gray-500">{modulo.descripcion}</p>
                           </div>
                         </div>
-                        {!isAvailable && (
-                          <XIcon className="w-4 h-4 text-gray-400" />
-                        )}
                       </div>
                     </div>
                   )

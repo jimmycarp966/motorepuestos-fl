@@ -177,13 +177,17 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
 
       if (authError) throw authError
 
-      // 2. Asegurar que los permisos estén completos según el rol
-      let permisosCompletos = empleadoData.permisos_modulos
-      if (empleadoData.rol === 'Administrador') {
-        permisosCompletos = MODULOS_DISPONIBLES.map(modulo => modulo.modulo)
-      } else {
-        const permisosDelRol = get().getEmpleadoPermissions(empleadoData.rol)
-        permisosCompletos = [...new Set([...empleadoData.permisos_modulos, ...permisosDelRol])]
+      // 2. Usar los permisos seleccionados por el administrador (selección libre)
+      let permisosCompletos = empleadoData.permisos_modulos || []
+      
+      // Si no se seleccionaron permisos específicos, usar los del rol como fallback
+      if (permisosCompletos.length === 0) {
+        if (empleadoData.rol === 'Administrador') {
+          permisosCompletos = MODULOS_DISPONIBLES.map(modulo => modulo.modulo)
+        } else {
+          const permisosDelRol = get().getEmpleadoPermissions(empleadoData.rol)
+          permisosCompletos = permisosDelRol
+        }
       }
 
       // 3. Crear empleado en tabla empleados usando el ID del usuario auth
@@ -261,13 +265,17 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
         if (authError) throw authError
       }
 
-      // 2. Asegurar que los permisos estén completos según el rol
-      let permisosCompletos = empleadoData.permisos_modulos
-      if (empleadoData.rol === 'Administrador') {
-        permisosCompletos = MODULOS_DISPONIBLES.map(modulo => modulo.modulo)
-      } else if (empleadoData.permisos_modulos && empleadoData.rol) {
-        const permisosDelRol = get().getEmpleadoPermissions(empleadoData.rol)
-        permisosCompletos = [...new Set([...empleadoData.permisos_modulos, ...permisosDelRol])]
+      // 2. Usar los permisos seleccionados por el administrador (selección libre)
+      let permisosCompletos = empleadoData.permisos_modulos || []
+      
+      // Si no se seleccionaron permisos específicos, usar los del rol como fallback
+      if (permisosCompletos.length === 0) {
+        if (empleadoData.rol === 'Administrador') {
+          permisosCompletos = MODULOS_DISPONIBLES.map(modulo => modulo.modulo)
+        } else {
+          const permisosDelRol = get().getEmpleadoPermissions(empleadoData.rol)
+          permisosCompletos = permisosDelRol
+        }
       }
 
       // 3. Actualizar empleado en tabla empleados
@@ -504,30 +512,33 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
     }
   },
 
-  // Eliminar empleado (soft delete)
+  // Eliminar empleado (eliminación real)
   deleteEmpleado: async (id: string) => {
     set((state) => ({
       empleados: { ...state.empleados, loading: true, error: null }
     }))
 
     try {
-      const { error } = await supabase
+      // 1. Eliminar empleado de la tabla empleados
+      const { error: empleadoError } = await supabase
         .from('empleados')
-        .update({ 
-          activo: false,
-          updated_at: new Date().toISOString(),
-        })
+        .delete()
         .eq('id', id)
 
-      if (error) throw error
+      if (empleadoError) throw empleadoError
 
-      // Actualizar estado local
+      // 2. Eliminar usuario de auth (si existe)
+      try {
+        await supabaseAdmin.auth.admin.deleteUser(id)
+      } catch (authError) {
+        console.warn('⚠️ No se pudo eliminar usuario de auth:', authError)
+      }
+
+      // Actualizar estado local - remover completamente del array
       set((state) => ({
         empleados: {
           ...state.empleados,
-          empleados: state.empleados.empleados.map(emp => 
-            emp.id === id ? { ...emp, activo: false } : emp
-          ),
+          empleados: state.empleados.empleados.filter(emp => emp.id !== id),
           loading: false,
         }
       }))
