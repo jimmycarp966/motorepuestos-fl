@@ -68,6 +68,7 @@ function App() {
 
   // Cargar datos según el módulo activo
   useEffect(() => {
+    console.log('🔄 [App] Módulo cambió a:', currentModule)
     if (!user) return
 
     const loadModuleData = async () => {
@@ -110,7 +111,7 @@ function App() {
 
   // Renderizar módulo correspondiente
   const renderModule = () => {
-    console.log('🎯 [App] Renderizando módulo:', currentModule)
+    console.log('🎯 [App] Renderizando módulo:', currentModule, 'Usuario:', user?.nombre)
     
     switch (currentModule) {
       case 'dashboard':

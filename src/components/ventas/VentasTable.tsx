@@ -214,7 +214,9 @@ export const VentasTable: React.FC = () => {
   }
 
   // Funciones de venta
-  const handleSubmit = async () => {
+  const handleSubmit = async (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
     if (cartItems.length === 0) {
       addNotification({
         id: Date.now().toString(),
@@ -229,7 +231,10 @@ export const VentasTable: React.FC = () => {
     setShowConfig(true)
   }
 
-  const handleFinalizarVenta = async () => {
+  const handleFinalizarVenta = async (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
+    console.log('🚀 [VentasTable] Iniciando finalización de venta...')
     setIsSubmitting(true)
 
     try {
@@ -245,7 +250,9 @@ export const VentasTable: React.FC = () => {
         }))
       }
 
+      console.log('🚀 [VentasTable] Llamando registrarVenta...')
       await registrarVenta(ventaData)
+      console.log('✅ [VentasTable] Venta registrada exitosamente')
       
       // Nota: registrarVenta ya maneja el registro de ingreso en caja automáticamente
       // No es necesario llamar registrarIngreso aquí para evitar duplicación
@@ -255,7 +262,9 @@ export const VentasTable: React.FC = () => {
       setSelectedCliente(null)
       setMetodoPago('efectivo')
       setShowConfig(false)
+      console.log('✅ [VentasTable] Formulario limpiado, venta completada')
     } catch (error: any) {
+      console.error('❌ [VentasTable] Error en finalización de venta:', error)
       addNotification({
         id: Date.now().toString(),
         type: 'error',
@@ -264,6 +273,7 @@ export const VentasTable: React.FC = () => {
       })
     } finally {
       setIsSubmitting(false)
+      console.log('🏁 [VentasTable] Finalización de venta completada')
     }
   }
 
@@ -560,7 +570,8 @@ export const VentasTable: React.FC = () => {
               <Card className="p-4">
                 <div className="space-y-3">
                   <Button
-                    onClick={handleFinalizarVenta}
+                    type="button"
+                    onClick={(e) => handleFinalizarVenta(e)}
                     disabled={isSubmitting}
                     className="w-full bg-green-600 hover:bg-green-700"
                   >
@@ -593,7 +604,8 @@ export const VentasTable: React.FC = () => {
           <Card className="p-4">
             <div className="space-y-3">
               <Button
-                onClick={handleSubmit}
+                type="button"
+                onClick={(e) => handleSubmit(e)}
                 disabled={cartItems.length === 0}
                 className="w-full bg-green-600 hover:bg-green-700"
               >
