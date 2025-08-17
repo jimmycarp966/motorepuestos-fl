@@ -449,6 +449,15 @@ export interface ArqueoActions {
 
 export type ArqueoSlice = ArqueoState & ArqueoActions;
 
+export interface CalendarioActions {
+  fetchEventos: () => Promise<void>
+  createEvento: (eventoData: CreateEventoData) => Promise<void>
+  updateEvento: (id: string, eventoData: Partial<CreateEventoData>) => Promise<void>
+  deleteEvento: (id: string) => Promise<void>
+}
+
+export type CalendarioSlice = CalendarioState & CalendarioActions;
+
 export interface AppStore extends 
   AuthSlice, 
   ProductosSlice, 
@@ -458,5 +467,6 @@ export interface AppStore extends
   CajaSlice, 
   ReportesSlice,
   ArqueoSlice,
+  CalendarioSlice,
   UISlice, 
   NotificationsSlice {}

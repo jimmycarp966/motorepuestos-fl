@@ -8,6 +8,7 @@ import { empleadosSlice } from './slices/empleadosSlice'
 import { cajaSlice } from './slices/cajaSlice'
 import { reportesSlice } from './slices/reportesSlice'
 import { arqueoSlice } from './slices/arqueoSlice'
+import { calendarioSlice } from './slices/calendarioSlice'
 import { uiSlice } from './slices/uiSlice'
 import { notificationsSlice } from './slices/notificationsSlice'
 import type { AppStore } from './types'
@@ -23,6 +24,7 @@ export const useAppStore = create<AppStore>()(
       ...cajaSlice(...a),
       ...reportesSlice(...a),
       ...arqueoSlice(...a),
+      ...calendarioSlice(...a),
       ...uiSlice(...a),
       ...notificationsSlice(...a),
     }),
