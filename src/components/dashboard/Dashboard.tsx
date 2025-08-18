@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { useAppStore } from '../../store'
+import { useComponentShortcuts, createShortcut } from '../../hooks/useKeyboardShortcuts'
 import { 
   useDashboardKPIs,
   useVentasRecientes,
@@ -50,6 +51,26 @@ export const Dashboard: React.FC = () => {
   // Estado para retry automático
   const [retryCount, setRetryCount] = React.useState(0)
   const [lastErrorTime, setLastErrorTime] = React.useState<number | null>(null)
+
+  // Shortcuts para Dashboard
+  const dashboardShortcuts = [
+    createShortcut('r', () => {
+      loadDashboardData(true)
+      addNotification({
+        id: `refresh-${Date.now()}`,
+        type: 'info',
+        title: 'Dashboard Actualizado',
+        message: 'Datos refrescados (Ctrl+R)',
+        duration: 1500
+      })
+    }, 'Refrescar dashboard', { ctrlKey: true }),
+    
+    createShortcut('F9', () => {
+      window.location.reload()
+    }, 'Refrescar aplicación completa')
+  ]
+
+  useComponentShortcuts(dashboardShortcuts)
 
   // Función para cargar datos con manejo de errores mejorado
   const loadDashboardData = React.useCallback(async (isRetry = false) => {

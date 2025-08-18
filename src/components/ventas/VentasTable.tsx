@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useAppStore } from '../../store'
+import { useComponentShortcuts, createShortcut } from '../../hooks/useKeyboardShortcuts'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
 import { Input } from '../ui/input'
@@ -16,7 +17,8 @@ import {
   Users,
   CheckCircle,
   ArrowDown,
-  ArrowUp
+  ArrowUp,
+  Keyboard
 } from 'lucide-react'
 import { useSearchFilter } from '../../hooks/useSearchFilter'
 
@@ -55,6 +57,67 @@ export const VentasTable: React.FC = () => {
   // Refs
   const searchInputRef = useRef<HTMLInputElement>(null)
 
+  // Shortcuts específicos para Ventas
+  const ventasShortcuts = [
+    createShortcut('F10', () => {
+      // Enfocar el campo de búsqueda
+      if (searchInputRef.current) {
+        searchInputRef.current.focus()
+        addNotification({
+          id: `shortcut-${Date.now()}`,
+          type: 'info',
+          title: 'Atajo F10',
+          message: 'Campo de búsqueda enfocado',
+          duration: 1500
+        })
+      }
+    }, 'Enfocar buscador de productos'),
+    
+    createShortcut('F11', () => {
+      // Finalizar venta si hay items en el carrito
+      if (cartItems.length > 0 && !isSubmitting) {
+        handleFinalizarVenta()
+        addNotification({
+          id: `shortcut-${Date.now()}`,
+          type: 'info',
+          title: 'Atajo F11',
+          message: 'Finalizando venta...',
+          duration: 1500
+        })
+      } else if (cartItems.length === 0) {
+        addNotification({
+          id: `shortcut-${Date.now()}`,
+          type: 'warning',
+          title: 'Atajo F11',
+          message: 'Agrega productos al carrito primero',
+          duration: 2000
+        })
+      }
+    }, 'Finalizar venta'),
+    
+    createShortcut('Escape', () => {
+      // Limpiar carrito o cerrar sugerencias
+      if (showProductSuggestions) {
+        setShowProductSuggestions(false)
+      } else if (cartItems.length > 0) {
+        if (confirm('¿Deseas limpiar el carrito?')) {
+          setCartItems([])
+          setSelectedCliente(null)
+        }
+      }
+    }, 'Cancelar/Limpiar'),
+    
+    createShortcut('Enter', () => {
+      // Si hay sugerencias visibles, seleccionar la primera
+      if (showProductSuggestions && filteredProductos.length > 0) {
+        handleProductSelect(filteredProductos[0])
+        setShowProductSuggestions(false)
+        setSearchTerm('')
+      }
+    }, 'Seleccionar primer producto')
+  ]
+
+  useComponentShortcuts(ventasShortcuts)
 
 
   // Cargar datos al montar
@@ -331,10 +394,16 @@ export const VentasTable: React.FC = () => {
         <div className="space-y-6">
           {/* Búsqueda rápida de productos */}
           <Card className="p-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-              <Search className="w-5 h-5 mr-2 text-blue-600" />
-              Búsqueda Rápida
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                <Search className="w-5 h-5 mr-2 text-blue-600" />
+                Búsqueda Rápida
+              </h3>
+              <div className="flex items-center gap-1 text-xs text-gray-500">
+                <Keyboard size={14} />
+                <span className="bg-gray-100 px-2 py-1 rounded font-mono">F10</span>
+              </div>
+            </div>
             
             <div className="relative">
               <Input
@@ -597,6 +666,13 @@ export const VentasTable: React.FC = () => {
               {/* Botón confirmar venta */}
               <Card className="p-4">
                 <div className="space-y-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">Finalizar Venta</span>
+                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                      <Keyboard size={12} />
+                      <span className="bg-gray-100 px-1.5 py-0.5 rounded font-mono">F11</span>
+                    </div>
+                  </div>
                   <Button
                     type="button"
                     onClick={(e) => handleFinalizarVenta(e)}

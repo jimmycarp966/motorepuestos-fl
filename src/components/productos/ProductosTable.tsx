@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useAppStore } from '../../store'
 import { useProductosFiltered, useCategorias, useLoadingStates, useErrorStates } from '../../lib/selectors'
 import { usePagination, useTableLogic, useCRUDOperations } from '../../hooks/useTableLogic'
+import { useComponentShortcuts, createShortcut } from '../../hooks/useKeyboardShortcuts'
 import TableBase, { TableColumn, TableAction } from '../shared/TableBase'
 import { Edit, Trash2, Package, AlertTriangle, Tag, DollarSign, Filter } from 'lucide-react'
 import { ProductoForm } from './ProductoForm'
@@ -39,6 +40,24 @@ export const ProductosTable: React.FC = () => {
 
   // Paginación
   const pagination = usePagination(productosData.productos)
+
+  // Shortcuts para Productos
+  const productosShortcuts = [
+    createShortcut('n', () => {
+      handlers.openCreateForm()
+    }, 'Nuevo producto', { ctrlKey: true }),
+    
+    createShortcut('f', () => {
+      // Focus en filtro de stock
+      setStockFilter(stockFilter === 'all' ? 'low' : stockFilter === 'low' ? 'out' : 'all')
+    }, 'Cambiar filtro de stock', { ctrlKey: true }),
+    
+    createShortcut('r', () => {
+      crudOps.handleRefresh()
+    }, 'Refrescar productos', { ctrlKey: true })
+  ]
+
+  useComponentShortcuts(productosShortcuts)
 
   // Cargar datos al montar
   useEffect(() => {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAppStore } from '../../store'
 import { usePermissionGuard } from '../../hooks/usePermissionGuard'
+import { useGlobalNavigation } from '../../hooks/useKeyboardShortcuts'
 import { Button } from '../ui/button'
 import { 
   LayoutDashboard, 
@@ -13,18 +14,19 @@ import {
   LogOut,
   Shield,
   Menu,
-  X
+  X,
+  Keyboard
 } from 'lucide-react'
 
 
 const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: '#667eea' },
-  { id: 'empleados', label: 'Empleados', icon: Users, color: '#f093fb' },
-  { id: 'productos', label: 'Productos', icon: Package, color: '#4facfe' },
-  { id: 'clientes', label: 'Clientes', icon: UserCheck, color: '#43e97b' },
-  { id: 'ventas', label: 'Ventas', icon: ShoppingCart, color: '#fa709a' },
-  { id: 'caja', label: 'Caja', icon: DollarSign, color: '#ffecd2' },
-  { id: 'reportes', label: 'Reportes', icon: BarChart3, color: '#a8edea' },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: '#667eea', shortcut: 'F1' },
+  { id: 'ventas', label: 'Ventas', icon: ShoppingCart, color: '#fa709a', shortcut: 'F2' },
+  { id: 'productos', label: 'Productos', icon: Package, color: '#4facfe', shortcut: 'F3' },
+  { id: 'clientes', label: 'Clientes', icon: UserCheck, color: '#43e97b', shortcut: 'F4' },
+  { id: 'empleados', label: 'Empleados', icon: Users, color: '#f093fb', shortcut: 'F5' },
+  { id: 'caja', label: 'Caja', icon: DollarSign, color: '#ffecd2', shortcut: 'F6' },
+  { id: 'reportes', label: 'Reportes', icon: BarChart3, color: '#a8edea', shortcut: 'F7' },
 ]
 
 export const Sidebar: React.FC = () => {
@@ -34,6 +36,9 @@ export const Sidebar: React.FC = () => {
   const currentModule = useAppStore((state) => state.ui.currentModule)
   const setCurrentModule = useAppStore((state) => state.setCurrentModule)
   const permissions = usePermissionGuard()
+  
+  // Activar navegación global con shortcuts
+  useGlobalNavigation()
   
   // Estado para sidebar móvil
   const [isMobileOpen, setIsMobileOpen] = useState(false)
@@ -159,8 +164,8 @@ export const Sidebar: React.FC = () => {
                   key={item.id}
                   onClick={() => handleMenuClick(item.id)}
                   className={`
-                    w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl
-                    transition-all duration-200 mb-2 font-medium text-sm relative
+                    w-full flex items-center justify-between px-4 py-3 text-left rounded-xl
+                    transition-all duration-200 mb-2 font-medium text-sm relative group
                     ${isActive 
                       ? 'text-blue-600 bg-blue-50 font-semibold' 
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:translate-x-1'
@@ -170,13 +175,25 @@ export const Sidebar: React.FC = () => {
                   {isActive && (
                     <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-3/5 bg-blue-600 rounded-r" />
                   )}
-                  <div className={`
-                    w-5 h-5 flex items-center justify-center
-                    ${isActive ? 'text-blue-600' : 'text-gray-400'}
-                  `}>
-                    <Icon size={20} />
+                  
+                  <div className="flex items-center gap-3">
+                    <div className={`
+                      w-5 h-5 flex items-center justify-center
+                      ${isActive ? 'text-blue-600' : 'text-gray-400'}
+                    `}>
+                      <Icon size={20} />
+                    </div>
+                    <span>{item.label}</span>
                   </div>
-                  <span>{item.label}</span>
+                  
+                  {/* Mostrar shortcut */}
+                  <div className={`
+                    text-xs px-2 py-1 rounded-md font-mono opacity-60 transition-opacity
+                    ${isActive ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}
+                    group-hover:opacity-100
+                  `}>
+                    {item.shortcut}
+                  </div>
                 </button>
               )
             })}
@@ -185,6 +202,20 @@ export const Sidebar: React.FC = () => {
 
         {/* Footer del sidebar */}
         <div className="p-3 sm:p-6 border-t border-gray-200 bg-gray-50">
+          {/* Ayuda de shortcuts */}
+          <div className="mb-4 p-3 bg-white rounded-lg border border-gray-200">
+            <div className="flex items-center gap-2 mb-2">
+              <Keyboard size={14} className="text-blue-600" />
+              <span className="text-xs font-medium text-gray-700">Atajos Rápidos</span>
+            </div>
+            <div className="text-xs text-gray-500 space-y-1">
+              <div>F1-F7: Navegación</div>
+              <div>F9: Refrescar</div>
+              <div>F10: Buscar (Ventas)</div>
+              <div>F11: Finalizar Venta</div>
+            </div>
+          </div>
+          
           <div className="flex items-center gap-2 mb-4 p-3 bg-white rounded-lg border border-gray-200">
             <div className="w-2 h-2 rounded-full bg-green-500" />
             <span className="text-sm text-gray-600">

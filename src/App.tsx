@@ -12,6 +12,7 @@ import { CajaTable } from './components/caja/CajaTable'
 import ReportesTable from './components/reportes/ReportesTable'
 import { NotificationsContainer } from './components/ui/notifications'
 import { ConnectionError } from './components/ui/ConnectionError'
+import { ShortcutsHelp } from './components/ui/ShortcutsHelp'
 
 import { Footer } from './components/ui/Footer'
 
@@ -239,6 +240,9 @@ function App() {
         {/* Footer */}
         <Footer />
       </main>
+
+      {/* Ayuda de Shortcuts - Botón flotante */}
+      <ShortcutsHelp />
     </div>
   )
 }

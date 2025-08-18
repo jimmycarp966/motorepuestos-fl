@@ -75,3 +75,6 @@ export {
 // Componentes responsive y búsqueda
 export { default as ResponsiveTable } from './ui/responsive-table'
 export { default as GlobalSearch } from './ui/global-search'
+
+// Ayuda y shortcuts
+export { ShortcutsHelp } from './ui/ShortcutsHelp'
