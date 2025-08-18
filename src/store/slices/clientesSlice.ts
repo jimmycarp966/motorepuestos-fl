@@ -138,4 +138,93 @@ export const clientesSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'clien
       })
     }
   },
+
+  // Acción compuesta: Pagar deuda de cliente
+  pagarDeudaCliente: async (clienteId: string, monto: number) => {
+    set((state) => ({ clientes: { ...state.clientes, loading: true, error: null } }))
+    
+    try {
+      const cliente = get().clientes.clientes.find(c => c.id === clienteId)
+      if (!cliente) throw new Error('Cliente no encontrado')
+
+      // Validar que el monto no exceda la deuda
+      if (monto > cliente.saldo_cuenta_corriente) {
+        throw new Error(`El monto excede la deuda pendiente ($${cliente.saldo_cuenta_corriente})`)
+      }
+
+      if (monto <= 0) {
+        throw new Error('El monto debe ser mayor a 0')
+      }
+
+      const empleadoId = get().auth.session?.user?.id || get().auth.user?.id
+      if (!empleadoId) throw new Error('Usuario no autenticado')
+
+      // 1. Actualizar saldo del cliente
+      const nuevoSaldo = cliente.saldo_cuenta_corriente - monto
+      const { data: clienteActualizado, error: errorCliente } = await supabase
+        .from('clientes')
+        .update({
+          saldo_cuenta_corriente: nuevoSaldo,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', clienteId)
+        .select()
+        .single()
+
+      if (errorCliente) throw errorCliente
+
+      // 2. Registrar ingreso en caja (modalidad cuenta corriente)
+      const concepto = `Pago cuenta corriente - ${cliente.nombre}`
+      const { error: errorCaja } = await supabase
+        .from('movimientos_caja')
+        .insert([{
+          tipo: 'ingreso',
+          monto,
+          concepto,
+          empleado_id: empleadoId,
+          fecha: new Date().toISOString(),
+          metodo_pago: 'cuenta_corriente'
+        }])
+
+      if (errorCaja) {
+        console.warn('⚠️ Error registrando en caja:', errorCaja)
+        // No lanzar error aquí, el pago del cliente ya se realizó
+      }
+
+      // 3. Actualizar estado local
+      set((state) => ({ 
+        clientes: { 
+          ...state.clientes, 
+          clientes: state.clientes.clientes.map(c => c.id === clienteId ? clienteActualizado : c), 
+          loading: false 
+        } 
+      }))
+
+      // 4. Refrescar datos relacionados
+      get().fetchMovimientos?.()
+
+      // 5. Notificar éxito
+      get().addNotification({
+        id: Date.now().toString(),
+        type: 'success',
+        title: 'Pago registrado',
+        message: `Pago de $${monto} registrado para ${cliente.nombre}. Nuevo saldo: $${nuevoSaldo}`,
+      })
+
+      return clienteActualizado
+
+    } catch (error: any) {
+      set((state) => ({ clientes: { ...state.clientes, loading: false, error: error.message } }))
+
+      // Notificar error
+      get().addNotification({
+        id: Date.now().toString(),
+        type: 'error',
+        title: 'Error al registrar pago',
+        message: error.message,
+      })
+
+      throw error
+    }
+  },
 })

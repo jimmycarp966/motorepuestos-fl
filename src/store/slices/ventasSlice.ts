@@ -180,27 +180,50 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
                  }
                }
 
-               // Registrar ingreso en caja
-               const concepto = `Venta #${venta.id}`
-               try {
-                 const { error: errorCaja } = await supabase
-                   .from('movimientos_caja')
-                   .insert([{
-                     tipo: 'ingreso',
-                     monto: total,
-                     concepto,
-                     empleado_id: empleadoId,
-                     fecha: fechaHoy,
-                     metodo_pago: ventaData.metodo_pago
-                   }])
+               // Registrar ingreso en caja SOLO si NO es cuenta corriente
+               if (ventaData.metodo_pago !== 'cuenta_corriente') {
+                 const concepto = `Venta #${venta.id}`
+                 try {
+                   const { error: errorCaja } = await supabase
+                     .from('movimientos_caja')
+                     .insert([{
+                       tipo: 'ingreso',
+                       monto: total,
+                       concepto,
+                       empleado_id: empleadoId,
+                       fecha: fechaHoy,
+                       metodo_pago: ventaData.metodo_pago
+                     }])
 
-                 if (errorCaja) {
-                   console.warn(`⚠️ Movimiento de caja no registrado:`, errorCaja)
-                 } else {
-                   cajaRegistrada = true
+                   if (errorCaja) {
+                     console.warn(`⚠️ Movimiento de caja no registrado:`, errorCaja)
+                   } else {
+                     cajaRegistrada = true
+                   }
+                 } catch (cajaError) {
+                   console.warn(`⚠️ Error registrando en caja:`, cajaError)
                  }
-               } catch (cajaError) {
-                 console.warn(`⚠️ Error registrando en caja:`, cajaError)
+               } else {
+                 // Si es cuenta corriente, actualizar saldo del cliente
+                 if (ventaData.cliente_id) {
+                   try {
+                     const { error: errorCliente } = await supabase
+                       .from('clientes')
+                       .update({
+                         saldo_cuenta_corriente: supabase.sql`saldo_cuenta_corriente + ${total}`,
+                         updated_at: new Date().toISOString()
+                       })
+                       .eq('id', ventaData.cliente_id)
+
+                     if (errorCliente) {
+                       console.warn(`⚠️ Error actualizando saldo del cliente:`, errorCliente)
+                     } else {
+                       console.log(`✅ Saldo del cliente actualizado: +$${total}`)
+                     }
+                   } catch (clienteError) {
+                     console.warn(`⚠️ Error actualizando cliente:`, clienteError)
+                   }
+                 }
                }
 
                // 4. ACTUALIZAR ESTADO LOCAL

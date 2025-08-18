@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import { useAppStore } from '../../store'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
-import { Plus, Edit, Trash2, User, Mail, Phone, MapPin } from 'lucide-react'
+import { Plus, Edit, Trash2, User, Mail, Phone, MapPin, DollarSign, CreditCard } from 'lucide-react'
 import { ClienteForm } from './ClienteForm'
+import { PagarDeudaModal } from './PagarDeudaModal'
 
 export const ClientesTable: React.FC = () => {
   const clientes = useAppStore((state) => state.clientes.clientes)
@@ -12,6 +13,8 @@ export const ClientesTable: React.FC = () => {
   const addNotification = useAppStore((state) => state.addNotification)
   const [showForm, setShowForm] = useState(false)
   const [editingCliente, setEditingCliente] = useState<any>(null)
+  const [showPagarDeuda, setShowPagarDeuda] = useState(false)
+  const [selectedCliente, setSelectedCliente] = useState<any>(null)
 
   const handleDelete = async (id: string) => {
     try {
@@ -40,6 +43,16 @@ export const ClientesTable: React.FC = () => {
   const handleFormClose = () => {
     setShowForm(false)
     setEditingCliente(null)
+  }
+
+  const handlePagarDeuda = (cliente: any) => {
+    setSelectedCliente(cliente)
+    setShowPagarDeuda(true)
+  }
+
+  const handlePagarDeudaClose = () => {
+    setShowPagarDeuda(false)
+    setSelectedCliente(null)
   }
 
   if (loading) {
@@ -79,6 +92,9 @@ export const ClientesTable: React.FC = () => {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Dirección
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Cuenta Corriente
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Estado
@@ -135,6 +151,36 @@ export const ClientesTable: React.FC = () => {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-900">Saldo:</span>
+                        <span className={`text-sm font-semibold ${
+                          cliente.saldo_cuenta_corriente > 0 
+                            ? 'text-red-600' 
+                            : 'text-green-600'
+                        }`}>
+                          ${cliente.saldo_cuenta_corriente.toLocaleString()}
+                        </span>
+                      </div>
+                      {cliente.limite_credito > 0 && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500">Límite:</span>
+                          <span className="text-xs text-gray-600">
+                            ${cliente.limite_credito.toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+                      {cliente.saldo_cuenta_corriente > 0 && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500">Disponible:</span>
+                          <span className="text-xs text-gray-600">
+                            ${(cliente.limite_credito - cliente.saldo_cuenta_corriente).toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       cliente.activo 
                         ? 'bg-green-100 text-green-800' 
@@ -150,14 +196,27 @@ export const ClientesTable: React.FC = () => {
                         onClick={() => handleEdit(cliente)}
                         className="!bg-blue-600 !hover:bg-blue-700 !text-white !border-0"
                         style={{ backgroundColor: '#2563eb', color: 'white', border: 'none' }}
+                        title="Editar cliente"
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
+                      {cliente.saldo_cuenta_corriente > 0 && (
+                        <Button
+                          size="sm"
+                          onClick={() => handlePagarDeuda(cliente)}
+                          className="!bg-green-600 !hover:bg-green-700 !text-white !border-0"
+                          style={{ backgroundColor: '#059669', color: 'white', border: 'none' }}
+                          title="Pagar deuda"
+                        >
+                          <DollarSign className="w-4 h-4" />
+                        </Button>
+                      )}
                       <Button
                         size="sm"
                         onClick={() => handleDelete(cliente.id)}
                         className="!bg-red-600 !hover:bg-red-700 !text-white !border-0"
                         style={{ backgroundColor: '#dc2626', color: 'white', border: 'none' }}
+                        title="Eliminar cliente"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -174,6 +233,13 @@ export const ClientesTable: React.FC = () => {
         <ClienteForm
           cliente={editingCliente}
           onClose={handleFormClose}
+        />
+      )}
+
+      {showPagarDeuda && selectedCliente && (
+        <PagarDeudaModal
+          cliente={selectedCliente}
+          onClose={handlePagarDeudaClose}
         />
       )}
     </div>

@@ -493,7 +493,8 @@ export interface ClientesSlice {
   createCliente: (data: CreateClienteData) => Promise<void>
   updateCliente: (id: string, data: UpdateClienteData) => Promise<void>
   deleteCliente: (id: string) => Promise<void>
-  actualizarCuentaCorriente: (id: string, monto: number) => Promise<void>
+  actualizarCuentaCorriente: (clienteId: string, monto: number, tipo: 'cargo' | 'pago') => Promise<void>
+  pagarDeudaCliente: (clienteId: string, monto: number) => Promise<any>
 }
 
 export interface EmpleadosSlice {
