@@ -20,7 +20,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         case 'warning':
           return "border-yellow-500 bg-yellow-50 focus-visible:ring-yellow-500 focus-visible:border-yellow-500 hover:border-yellow-600"
         default:
-          return "border-slate-300 bg-white focus-visible:ring-moto-blue focus-visible:border-moto-blue hover:border-slate-400"
+          return "border-slate-300 bg-white hover:border-slate-400"
       }
     }
 
@@ -43,10 +43,34 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             type={type}
             className={cn(
-              "flex h-11 w-full rounded-moto border-2 px-4 py-3 text-base text-slate-800 placeholder-slate-500 shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60 disabled:bg-slate-50",
+              "flex h-11 w-full border-2 px-4 py-3 text-base text-slate-800 placeholder-slate-500 shadow-sm transition-all duration-200 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 disabled:bg-slate-50",
               getVariantStyles(),
               className
             )}
+            style={{
+              borderRadius: '12px',
+              fontSize: '0.95rem',
+              fontWeight: '500',
+              ...(variant === 'default' && {
+                borderColor: '#cbd5e1',
+                ':focus': {
+                  borderColor: '#0ea5e9',
+                  boxShadow: '0 0 0 3px rgba(14, 165, 233, 0.1)'
+                }
+              })
+            }}
+            onFocus={(e) => {
+              if (variant === 'default') {
+                e.target.style.borderColor = '#0ea5e9'
+                e.target.style.boxShadow = '0 0 0 3px rgba(14, 165, 233, 0.1)'
+              }
+            }}
+            onBlur={(e) => {
+              if (variant === 'default') {
+                e.target.style.borderColor = '#cbd5e1'
+                e.target.style.boxShadow = 'none'
+              }
+            }}
             ref={ref}
             {...props}
           />

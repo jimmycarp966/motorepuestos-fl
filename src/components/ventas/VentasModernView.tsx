@@ -221,13 +221,13 @@ export const VentasModernView: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen" style={{ backgroundColor: '#f8fafc' }}>
       {/* Panel Principal - Productos */}
       <div className="flex-1 flex flex-col">
         {/* Header de búsqueda y filtros */}
         <div className="bg-white shadow-sm border-b border-slate-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-slate-800">
+            <h1 className="text-2xl font-bold" style={{ color: '#0ea5e9' }}>
               🏪 Punto de Venta - Motorepuestos
             </h1>
             <div className="flex items-center space-x-2">
@@ -285,7 +285,7 @@ export const VentasModernView: React.FC = () => {
           </div>
 
           {/* Configuración de precios */}
-          <div className="flex items-center justify-between mt-4 p-3 bg-moto-blue/10 rounded-moto">
+          <div className="flex items-center justify-between mt-4 p-3 rounded-lg" style={{ backgroundColor: 'rgba(14, 165, 233, 0.1)' }}>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <Label className="text-sm">Tipo de Precio:</Label>
@@ -354,7 +354,7 @@ export const VentasModernView: React.FC = () => {
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-slate-600">Precio:</span>
-                        <span className="text-lg font-bold text-moto-blue">
+                        <span className="text-lg font-bold" style={{ color: '#0ea5e9' }}>
                           ${precio.toFixed(2)}
                         </span>
                       </div>
@@ -630,7 +630,12 @@ export const VentasModernView: React.FC = () => {
               <Button
                 onClick={handleFinalizarVenta}
                 disabled={isSubmitting}
-                className="ventas-finalizar-btn w-full py-4 text-lg"
+                className="w-full py-4 text-lg font-bold text-white"
+                style={{ 
+                  background: 'linear-gradient(135deg, #0ea5e9 0%, #ff6b35 100%)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}
                 size="lg"
               >
                 {isSubmitting ? (
