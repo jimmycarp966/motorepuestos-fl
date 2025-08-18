@@ -43,9 +43,9 @@ export const LoginForm: React.FC = () => {
         backgroundColor: 'white',
         borderRadius: '1.5rem',
         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        padding: '3rem',
+        padding: 'clamp(1.5rem, 4vw, 3rem)',
         width: '100%',
-        maxWidth: '450px',
+        maxWidth: 'min(450px, calc(100vw - 2rem))',
         position: 'relative',
         overflow: 'hidden'
       }}>
@@ -83,8 +83,8 @@ export const LoginForm: React.FC = () => {
               src="/assets/sirius-logo.png" 
               alt="Sirius Logo" 
               style={{ 
-                width: '120px', 
-                height: '120px',
+                width: 'clamp(80px, 15vw, 120px)', 
+                height: 'clamp(80px, 15vw, 120px)',
                 objectFit: 'contain',
                 filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))'
               }} 
@@ -92,7 +92,7 @@ export const LoginForm: React.FC = () => {
           </div>
           
           <h1 style={{
-            fontSize: '2rem',
+            fontSize: 'clamp(1.5rem, 5vw, 2rem)',
             fontWeight: '700',
             color: '#1e293b',
             marginBottom: '0.5rem'
@@ -101,7 +101,7 @@ export const LoginForm: React.FC = () => {
           </h1>
           
           <p style={{
-            fontSize: '1rem',
+            fontSize: 'clamp(0.875rem, 3vw, 1rem)',
             color: '#64748b',
             margin: 0
           }}>

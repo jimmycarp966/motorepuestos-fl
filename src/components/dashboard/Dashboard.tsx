@@ -278,12 +278,15 @@ export const Dashboard: React.FC = () => {
   ]
 
   return (
-    <div style={{ padding: '1rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div style={{ 
+      padding: 'clamp(0.75rem, 3vw, 1rem)', 
+      fontFamily: 'Inter, system-ui, sans-serif' 
+    }}>
 
       {/* Header del Dashboard */}
-      <div style={{ marginBottom: '1.5rem' }}>
+      <div style={{ marginBottom: 'clamp(1rem, 3vw, 1.5rem)' }}>
         <h1 style={{ 
-          fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
+          fontSize: 'clamp(1.25rem, 4vw, 2rem)', 
           fontWeight: '700', 
           color: '#1e293b',
           marginBottom: '0.5rem'
@@ -291,7 +294,7 @@ export const Dashboard: React.FC = () => {
           Dashboard
         </h1>
         <p style={{ 
-          fontSize: 'clamp(0.875rem, 2vw, 1rem)', 
+          fontSize: 'clamp(0.75rem, 2vw, 1rem)', 
           color: '#64748b',
           margin: 0
         }}>
@@ -299,12 +302,12 @@ export const Dashboard: React.FC = () => {
         </p>
       </div>
 
-      {/* KPIs Grid */}
+      {/* KPIs Grid - Optimizado para móviles */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '1rem',
-        marginBottom: '1.5rem'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))',
+        gap: 'clamp(0.75rem, 2vw, 1rem)',
+        marginBottom: 'clamp(1rem, 3vw, 1.5rem)'
       }}>
         {kpiCards.map((card, index) => {
           const Icon = card.icon

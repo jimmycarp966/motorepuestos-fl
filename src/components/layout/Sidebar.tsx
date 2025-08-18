@@ -115,14 +115,15 @@ export const Sidebar: React.FC = () => {
 
       {/* Sidebar */}
       <div className={`
-        fixed top-0 left-0 h-full bg-white border-r border-gray-200 z-50 w-[280px]
+        fixed top-0 left-0 h-full bg-white border-r border-gray-200 z-50 
+        w-[min(280px,85vw)] sm:w-[280px]
         flex flex-col shadow-xl transition-transform duration-300 ease-in-out
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Header del sidebar */}
-        <div className="p-8 pb-6 bg-gradient-to-br from-blue-500 to-purple-600 text-white border-b border-white/10">
-          <div className="mb-4">
-            <h1 className="text-xl font-bold leading-tight tracking-tight">
+        <div className="p-4 sm:p-8 pb-4 sm:pb-6 bg-gradient-to-br from-blue-500 to-purple-600 text-white border-b border-white/10">
+          <div className="mb-3 sm:mb-4">
+            <h1 className="text-lg sm:text-xl font-bold leading-tight tracking-tight">
               Motorepuestos F.L.
             </h1>
           </div>
@@ -143,7 +144,7 @@ export const Sidebar: React.FC = () => {
         </div>
 
         {/* Navegación */}
-        <nav className="flex-1 p-6 overflow-y-auto">
+        <nav className="flex-1 p-3 sm:p-6 overflow-y-auto">
           <div className="mb-4">
             <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 pl-2">
               Navegación
@@ -183,7 +184,7 @@ export const Sidebar: React.FC = () => {
         </nav>
 
         {/* Footer del sidebar */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
+        <div className="p-3 sm:p-6 border-t border-gray-200 bg-gray-50">
           <div className="flex items-center gap-2 mb-4 p-3 bg-white rounded-lg border border-gray-200">
             <div className="w-2 h-2 rounded-full bg-green-500" />
             <span className="text-sm text-gray-600">

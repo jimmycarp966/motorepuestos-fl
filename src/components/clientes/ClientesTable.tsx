@@ -68,7 +68,7 @@ export const ClientesTable: React.FC = () => {
 
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full" style={{ minWidth: '600px' }}>
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -91,35 +91,35 @@ export const ClientesTable: React.FC = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {clientes.map((cliente) => (
                 <tr key={cliente.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center">
-                          <User className="h-6 w-6 text-white" />
+                      <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10">
+                        <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center">
+                          <User className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
                         </div>
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
+                      <div className="ml-2 sm:ml-4 min-w-0 flex-1">
+                        <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
                           {cliente.nombre}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-xs text-gray-500 hidden sm:block">
                           ID: {cliente.id.slice(0, 8)}...
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                     <div className="space-y-1">
                       {cliente.email && (
-                        <div className="flex items-center text-sm text-gray-900">
-                          <Mail className="w-4 h-4 mr-2 text-gray-400" />
-                          {cliente.email}
+                        <div className="flex items-center text-xs sm:text-sm text-gray-900">
+                          <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-gray-400 flex-shrink-0" />
+                          <span className="truncate">{cliente.email}</span>
                         </div>
                       )}
                       {cliente.telefono && (
-                        <div className="flex items-center text-sm text-gray-900">
-                          <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                          {cliente.telefono}
+                        <div className="flex items-center text-xs sm:text-sm text-gray-900">
+                          <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-gray-400 flex-shrink-0" />
+                          <span className="truncate">{cliente.telefono}</span>
                         </div>
                       )}
                     </div>
