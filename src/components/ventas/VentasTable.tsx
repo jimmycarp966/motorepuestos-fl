@@ -18,9 +18,11 @@ import {
   CheckCircle,
   ArrowDown,
   ArrowUp,
-  Keyboard
+  Keyboard,
+  FileText
 } from 'lucide-react'
 import { useSearchFilter } from '../../hooks/useSearchFilter'
+import { FacturacionModal } from '../facturacion/FacturacionModal'
 
 interface CartItem {
   producto: any
@@ -53,6 +55,8 @@ export const VentasTable: React.FC = () => {
   const [showClientSearch, setShowClientSearch] = useState(false)
   const [searchClientTerm, setSearchClientTerm] = useState('')
   const [showConfig, setShowConfig] = useState(false)
+  const [showFacturacionModal, setShowFacturacionModal] = useState(false)
+  const [selectedVentaForFactura, setSelectedVentaForFactura] = useState<any>(null)
   
   // Refs
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -345,12 +349,26 @@ export const VentasTable: React.FC = () => {
   }
 
   const handleFacturarAFIP = () => {
-    addNotification({
-      id: Date.now().toString(),
-      type: 'info',
-      title: 'Facturación AFIP',
-      message: 'Funcionalidad de facturación AFIP será implementada próximamente'
-    })
+    if (cartItems.length === 0) {
+      addNotification({
+        id: Date.now().toString(),
+        type: 'error',
+        title: 'Carrito vacío',
+        message: 'Debes agregar al menos un producto para facturar'
+      })
+      return
+    }
+
+    // Crear venta temporal para facturación
+    const ventaTemporal = {
+      id: `temp-${Date.now()}`,
+      total: total,
+      cliente_id: selectedCliente?.id || null,
+      items: cartItems
+    }
+
+    setSelectedVentaForFactura(ventaTemporal)
+    setShowFacturacionModal(true)
   }
 
   const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0)
@@ -728,8 +746,9 @@ export const VentasTable: React.FC = () => {
                 onClick={handleFacturarAFIP}
                 variant="outline"
                 className="w-full bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                disabled={cartItems.length === 0}
               >
-                <Receipt className="w-4 h-4 mr-2" />
+                <FileText className="w-4 h-4 mr-2" />
                 Facturar AFIP
               </Button>
             </div>
@@ -805,6 +824,30 @@ export const VentasTable: React.FC = () => {
             </div>
           </Card>
         </div>
+      )}
+
+      {/* Modal de Facturación AFIP */}
+      {showFacturacionModal && selectedVentaForFactura && (
+        <FacturacionModal
+          ventaId={selectedVentaForFactura.id}
+          total={selectedVentaForFactura.total}
+          clienteId={selectedVentaForFactura.cliente_id}
+          onClose={() => {
+            setShowFacturacionModal(false)
+            setSelectedVentaForFactura(null)
+          }}
+          onSuccess={(comprobante) => {
+            addNotification({
+              id: `factura-${Date.now()}`,
+              type: 'success',
+              title: 'Factura Generada',
+              message: `Factura ${comprobante.tipo_comprobante} generada exitosamente con CAE: ${comprobante.cae}`,
+              duration: 5000
+            })
+            setShowFacturacionModal(false)
+            setSelectedVentaForFactura(null)
+          }}
+        />
       )}
     </div>
   )

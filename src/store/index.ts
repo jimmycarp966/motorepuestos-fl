@@ -12,6 +12,7 @@ import { calendarioSlice } from './slices/calendarioSlice'
 import { cajaHistorialSlice } from './slices/cajaHistorialSlice'
 import { uiSlice } from './slices/uiSlice'
 import { notificationsSlice } from './slices/notificationsSlice'
+import { facturacionSlice } from './slices/facturacionSlice'
 import { ErrorHandler } from '../lib/errorHandler'
 import { AuditLogger } from '../lib/auditLogger'
 import type { AppStore } from './types'
@@ -32,6 +33,7 @@ export const useAppStore = create<AppStore>()(
         ...cajaHistorialSlice(...a),
         ...uiSlice(...a),
         ...notificationsSlice(...a),
+        ...facturacionSlice(...a),
       }
 
       // Configurar ErrorHandler con el callback de notificaciones

@@ -538,6 +538,57 @@ export interface CajaHistorialActions {
 
 export type CajaHistorialSlice = CajaHistorialState & CajaHistorialActions;
 
+// Tipos para facturación AFIP
+export interface ComprobanteElectronico {
+  id: string
+  venta_id: string
+  tipo_comprobante: string
+  punto_venta: number
+  numero_comprobante: number
+  fecha_emision: string
+  fecha_vencimiento?: string
+  cae?: string
+  cae_vto?: string
+  resultado: string
+  motivo_rechazo?: string
+  observaciones?: string
+  xml_request?: string
+  xml_response?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ConfiguracionAFIP {
+  id: string
+  cuit: string
+  punto_venta: number
+  condicion_iva: string
+  ambiente: string
+  certificado_path?: string
+  clave_privada_path?: string
+  activo: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface FacturacionSlice {
+  // State
+  comprobantes: ComprobanteElectronico[]
+  configuracion: ConfiguracionAFIP | null
+  facturacionLoading: boolean
+  facturacionError: string | null
+  lastComprobante: ComprobanteElectronico | null
+
+  // Actions
+  fetchComprobantes: () => Promise<void>
+  fetchConfiguracionAFIP: () => Promise<void>
+  generarComprobante: (ventaId: string) => Promise<ComprobanteElectronico | null>
+  verificarEstadoAFIP: () => Promise<boolean>
+  clearFacturacionError: () => void
+  clearLastComprobante: () => void
+  setConfiguracion: (config: ConfiguracionAFIP) => void
+}
+
 export interface AppStore extends 
   AuthSlice, 
   ProductosSlice, 
@@ -549,7 +600,8 @@ export interface AppStore extends
   ArqueoSlice,
   CalendarioSlice,
   UISlice, 
-  NotificationsSlice {
+  NotificationsSlice,
+  FacturacionSlice {
   // Propiedades adicionales para slices que no están en el store principal
   cajaHistorial: CajaHistorialState
 }

@@ -121,16 +121,10 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
               <Input
                 {...register('nombre')}
                 placeholder="Ingresa el nombre completo"
-                className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
-                  errors.nombre ? 'border-red-300 bg-red-50' : 'border-gray-200'
-                }`}
+                variant={errors.nombre ? 'error' : 'default'}
+                helperText={errors.nombre?.message}
+                showIcon={!!errors.nombre}
               />
-              {errors.nombre && (
-                <p className="text-red-500 text-sm flex items-center mt-1">
-                  <span className="mr-1">⚠️</span>
-                  {errors.nombre.message}
-                </p>
-              )}
             </div>
 
             {/* Campo Email */}
@@ -142,16 +136,10 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
                 type="email"
                 {...register('email')}
                 placeholder="cliente@ejemplo.com"
-                className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
-                  errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200'
-                }`}
+                variant={errors.email ? 'error' : 'default'}
+                helperText={errors.email?.message}
+                showIcon={!!errors.email}
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm flex items-center mt-1">
-                  <span className="mr-1">⚠️</span>
-                  {errors.email.message}
-                </p>
-              )}
             </div>
 
             {/* Campo Teléfono */}
@@ -162,7 +150,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
               <Input
                 {...register('telefono')}
                 placeholder="+1234567890"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:border-gray-300 transition-all duration-200"
+                helperText="Número de contacto del cliente"
               />
             </div>
 
@@ -174,7 +162,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
               <textarea
                 {...register('direccion')}
                 placeholder="Ingresa la dirección completa..."
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:border-gray-300 resize-none transition-all duration-200"
+                className="form-textarea"
                 rows={3}
               />
             </div>
@@ -185,23 +173,18 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
                 💳 Límite de Crédito
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10">$</span>
                 <Input
                   type="number"
                   step="0.01"
                   {...register('limite_credito', { valueAsNumber: true })}
                   placeholder="0.00"
-                  className={`w-full pl-8 pr-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
-                    errors.limite_credito ? 'border-red-300 bg-red-50' : 'border-gray-200'
-                  }`}
+                  className="pl-8"
+                  variant={errors.limite_credito ? 'error' : 'default'}
+                  helperText={errors.limite_credito?.message || "Monto máximo de crédito permitido"}
+                  showIcon={!!errors.limite_credito}
                 />
               </div>
-              {errors.limite_credito && (
-                <p className="text-red-500 text-sm flex items-center mt-1">
-                  <span className="mr-1">⚠️</span>
-                  {errors.limite_credito.message}
-                </p>
-              )}
             </div>
 
             {/* Botones de acción */}

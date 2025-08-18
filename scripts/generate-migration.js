@@ -5,8 +5,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Leer el archivo producto.txt
-const productoPath = path.join(__dirname, '..', 'producto.txt');
+// Leer el archivo produc.txt
+const productoPath = path.join(__dirname, '..', 'produc.txt');
 const contenido = fs.readFileSync(productoPath, 'utf8');
 
 // Procesar las líneas
@@ -21,168 +21,161 @@ function limpiarValor(valor) {
 // Función para extraer precio numérico
 function extraerPrecio(precioStr) {
   if (!precioStr) return 0;
-  const match = precioStr.match(/\$?([0-9,]+\.?[0-9]*)/);
+  const match = precioStr.match(/\$?([0-9,]+\.[0-9]*)/);
   if (match) {
-    return parseFloat(match[1].replace(',', ''));
-  }
-  return 0;
-}
-
-// Función para extraer número entero
-function extraerNumero(numStr) {
-  if (!numStr) return 0;
-  const match = numStr.match(/([0-9,]+\.?[0-9]*)/);
-  if (match) {
-    return parseInt(match[1].replace(',', ''));
+    return parseFloat(match[1].replace(/,/g, ''));
   }
   return 0;
 }
 
 // Función para determinar categoría basada en el nombre
 function determinarCategoria(nombre) {
-  const nombreLower = nombre.toLowerCase();
+  const nombreUpper = nombre.toUpperCase();
   
-  if (nombreLower.includes('aceite')) return 'Lubricantes';
-  if (nombreLower.includes('filtro')) return 'Filtros';
-  if (nombreLower.includes('bujia') || nombreLower.includes('bujía')) return 'Encendido';
-  if (nombreLower.includes('freno')) return 'Frenos';
-  if (nombreLower.includes('bateria') || nombreLower.includes('batería')) return 'Eléctrico';
-  if (nombreLower.includes('amortiguador')) return 'Suspensión';
-  if (nombreLower.includes('cadena')) return 'Transmisión';
-  if (nombreLower.includes('carburador')) return 'Carburación';
-  if (nombreLower.includes('cilindro')) return 'Motor';
-  if (nombreLower.includes('piston') || nombreLower.includes('pistón')) return 'Motor';
-  if (nombreLower.includes('aro')) return 'Motor';
-  if (nombreLower.includes('junta')) return 'Motor';
-  if (nombreLower.includes('cable')) return 'Eléctrico';
-  if (nombreLower.includes('lampara') || nombreLower.includes('lámpara')) return 'Iluminación';
-  if (nombreLower.includes('faro') || nombreLower.includes('farol')) return 'Iluminación';
-  if (nombreLower.includes('espejo')) return 'Espejos';
-  if (nombreLower.includes('manubrio')) return 'Accesorios';
-  if (nombreLower.includes('asiento')) return 'Accesorios';
-  if (nombreLower.includes('funda')) return 'Accesorios';
-  if (nombreLower.includes('casco')) return 'Seguridad';
-  if (nombreLower.includes('guante')) return 'Seguridad';
-  if (nombreLower.includes('agua')) return 'Refrigeración';
-  if (nombreLower.includes('limpiador') || nombreLower.includes('limpieza')) return 'Limpieza';
-  if (nombreLower.includes('grasa') || nombreLower.includes('lubricante')) return 'Lubricantes';
-  if (nombreLower.includes('llanta') || nombreLower.includes('cubierta')) return 'Neumáticos';
-  if (nombreLower.includes('candado')) return 'Seguridad';
-  if (nombreLower.includes('herramienta')) return 'Herramientas';
+  if (nombreUpper.includes('ACEITE') || nombreUpper.includes('LUBRICANTE')) return 'Lubricantes';
+  if (nombreUpper.includes('FILTRO')) return 'Filtros';
+  if (nombreUpper.includes('FRENO') || nombreUpper.includes('ZAPATA')) return 'Frenos';
+  if (nombreUpper.includes('MOTOR') || nombreUpper.includes('CILINDRO') || nombreUpper.includes('PISTON')) return 'Motor';
+  if (nombreUpper.includes('TRANSMISION') || nombreUpper.includes('ENGRANAJE') || nombreUpper.includes('CADENA')) return 'Transmisión';
+  if (nombreUpper.includes('ELECTRICO') || nombreUpper.includes('BATERIA') || nombreUpper.includes('BOMBILLA')) return 'Eléctrico';
+  if (nombreUpper.includes('NEUMATICO') || nombreUpper.includes('LLANTA')) return 'Neumáticos';
+  if (nombreUpper.includes('CARBURADOR') || nombreUpper.includes('INYECTOR')) return 'Carburación';
+  if (nombreUpper.includes('ENCENDIDO') || nombreUpper.includes('BUJIA')) return 'Encendido';
+  if (nombreUpper.includes('ILUMINACION') || nombreUpper.includes('LUCES')) return 'Iluminación';
+  if (nombreUpper.includes('ACCESORIO') || nombreUpper.includes('CASCO') || nombreUpper.includes('GUANTE')) return 'Accesorios';
   
   return 'Repuestos';
 }
 
 // Función para determinar unidad de medida
 function determinarUnidadMedida(nombre) {
-  const nombreLower = nombre.toLowerCase();
+  const nombreUpper = nombre.toUpperCase();
   
-  if (nombreLower.includes('aceite') || nombreLower.includes('agua') || nombreLower.includes('líquido')) return 'Litro';
-  if (nombreLower.includes('bujia') || nombreLower.includes('bujía') || nombreLower.includes('filtro')) return 'Unidad';
-  if (nombreLower.includes('aro')) return 'Juego';
-  if (nombreLower.includes('cable')) return 'Unidad';
-  if (nombreLower.includes('junta')) return 'Unidad';
-  if (nombreLower.includes('lampara') || nombreLower.includes('lámpara')) return 'Unidad';
-  if (nombreLower.includes('faro') || nombreLower.includes('farol')) return 'Unidad';
-  if (nombreLower.includes('espejo')) return 'Unidad';
-  if (nombreLower.includes('manubrio')) return 'Unidad';
-  if (nombreLower.includes('asiento')) return 'Unidad';
-  if (nombreLower.includes('funda')) return 'Unidad';
-  if (nombreLower.includes('casco')) return 'Unidad';
-  if (nombreLower.includes('guante')) return 'Par';
-  if (nombreLower.includes('llanta') || nombreLower.includes('cubierta')) return 'Unidad';
-  if (nombreLower.includes('candado')) return 'Unidad';
-  if (nombreLower.includes('herramienta')) return 'Unidad';
+  if (nombreUpper.includes('ACEITE') || nombreUpper.includes('LUBRICANTE')) return 'LITRO';
+  if (nombreUpper.includes('NEUMATICO') || nombreUpper.includes('LLANTA')) return 'UNIDAD';
+  if (nombreUpper.includes('FILTRO')) return 'UNIDAD';
+  if (nombreUpper.includes('BATERIA')) return 'UNIDAD';
+  if (nombreUpper.includes('CASCO')) return 'UNIDAD';
+  if (nombreUpper.includes('GUANTE')) return 'PAR';
+  if (nombreUpper.includes('CADENA')) return 'UNIDAD';
+  if (nombreUpper.includes('BOMBILLA')) return 'UNIDAD';
   
-  return 'Unidad';
+  return 'UNIDAD';
 }
 
 // Procesar productos
 const productos = [];
+const categorias = {};
 
-// Saltar la primera línea (encabezados)
-for (let i = 1; i < lineas.length; i++) {
-  const linea = lineas[i];
-  const campos = linea.split('\t');
+lineas.forEach((linea, index) => {
+  if (index === 0) return; // Saltar encabezado
   
-  if (campos.length >= 8) {
-    const codigo = limpiarValor(campos[0]);
-    const descripcion = limpiarValor(campos[1]);
-    const precioCosto = extraerPrecio(campos[2]);
-    const precioVenta = extraerPrecio(campos[3]);
-    const precioMayoreo = extraerPrecio(campos[4]);
-    const inventario = extraerNumero(campos[5]);
-    const invMinimo = extraerNumero(campos[6]);
-    const departamento = limpiarValor(campos[7]);
-    
-    if (codigo && descripcion) {
-      const categoria = determinarCategoria(descripcion);
-      const unidadMedida = determinarUnidadMedida(descripcion);
-      
-      productos.push({
-        codigo_sku: codigo,
-        nombre: descripcion,
-        descripcion: descripcion,
-        costo: precioCosto,
-        precio_minorista: precioVenta,
-        precio_mayorista: precioMayoreo,
-        stock: inventario,
-        stock_minimo: invMinimo,
-        categoria: categoria,
-        unidad_medida: unidadMedida,
-        activo: true
-      });
-    }
-  }
-}
+  const columnas = linea.split('\t');
+  if (columnas.length < 7) return;
+  
+  const codigo = limpiarValor(columnas[0]);
+  const nombre = limpiarValor(columnas[1]);
+  const precioCosto = extraerPrecio(columnas[2]);
+  const precioVenta = extraerPrecio(columnas[3]);
+  const precioMayoreo = extraerPrecio(columnas[4]);
+  const inventario = parseInt(columnas[5]) || 0;
+  const invMinimo = parseInt(columnas[6]) || 0;
+  
+  if (!codigo || !nombre) return;
+  
+  const categoria = determinarCategoria(nombre);
+  const unidadMedida = determinarUnidadMedida(nombre);
+  
+  // Contar categorías
+  categorias[categoria] = (categorias[categoria] || 0) + 1;
+  
+  productos.push({
+    codigo_sku: codigo,
+    nombre: nombre,
+    descripcion: nombre,
+    categoria: categoria,
+    precio_minorista: precioVenta,
+    precio_mayorista: precioMayoreo,
+    costo: precioCosto,
+    stock: inventario,
+    stock_minimo: invMinimo,
+    unidad_medida: unidadMedida,
+    activo: true
+  });
+});
 
-// Generar SQL
-let sql = `-- Script completo para migrar productos del archivo producto.txt
+// Generar SQL con sintaxis corregida
+let sql = `-- Script para actualizar productos desde produc.txt - VERSIÓN FINAL
 -- Ejecutar en el SQL Editor de Supabase
+-- Este script ACTUALIZA productos existentes y AGREGA nuevos si no existen
 
--- 1. Agregar columna stock_minimo
-ALTER TABLE productos ADD COLUMN IF NOT EXISTS stock_minimo INTEGER DEFAULT 0;
+-- 1. Crear tabla temporal
+CREATE TEMP TABLE productos_temp (
+  codigo_sku VARCHAR(100) PRIMARY KEY,
+  nombre VARCHAR(255) NOT NULL,
+  descripcion TEXT,
+  categoria VARCHAR(100),
+  precio_minorista DECIMAL(10,2) DEFAULT 0,
+  precio_mayorista DECIMAL(10,2) DEFAULT 0,
+  costo DECIMAL(10,2) DEFAULT 0,
+  stock INTEGER DEFAULT 0,
+  stock_minimo INTEGER DEFAULT 0,
+  unidad_medida VARCHAR(50) DEFAULT 'UNIDAD',
+  activo BOOLEAN DEFAULT true
+);
 
--- 2. Eliminar todos los productos existentes
-TRUNCATE TABLE productos RESTART IDENTITY CASCADE;
-
--- 3. Insertar productos del archivo producto.txt
--- Total de productos: ${productos.length}
-
-INSERT INTO productos (
-  codigo_sku, 
-  nombre, 
-  descripcion, 
-  costo, 
-  precio_minorista, 
-  precio_mayorista, 
-  stock, 
-  stock_minimo,
-  categoria, 
-  unidad_medida, 
-  activo
-) VALUES 
+-- 2. Insertar datos en tabla temporal
+INSERT INTO productos_temp (codigo_sku, nombre, descripcion, categoria, precio_minorista, precio_mayorista, costo, stock, stock_minimo, unidad_medida, activo) VALUES
 `;
 
 // Agregar productos al SQL
 productos.forEach((producto, index) => {
   const isLast = index === productos.length - 1;
-  const comma = isLast ? ';' : ',';
-  
-  sql += `('${producto.codigo_sku.replace(/'/g, "''")}', '${producto.nombre.replace(/'/g, "''")}', '${producto.descripcion.replace(/'/g, "''")}', ${producto.costo}, ${producto.precio_minorista}, ${producto.precio_mayorista}, ${producto.stock}, ${producto.stock_minimo}, '${producto.categoria}', '${producto.unidad_medida}', ${producto.activo})${comma}\n`;
+  sql += `('${producto.codigo_sku}', '${producto.nombre.replace(/'/g, "''")}', '${producto.descripcion.replace(/'/g, "''")}', '${producto.categoria}', ${producto.precio_minorista}, ${producto.precio_mayorista}, ${producto.costo}, ${producto.stock}, ${producto.stock_minimo}, '${producto.unidad_medida}', ${producto.activo})${isLast ? ';' : ','}\n`;
 });
 
-// Agregar verificación final
 sql += `
--- Verificar la migración
+-- 3. Actualizar productos existentes
+UPDATE productos 
+SET 
+  nombre = pt.nombre,
+  descripcion = pt.descripcion,
+  categoria = pt.categoria,
+  precio_minorista = pt.precio_minorista,
+  precio_mayorista = pt.precio_mayorista,
+  costo = pt.costo,
+  stock = pt.stock,
+  stock_minimo = pt.stock_minimo,
+  unidad_medida = pt.unidad_medida,
+  activo = pt.activo,
+  updated_at = NOW()
+FROM productos_temp pt
+WHERE productos.codigo_sku = pt.codigo_sku;
+
+-- 4. Insertar productos nuevos
+INSERT INTO productos (
+  codigo_sku, nombre, descripcion, categoria, 
+  precio_minorista, precio_mayorista, costo, stock, stock_minimo, unidad_medida, activo
+)
+SELECT 
+  pt.codigo_sku, pt.nombre, pt.descripcion, pt.categoria, 
+  pt.precio_minorista, pt.precio_mayorista, pt.costo, pt.stock, pt.stock_minimo, 
+  pt.unidad_medida, pt.activo
+FROM productos_temp pt
+LEFT JOIN productos p ON p.codigo_sku = pt.codigo_sku
+WHERE p.codigo_sku IS NULL;
+
+-- 5. Verificar la actualización
 SELECT 
   COUNT(*) as total_productos,
   SUM(stock) as stock_total,
   AVG(precio_minorista) as precio_promedio,
-  SUM(stock_minimo) as stock_minimo_total
+  SUM(stock_minimo) as stock_minimo_total,
+  COUNT(CASE WHEN precio_mayorista > 0 THEN 1 END) as productos_con_mayorista,
+  COUNT(CASE WHEN costo > 0 THEN 1 END) as productos_con_costo
 FROM productos;
 
--- Mostrar algunos productos como ejemplo
+-- 6. Mostrar algunos productos actualizados como ejemplo
 SELECT 
   codigo_sku,
   nombre,
@@ -191,28 +184,53 @@ SELECT
   precio_mayorista,
   stock,
   stock_minimo,
-  categoria
+  categoria,
+  unidad_medida
 FROM productos 
 ORDER BY created_at 
 LIMIT 10;
+
+-- 7. Mostrar estadísticas por categoría
+SELECT 
+  categoria,
+  COUNT(*) as cantidad_productos,
+  SUM(stock) as stock_total,
+  AVG(precio_minorista) as precio_promedio,
+  AVG(costo) as costo_promedio
+FROM productos 
+GROUP BY categoria 
+ORDER BY cantidad_productos DESC;
+
+-- 8. Limpiar tabla temporal
+DROP TABLE productos_temp;
 `;
 
-// Guardar el archivo SQL
-const outputPath = path.join(__dirname, '..', 'migrate-productos-complete.sql');
+// Escribir archivo SQL
+const outputPath = path.join(__dirname, '..', 'cargar-productos-completo-1435.sql');
 fs.writeFileSync(outputPath, sql);
 
-console.log(`✅ Script SQL generado exitosamente!`);
-console.log(`📁 Archivo: ${outputPath}`);
-console.log(`📊 Total de productos procesados: ${productos.length}`);
-
 // Mostrar estadísticas
-const categorias = {};
-const unidades = {};
-productos.forEach(p => {
-  categorias[p.categoria] = (categorias[p.categoria] || 0) + 1;
-  unidades[p.unidad_medida] = (unidades[p.unidad_medida] || 0) + 1;
-});
+console.log(`✅ Script SQL generado exitosamente: ${outputPath}`);
+console.log(`📊 Total de productos procesados: ${productos.length}`);
+console.log(`📈 Estadísticas por categoría:`);
 
-console.log('\n📈 Estadísticas:');
-console.log('Categorías:', Object.entries(categorias).map(([cat, count]) => `${cat}: ${count}`).join(', '));
-console.log('Unidades de medida:', Object.entries(unidades).map(([unit, count]) => `${unit}: ${count}`).join(', '));
+Object.entries(categorias)
+  .sort(([,a], [,b]) => b - a)
+  .forEach(([categoria, cantidad]) => {
+    console.log(`  - ${categoria}: ${cantidad} productos`);
+  });
+
+console.log(`\n🎯 Funcionalidades del script:`);
+console.log(`  ✅ Actualiza productos existentes por SKU`);
+console.log(`  ✅ Agrega productos nuevos si no existen`);
+console.log(`  ✅ Mapea correctamente: precio mayoreo → precio_mayorista`);
+console.log(`  ✅ Mapea correctamente: precio costo → costo`);
+console.log(`  ✅ Mapea correctamente: precio venta → precio_minorista`);
+console.log(`  ✅ Incluye stock y stock mínimo`);
+console.log(`  ✅ Categorización automática por nombre`);
+console.log(`  ✅ Unidades de medida automáticas`);
+
+console.log(`\n📝 Para ejecutar:`);
+console.log(`  1. Abrir SQL Editor en Supabase`);
+console.log(`  2. Copiar y pegar el contenido del archivo generado`);
+console.log(`  3. Ejecutar el script completo`);

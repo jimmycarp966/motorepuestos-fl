@@ -220,26 +220,6 @@ class SmartCacheManager {
   }
 
   /**
-   * Limpiar entradas expiradas
-   */
-  cleanup(): void {
-    const now = Date.now()
-    const expiredKeys: string[] = []
-
-    for (const [key, entry] of this.cache.entries()) {
-      if (now > entry.expiresAt) {
-        expiredKeys.push(key)
-      }
-    }
-
-    expiredKeys.forEach(key => this.delete(key))
-
-    if (config.debug) {
-      console.log(`🗄️ [Cache] CLEANUP: Removed ${expiredKeys.length} expired entries`)
-    }
-  }
-
-  /**
    * Limpiar todo el cache
    */
   clear(): void {

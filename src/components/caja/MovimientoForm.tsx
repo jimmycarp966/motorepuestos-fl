@@ -125,23 +125,18 @@ export const MovimientoForm: React.FC<MovimientoFormProps> = ({
                 💰 Monto *
               </label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5 z-10" />
                 <Input
                   {...register('monto', { valueAsNumber: true })}
                   type="number"
                   step="0.01"
                   placeholder="0.00"
-                  className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                    errors.monto ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className="pl-10"
+                  variant={errors.monto ? 'error' : 'default'}
+                  helperText={errors.monto?.message || "Ingresa el monto del movimiento"}
+                  showIcon={!!errors.monto}
                 />
               </div>
-              {errors.monto && (
-                <p className="text-red-500 text-sm flex items-center mt-1">
-                  <span className="mr-1">⚠️</span>
-                  {errors.monto.message}
-                </p>
-              )}
             </div>
 
             {/* Campo Concepto */}
@@ -153,16 +148,10 @@ export const MovimientoForm: React.FC<MovimientoFormProps> = ({
                 {...register('concepto')}
                 type="text"
                 placeholder="Descripción del movimiento..."
-                className={`w-full px-4 py-3 border-2 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                  errors.concepto ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
-                }`}
+                variant={errors.concepto ? 'error' : 'default'}
+                helperText={errors.concepto?.message || "Explica brevemente el motivo del movimiento"}
+                showIcon={!!errors.concepto}
               />
-              {errors.concepto && (
-                <p className="text-red-500 text-sm flex items-center mt-1">
-                  <span className="mr-1">⚠️</span>
-                  {errors.concepto.message}
-                </p>
-              )}
             </div>
 
             {/* Información adicional */}
