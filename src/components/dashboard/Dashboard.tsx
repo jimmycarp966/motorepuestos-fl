@@ -8,6 +8,7 @@ import {
   useLoadingStates,
   useErrorStates
 } from '../../lib/selectors'
+import { useCalendarSync } from '../../lib/calendarSync'
 
 import { 
   TrendingUp, 
@@ -40,6 +41,7 @@ export const Dashboard: React.FC = () => {
   const movimientosRecientes = useMovimientosRecientes(5)
   const loadingStates = useLoadingStates()
   const errorStates = useErrorStates()
+  const calendarSync = useCalendarSync()
   
   // Acciones del store
   const fetchVentas = useAppStore((state) => state.fetchVentas)
@@ -306,21 +308,48 @@ export const Dashboard: React.FC = () => {
 
       {/* Header del Dashboard */}
       <div style={{ marginBottom: 'clamp(1rem, 3vw, 1.5rem)' }}>
-        <h1 style={{ 
-          fontSize: 'clamp(1.25rem, 4vw, 2rem)', 
-          fontWeight: '700', 
-          color: '#1e293b',
-          marginBottom: '0.5rem'
-        }}>
-          Dashboard
-        </h1>
-        <p style={{ 
-          fontSize: 'clamp(0.75rem, 2vw, 1rem)', 
-          color: '#64748b',
-          margin: 0
-        }}>
-          Resumen general del sistema de gestión
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+          <div>
+            <h1 style={{ 
+              fontSize: 'clamp(1.25rem, 4vw, 2rem)', 
+              fontWeight: '700', 
+              color: '#1e293b',
+              marginBottom: '0.5rem'
+            }}>
+              Dashboard
+            </h1>
+            <p style={{ 
+              fontSize: 'clamp(0.75rem, 2vw, 1rem)', 
+              color: '#64748b',
+              margin: 0
+            }}>
+              Resumen general del sistema de gestión
+            </p>
+          </div>
+          
+          {/* Indicador de sincronización de calendario */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.5rem 0.75rem',
+            backgroundColor: calendarSync.syncInProgress ? '#fef3c7' : '#f0fdf4',
+            border: `1px solid ${calendarSync.syncInProgress ? '#f59e0b' : '#10b981'}`,
+            borderRadius: '0.5rem',
+            fontSize: '0.75rem'
+          }}>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: calendarSync.syncInProgress ? '#f59e0b' : '#10b981',
+              animation: calendarSync.syncInProgress ? 'pulse 2s infinite' : 'none'
+            }} />
+            <span style={{ color: calendarSync.syncInProgress ? '#92400e' : '#065f46' }}>
+              {calendarSync.syncInProgress ? 'Sincronizando...' : `Día: ${calendarSync.currentDate}`}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* KPIs Grid - Optimizado para móviles */}

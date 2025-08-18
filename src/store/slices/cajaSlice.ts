@@ -35,9 +35,10 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
       }, 0) || 0
 
       // Determinar si la caja está abierta (si hay movimientos hoy)
+      const fechaHoy = new Date().toISOString().split('T')[0]
       const movimientosHoy = data?.filter(m => {
-        const hoy = new Date().toDateString()
-        return new Date(m.fecha).toDateString() === hoy
+        const movimientoFecha = typeof m.fecha === 'string' ? m.fecha.split('T')[0] : m.fecha
+        return movimientoFecha === fechaHoy
       }) || []
 
       const cajaAbierta = movimientosHoy.length > 0

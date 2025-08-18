@@ -3,6 +3,7 @@ import { shallow } from 'zustand/shallow'
 import { useAppStore } from '../store'
 import { DateUtils } from './dateUtils'
 import { businessCache } from './cacheManager'
+import { useCalendarSync } from './calendarSync'
 import type { AppStore, Venta, Producto, Cliente, MovimientoCaja } from '../store/types'
 
 // Tipos para filtros avanzados
@@ -61,11 +62,14 @@ export interface VentasStats {
 // SELECTORES PARA DASHBOARD
 // ================================
 
-// Selector optimizado para KPIs del dashboard
+// Selector optimizado para KPIs del dashboard con sincronización de calendario
 export const useDashboardKPIs = (): DashboardKPIs => {
+  const calendarSync = useCalendarSync()
+  
   return useAppStore(
     useCallback((state: AppStore) => {
-      const fechaHoy = DateUtils.getCurrentDate()
+      // Usar fecha actual del sistema de sincronización
+      const fechaHoy = calendarSync.currentDate
       const unaSemanaPasada = DateUtils.subtractDays(fechaHoy, 7)
       const unMesPasado = DateUtils.subtractDays(fechaHoy, 30)
 
@@ -81,8 +85,13 @@ export const useDashboardKPIs = (): DashboardKPIs => {
       // Filtrar ventas del mes
       const ventasMes = state.ventas.filter(v => v.fecha >= unMesPasado)
 
-      // Calcular saldo de caja
-      const saldoCaja = state.caja.movimientos.reduce((sum, m) => {
+      // Calcular saldo de caja - solo movimientos del día actual
+      const movimientosHoy = state.caja.movimientos.filter(m => {
+        const movimientoFecha = typeof m.fecha === 'string' ? m.fecha.split('T')[0] : m.fecha
+        return movimientoFecha === fechaHoy
+      })
+      
+      const saldoCaja = movimientosHoy.reduce((sum, m) => {
         return m.tipo === 'ingreso' ? sum + m.monto : sum - m.monto
       }, 0)
 
@@ -101,7 +110,7 @@ export const useDashboardKPIs = (): DashboardKPIs => {
         ventasSemanaPasada: ventasSemanaPasada.reduce((sum, v) => sum + v.total, 0),
         ingresosMes: ventasMes.reduce((sum, v) => sum + v.total, 0)
       }
-    }, []),
+    }, [calendarSync.currentDate]),
     shallow
   )
 }

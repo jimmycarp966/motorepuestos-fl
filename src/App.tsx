@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAppStore } from './store'
+import { initializeCalendarSync } from './lib/calendarSync'
 import { LoginForm } from './components/auth/LoginForm'
 import { Sidebar } from './components/layout/Sidebar'
 
@@ -62,6 +63,14 @@ function App() {
   useEffect(() => {
     setDebugInfo(prev => ({ ...prev, storeState: { loading, user } }))
   }, [loading, user])
+
+  // Inicializar sistema de sincronización de calendario
+  useEffect(() => {
+    if (user) {
+      console.log('🔄 [App] Inicializando sistema de sincronización de calendario...')
+      initializeCalendarSync(useAppStore)
+    }
+  }, [user])
 
   // Cargar datos según el módulo activo
   useEffect(() => {
