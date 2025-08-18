@@ -100,8 +100,7 @@ export const Sidebar: React.FC = () => {
       {/* Botón de toggle para móviles */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg border border-gray-200"
-        style={{ zIndex: 60 }}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
       >
         {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
@@ -115,68 +114,28 @@ export const Sidebar: React.FC = () => {
       )}
 
       {/* Sidebar */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        height: '100%',
-        backgroundColor: 'white',
-        borderRight: '1px solid #e2e8f0',
-        zIndex: 50,
-        width: '280px',
-        boxShadow: '4px 0 20px rgba(0, 0, 0, 0.1)',
-        display: 'flex',
-        flexDirection: 'column',
-        transform: isMobileOpen ? 'translateX(0)' : 'translateX(-100%)',
-        transition: 'transform 0.3s ease-in-out',
-        '@media (min-width: 1024px)': {
-          transform: 'translateX(0)',
-        }
-      }}>
+      <div className={`
+        fixed top-0 left-0 h-full bg-white border-r border-gray-200 z-50 w-70
+        flex flex-col shadow-xl transition-transform duration-300 ease-in-out
+        ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
         {/* Header del sidebar */}
-        <div style={{
-          padding: '2rem 1.5rem 1.5rem',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          color: 'white',
-          borderBottom: '1px solid rgba(255,255,255,0.1)'
-        }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <h1 style={{ 
-              fontSize: '1.5rem', 
-              fontWeight: '700',
-              margin: 0,
-              letterSpacing: '-0.025em'
-            }}>
+        <div className="p-8 pb-6 bg-gradient-to-br from-blue-500 to-purple-600 text-white border-b border-white/10">
+          <div className="mb-4">
+            <h1 className="text-xl font-bold leading-tight tracking-tight">
               Motorepuestos F.L.
             </h1>
           </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '50%',
-              background: 'rgba(255,255,255,0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.25rem',
-              fontWeight: '600'
-            }}>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-semibold">
               {user.nombre.charAt(0).toUpperCase()}
             </div>
             <div>
-              <div style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.25rem' }}>
+              <div className="text-base font-semibold mb-1">
                 {user.nombre}
               </div>
-              <div style={{ 
-                fontSize: '0.875rem', 
-                opacity: 0.9,
-                background: 'rgba(255,255,255,0.2)',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '0.25rem',
-                display: 'inline-block'
-              }}>
+              <div className="text-sm opacity-90 bg-white/20 px-2 py-1 rounded inline-block">
                 {user.rol}
               </div>
             </div>
@@ -184,21 +143,9 @@ export const Sidebar: React.FC = () => {
         </div>
 
         {/* Navegación */}
-        <nav style={{ 
-          flex: 1, 
-          padding: '1.5rem 1rem',
-          overflowY: 'auto'
-        }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <div style={{ 
-              fontSize: '0.75rem', 
-              fontWeight: '600', 
-              color: '#64748b',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              marginBottom: '0.75rem',
-              paddingLeft: '0.5rem'
-            }}>
+        <nav className="flex-1 p-6 overflow-y-auto">
+          <div className="mb-4">
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 pl-2">
               Navegación
             </div>
             
@@ -210,57 +157,22 @@ export const Sidebar: React.FC = () => {
                 <button
                   key={item.id}
                   onClick={() => handleMenuClick(item.id)}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    padding: '0.875rem 1rem',
-                    textAlign: 'left',
-                    color: isActive ? '#667eea' : '#64748b',
-                    borderRadius: '0.75rem',
-                    border: 'none',
-                    background: isActive ? '#f1f5f9' : 'transparent',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    marginBottom: '0.5rem',
-                    fontWeight: isActive ? '600' : '500',
-                    fontSize: '0.875rem',
-                    position: 'relative'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = '#f8fafc'
-                      e.currentTarget.style.transform = 'translateX(4px)'
+                  className={`
+                    w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl
+                    transition-all duration-200 mb-2 font-medium text-sm relative
+                    ${isActive 
+                      ? 'text-blue-600 bg-blue-50 font-semibold' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:translate-x-1'
                     }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = 'transparent'
-                      e.currentTarget.style.transform = 'translateX(0)'
-                    }
-                  }}
+                  `}
                 >
                   {isActive && (
-                    <div style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      width: '4px',
-                      height: '60%',
-                      backgroundColor: '#667eea',
-                      borderRadius: '0 2px 2px 0'
-                    }} />
+                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-3/5 bg-blue-600 rounded-r" />
                   )}
-                  <div style={{
-                    width: '20px',
-                    height: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: isActive ? '#667eea' : '#94a3b8'
-                  }}>
+                  <div className={`
+                    w-5 h-5 flex items-center justify-center
+                    ${isActive ? 'text-blue-600' : 'text-gray-400'}
+                  `}>
                     <Icon size={20} />
                   </div>
                   <span>{item.label}</span>
@@ -271,60 +183,17 @@ export const Sidebar: React.FC = () => {
         </nav>
 
         {/* Footer del sidebar */}
-        <div style={{
-          padding: '1.5rem',
-          borderTop: '1px solid #e2e8f0',
-          backgroundColor: '#f8fafc'
-        }}>
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '0.5rem',
-            marginBottom: '1rem',
-            padding: '0.75rem',
-            backgroundColor: 'white',
-            borderRadius: '0.5rem',
-            border: '1px solid #e2e8f0'
-          }}>
-            <div style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              backgroundColor: '#10b981'
-            }} />
-            <span style={{ fontSize: '0.875rem', color: '#64748b' }}>
+        <div className="p-6 border-t border-gray-200 bg-gray-50">
+          <div className="flex items-center gap-2 mb-4 p-3 bg-white rounded-lg border border-gray-200">
+            <div className="w-2 h-2 rounded-full bg-green-500" />
+            <span className="text-sm text-gray-600">
               Sistema activo
             </span>
           </div>
           
           <button
             onClick={handleLogout}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              padding: '0.75rem 1rem',
-              border: '1px solid #e2e8f0',
-              borderRadius: '0.5rem',
-              backgroundColor: 'white',
-              color: '#64748b',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontSize: '0.875rem',
-              fontWeight: '500'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f1f5f9'
-              e.currentTarget.style.borderColor = '#cbd5e1'
-              e.currentTarget.style.color = '#475569'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'white'
-              e.currentTarget.style.borderColor = '#e2e8f0'
-              e.currentTarget.style.color = '#64748b'
-            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-lg bg-white text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 transition-all duration-200 text-sm font-medium"
           >
             <LogOut size={16} />
             Cerrar Sesión

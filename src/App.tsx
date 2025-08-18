@@ -192,103 +192,54 @@ function App() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#f8fafc',
-      fontFamily: 'Inter, system-ui, sans-serif',
-      display: 'flex'
-    }}>
+    <div className="min-h-screen bg-gray-50 font-sans flex">
       <NotificationsContainer />
       
-      {/* Sidebar fijo */}
+      {/* Sidebar */}
       <Sidebar />
       
-             {/* Contenido principal */}
-       <main style={{
-         flex: 1,
-         marginLeft: '0px',
-         minHeight: '100vh',
-         backgroundColor: '#f8fafc',
-         display: 'flex',
-         flexDirection: 'column',
-         '@media (min-width: 1024px)': {
-           marginLeft: '280px'
-         }
-       }}>
+      {/* Contenido principal */}
+      <main className="flex-1 flex flex-col lg:ml-70">
         {/* Header moderno */}
-        <header style={{
-          backgroundColor: 'white',
-          borderBottom: '1px solid #e2e8f0',
-          padding: '1rem 2rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <h1 style={{ 
-              fontSize: '1.5rem', 
-              fontWeight: '600', 
-              color: '#1e293b',
-              margin: 0
-            }}>
-                             {currentModule === 'dashboard' ? 'Dashboard' :
-                currentModule === 'empleados' ? 'Empleados' :
-                currentModule === 'productos' ? 'Productos' :
-                currentModule === 'clientes' ? 'Clientes' :
-                currentModule === 'ventas' ? 'Ventas' :
-                currentModule === 'caja' ? 'Caja' :
-                currentModule === 'reportes' ? 'Reportes' : 'Dashboard'}
+        <header className="bg-white border-b border-gray-200 px-4 lg:px-8 py-4 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">
+              {currentModule === 'dashboard' ? 'Dashboard' :
+               currentModule === 'empleados' ? 'Empleados' :
+               currentModule === 'productos' ? 'Productos' :
+               currentModule === 'clientes' ? 'Clientes' :
+               currentModule === 'ventas' ? 'Ventas' :
+               currentModule === 'caja' ? 'Caja' :
+               currentModule === 'reportes' ? 'Reportes' : 'Dashboard'}
             </h1>
           </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '0.875rem', color: '#64748b' }}>
+          <div className="flex items-center gap-4">
+            <div className="text-right hidden sm:block">
+              <div className="text-sm text-gray-500">
                 Bienvenido
               </div>
-              <div style={{ fontSize: '1rem', fontWeight: '500', color: '#1e293b' }}>
+              <div className="text-base font-medium text-gray-900">
                 {user.nombre}
               </div>
             </div>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontWeight: '600',
-              fontSize: '1rem'
-            }}>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
               {user.nombre.charAt(0).toUpperCase()}
             </div>
           </div>
         </header>
 
-                 {/* Contenido del módulo */}
-         <div style={{ 
-           padding: '2rem',
-           maxWidth: '100%',
-           overflowX: 'auto',
-           flex: 1
-         }}>
-           <div style={{
-             backgroundColor: 'white',
-             borderRadius: '0.75rem',
-             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-             overflow: 'hidden'
-           }}>
-             {renderModule()}
-           </div>
-         </div>
-         
-         {/* Footer */}
-         <Footer />
-               </main>
-     </div>
+        {/* Contenido del módulo */}
+        <div className="flex-1 p-4 lg:p-8 overflow-auto">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {renderModule()}
+          </div>
+        </div>
+        
+        {/* Footer */}
+        <Footer />
+      </main>
+    </div>
   )
 }
 

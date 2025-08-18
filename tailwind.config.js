@@ -47,6 +47,15 @@ module.exports = {
         'high-contrast': {'raw': '(prefers-contrast: high)'},
       },
 
+      // ===== ESPACIADO PERSONALIZADO =====
+      spacing: {
+        '70': '280px', // Ancho del sidebar
+        '18': '4.5rem',
+        '88': '22rem',
+        '128': '32rem',
+        '144': '36rem',
+      },
+
       // ===== COLORES PERSONALIZADOS =====
       colors: {
         // Colores principales para motorepuestos
