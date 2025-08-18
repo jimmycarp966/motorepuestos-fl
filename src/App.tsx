@@ -8,7 +8,7 @@ import { Dashboard } from './components/dashboard/Dashboard'
 import { EmpleadosTable } from './components/empleados/EmpleadosTable'
 import { ProductosTable } from './components/productos/ProductosTable'
 import { ClientesTable } from './components/clientes/ClientesTable'
-import { VentasTable } from './components/ventas/VentasTable'
+import { VentasModernView } from './components/ventas/VentasModernView'
 import { CajaTable } from './components/caja/CajaTable'
 import ReportesTable from './components/reportes/ReportesTable'
 import { NotificationsContainer } from './components/ui/notifications'
@@ -126,7 +126,7 @@ function App() {
       case 'clientes':
         return <ClientesTable />
       case 'ventas':
-        return <VentasTable />
+        return <VentasModernView />
       case 'caja':
         return <CajaTable />
       case 'reportes':
