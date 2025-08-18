@@ -222,7 +222,7 @@ CREATE INDEX IF NOT EXISTS idx_notificaciones_tipo ON notificaciones(tipo);
 CREATE INDEX IF NOT EXISTS idx_notificaciones_leida ON notificaciones(leida);
 
 -- Índices para movimientos_caja (mejorados)
-CREATE INDEX IF NOT EXISTS idx_movimientos_caja_empleado_fecha ON movimientos_caja(empleado_id, DATE(created_at));
+CREATE INDEX IF NOT EXISTS idx_movimientos_caja_empleado_fecha ON movimientos_caja(empleado_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_movimientos_caja_referencia ON movimientos_caja(referencia_id, referencia_tipo);
 
 DO $$ BEGIN RAISE NOTICE '✅ Índices creados exitosamente'; END $$;
