@@ -631,6 +631,12 @@ CREATE TABLE IF NOT EXISTS notificaciones_sistema (
 -- POLÍTICAS RLS PARA NUEVAS TABLAS
 -- ================================
 
+-- Limpiar políticas existentes para evitar duplicados
+DROP POLICY IF EXISTS "error_log_select_policy" ON error_log;
+DROP POLICY IF EXISTS "audit_log_select_policy" ON audit_log;
+DROP POLICY IF EXISTS "notificaciones_select_policy" ON notificaciones;
+DROP POLICY IF EXISTS "notificaciones_sistema_select_policy" ON notificaciones_sistema;
+
 -- Error log (solo admins)
 ALTER TABLE error_log ENABLE ROW LEVEL SECURITY;
 

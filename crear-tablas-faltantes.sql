@@ -274,6 +274,11 @@ FOR UPDATE USING (
   empleado_id = get_current_employee_id()
 );
 
+-- Limpiar políticas existentes para evitar duplicados
+DROP POLICY IF EXISTS "error_log_select_policy" ON error_log;
+DROP POLICY IF EXISTS "audit_log_select_policy" ON audit_log;
+DROP POLICY IF EXISTS "notificaciones_sistema_select_policy" ON notificaciones_sistema;
+
 -- Políticas para error_log (solo admins)
 CREATE POLICY "error_log_select_policy" ON error_log
 FOR SELECT USING (
