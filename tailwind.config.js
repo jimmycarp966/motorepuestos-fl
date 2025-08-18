@@ -58,19 +58,19 @@ module.exports = {
 
       // ===== COLORES PERSONALIZADOS =====
       colors: {
-        // Colores principales para motorepuestos
+        // Colores principales para motorepuestos - Paleta mejorada
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#172554',
+          50: '#f0f9ff',
+          100: '#e0f2fe', 
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9', // Azul mecánico principal
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+          950: '#082f49',
         },
         secondary: {
           50: '#f0f9ff',
@@ -137,14 +137,30 @@ module.exports = {
           900: '#7f1d1d',
           950: '#450a0a',
         },
-        // Colores específicos para motorepuestos
+        // Colores específicos para motorepuestos - Paleta ampliada
         moto: {
-          blue: '#3b82f6',
-          lightBlue: '#60a5fa',
-          darkBlue: '#1e40af',
-          gray: '#6b7280',
-          lightGray: '#f3f4f6',
-          darkGray: '#374151',
+          // Azules mecánicos
+          blue: '#0ea5e9',
+          lightBlue: '#38bdf8',
+          darkBlue: '#0369a1',
+          navy: '#1e293b',
+          
+          // Naranjas de alta visibilidad
+          orange: '#ff6b35',
+          lightOrange: '#ff8c42',
+          darkOrange: '#e55a2b',
+          
+          // Grises industriales
+          steel: '#64748b',
+          chrome: '#e2e8f0',
+          iron: '#475569',
+          carbon: '#334155',
+          
+          // Colores de estado
+          success: '#10b981',
+          warning: '#f59e0b',
+          error: '#ef4444',
+          info: '#0ea5e9',
         }
       },
 
@@ -295,8 +311,11 @@ module.exports = {
         'gradient-warning': 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)',
         'gradient-error': 'linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%)',
         'gradient-glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
-        'gradient-moto': 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%)',
-        'gradient-moto-dark': 'linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%)',
+        'gradient-moto': 'linear-gradient(135deg, #0ea5e9 0%, #ff6b35 100%)',
+        'gradient-moto-dark': 'linear-gradient(135deg, #0369a1 0%, #e55a2b 100%)',
+        'gradient-moto-hero': 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 50%, #ff6b35 100%)',
+        'gradient-moto-card': 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+        'gradient-moto-steel': 'linear-gradient(90deg, #64748b 0%, #475569 100%)',
       },
 
       // ===== FILTROS PERSONALIZADOS =====

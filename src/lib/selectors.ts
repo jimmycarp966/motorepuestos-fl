@@ -1,8 +1,31 @@
-import { useMemo, useCallback, useState } from 'react'
+import { useMemo, useCallback, useState, useRef } from 'react'
 import { shallow } from 'zustand/shallow'
 import { useAppStore } from '../store'
 import { DateUtils } from './dateUtils'
+import { businessCache } from './cacheManager'
 import type { AppStore, Venta, Producto, Cliente, MovimientoCaja } from '../store/types'
+
+// Tipos para filtros avanzados
+export interface VentasFilters {
+  fechaInicio?: string
+  fechaFin?: string
+  clienteId?: string
+  empleadoId?: string
+  metodoPago?: 'efectivo' | 'tarjeta' | 'transferencia' | 'cuenta_corriente'
+  tipoPrecio?: 'minorista' | 'mayorista'
+  montoMin?: number
+  montoMax?: number
+}
+
+export interface ProductosFilters {
+  categoria?: string
+  stockBajo?: boolean
+  sinStock?: boolean
+  activo?: boolean
+  precioMin?: number
+  precioMax?: number
+  searchTerm?: string
+}
 
 // Tipos para selectores optimizados
 export interface DashboardKPIs {
@@ -378,6 +401,125 @@ export const useErrorStates = () => {
       empleados: state.empleados?.error || null,
       caja: state.caja?.error || null
     }), []),
+    shallow
+  )
+}
+
+// ================================
+// SELECTORES GRANULARES OPTIMIZADOS
+// ================================
+
+// Hook para memoización estable de filtros
+const useStableFilter = <T>(filter: T): T => {
+  const filterRef = useRef(filter)
+  const filterStringRef = useRef('')
+  
+  const currentFilterString = JSON.stringify(filter)
+  
+  if (currentFilterString !== filterStringRef.current) {
+    filterRef.current = filter
+    filterStringRef.current = currentFilterString
+  }
+  
+  return filterRef.current
+}
+
+// Selector granular para ventas con filtros avanzados
+export const useVentasFiltered = (filters: VentasFilters = {}) => {
+  const stableFilters = useStableFilter(filters)
+  
+  return useAppStore(
+    useCallback((state: AppStore) => {
+      const ventas = state.ventas || []
+      
+      // Aplicar filtros de forma optimizada
+      const filtered = ventas.filter(venta => {
+        // Filtro por rango de fechas
+        if (stableFilters.fechaInicio && new Date(venta.fecha) < new Date(stableFilters.fechaInicio)) {
+          return false
+        }
+        if (stableFilters.fechaFin && new Date(venta.fecha) > new Date(stableFilters.fechaFin)) {
+          return false
+        }
+        
+        // Filtros específicos
+        if (stableFilters.clienteId && venta.cliente_id !== stableFilters.clienteId) return false
+        if (stableFilters.empleadoId && venta.empleado_id !== stableFilters.empleadoId) return false
+        if (stableFilters.metodoPago && venta.metodo_pago !== stableFilters.metodoPago) return false
+        if (stableFilters.tipoPrecio && venta.tipo_precio !== stableFilters.tipoPrecio) return false
+        
+        // Filtros por monto
+        if (stableFilters.montoMin && venta.total < stableFilters.montoMin) return false
+        if (stableFilters.montoMax && venta.total > stableFilters.montoMax) return false
+        
+        return true
+      })
+      
+      return {
+        ventas: filtered,
+        total: filtered.reduce((sum, v) => sum + v.total, 0),
+        count: filtered.length,
+        loading: state.loading,
+        error: state.error
+      }
+    }, [stableFilters]),
+    shallow
+  )
+}
+
+// Selector granular para productos con filtros avanzados
+export const useProductosFiltered = (filters: ProductosFilters = {}) => {
+  const stableFilters = useStableFilter(filters)
+  
+  return useAppStore(
+    useCallback((state: AppStore) => {
+      const productos = state.productos || []
+      
+      const filtered = productos.filter(producto => {
+        // Filtro de búsqueda
+        if (stableFilters.searchTerm) {
+          const term = stableFilters.searchTerm.toLowerCase()
+          const searchableText = `${producto.nombre} ${producto.codigo_sku} ${producto.categoria}`.toLowerCase()
+          if (!searchableText.includes(term)) return false
+        }
+        
+        // Filtros específicos
+        if (stableFilters.categoria && producto.categoria !== stableFilters.categoria) return false
+        if (stableFilters.activo !== undefined && producto.activo !== stableFilters.activo) return false
+        
+        // Filtros de stock
+        if (stableFilters.stockBajo && producto.stock > producto.stock_minimo) return false
+        if (stableFilters.sinStock && producto.stock > 0) return false
+        
+        // Filtros de precio
+        if (stableFilters.precioMin && producto.precio_minorista < stableFilters.precioMin) return false
+        if (stableFilters.precioMax && producto.precio_minorista > stableFilters.precioMax) return false
+        
+        return true
+      })
+      
+      return {
+        productos: filtered,
+        total: filtered.length,
+        stockBajo: filtered.filter(p => p.stock <= p.stock_minimo).length,
+        sinStock: filtered.filter(p => p.stock === 0).length,
+        valorTotal: filtered.reduce((sum, p) => sum + (p.precio_minorista * p.stock), 0),
+        loading: state.loading,
+        error: state.error
+      }
+    }, [stableFilters]),
+    shallow
+  )
+}
+
+// Selector para categorías únicas de productos
+export const useCategorias = () => {
+  return useAppStore(
+    useCallback((state: AppStore) => {
+      const productos = state.productos || []
+      const categorias = Array.from(new Set(productos.map(p => p.categoria)))
+      return categorias.sort()
+    }, []),
     shallow
   )
 }

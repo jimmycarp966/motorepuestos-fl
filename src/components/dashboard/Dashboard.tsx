@@ -22,6 +22,16 @@ import {
   AlertCircle
 } from 'lucide-react'
 
+// Importar nuevos componentes mejorados
+import { 
+  KPICard, 
+  MotorCard, 
+  KPICardSkeleton, 
+  EmptyState, 
+  ContextualLoader,
+  SpeedometerIcon 
+} from '../index'
+
 export const Dashboard: React.FC = () => {
   // Usar selectores optimizados con validaciones
   const kpis = useDashboardKPIs()
@@ -135,14 +145,23 @@ export const Dashboard: React.FC = () => {
   const isLoading = loadingStates.ventas || loadingStates.productos || loadingStates.caja
   const hasErrors = errorStates.ventas || errorStates.productos || errorStates.caja
 
-  // Mostrar loading si es necesario
+  // Mostrar loading si es necesario con nuevo componente
   if (isLoading) {
     return (
-      <div style={{ padding: '2rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
-        <div style={{ textAlign: 'center', paddingTop: '4rem' }}>
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p style={{ color: '#64748b' }}>Cargando dashboard...</p>
+      <div className="p-8 font-sans">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Dashboard</h1>
+          <p className="text-gray-600">Resumen general del sistema de gestión</p>
         </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <KPICardSkeleton />
+          <KPICardSkeleton />
+          <KPICardSkeleton />
+          <KPICardSkeleton />
+        </div>
+        
+        <ContextualLoader type="general" message="Cargando dashboard..." size="lg" />
       </div>
     )
   }

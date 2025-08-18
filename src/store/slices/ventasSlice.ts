@@ -21,53 +21,53 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
     loading: initialState.loading,
     error: initialState.error,
 
-         fetchVentas: async () => {
+         fetchVentas: async (page = 1, pageSize = 50) => {
        set((state) => ({ loading: true, error: null }))
        
        try {
-         const { data, error } = await supabase
+         const from = (page - 1) * pageSize
+         const to = from + pageSize - 1
+         
+         // Optimización: Una sola consulta con joins y paginación inteligente
+         const { data, error, count } = await supabase
            .from('ventas')
-           .select('*')
+           .select(`
+             *,
+             cliente:clientes(id, nombre, email, telefono),
+             empleado:empleados(id, nombre, email, rol),
+             items:venta_items(
+               id,
+               cantidad,
+               precio_unitario,
+               subtotal,
+               tipo_precio,
+               producto:productos(id, nombre, codigo_sku, categoria)
+             )
+           `, { count: 'exact' })
            .order('created_at', { ascending: false })
+           .range(from, to)
          
          if (error) {
            throw error
          }
          
-         if (!data) {
-           set((state) => ({ ventas: [], loading: false }))
-           return
-         }
-         
-         if (data.length > 0) {
-           try {
-             const { data: dataWithRelations, error: relationsError } = await supabase
-               .from('ventas')
-               .select(`
-                 *,
-                 cliente:clientes(*),
-                 empleado:empleados(*),
-                 items:venta_items(*)
-               `)
-               .order('created_at', { ascending: false })
-             
-             if (relationsError) {
-               set((state) => ({ ventas: data || [], loading: false }))
-             } else {
-               set((state) => ({ ventas: dataWithRelations || [], loading: false }))
-             }
-           } catch (relationsError: any) {
-             set((state) => ({ ventas: data || [], loading: false }))
-           }
-         } else {
-           set((state) => ({ ventas: [], loading: false }))
-         }
+         // Si es la primera página, reemplazar datos. Si no, agregar para infinite scroll
+         set((state) => ({ 
+           ventas: page === 1 ? (data || []) : [...state.ventas, ...(data || [])],
+           loading: false,
+           error: null,
+           totalCount: count || 0,
+           hasMore: (data?.length || 0) === pageSize
+         }))
          
        } catch (error: any) {
+         console.error('❌ [VentasSlice] Error en fetchVentas:', error)
          set((state) => ({ 
            ventas: [], 
            loading: false, 
-           error: error.message || 'Error desconocido al cargar ventas'
+           error: error.message || 'Error desconocido al cargar ventas',
+           totalCount: 0,
+           hasMore: false
          }))
        }
      },

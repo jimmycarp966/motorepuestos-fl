@@ -39,3 +39,37 @@ export { Textarea } from './ui/textarea'
 export { NotificationsContainer } from './ui/notifications'
 export { DebugButton } from './ui/DebugButton'
 export { DebugVentasCompleto } from './ui/DebugVentasCompleto'
+
+// Nuevos componentes UI mejorados
+export { MotorCard } from './ui/motor-card'
+export { ActionButton, useActionFeedback } from './ui/action-button'
+export { KPICard } from './ui/kpi-card'
+
+// Iconografía específica de motorepuestos
+export { 
+  MotorIcon, 
+  BrakesIcon, 
+  TransmissionIcon, 
+  ElectricIcon, 
+  TireIcon, 
+  OilIcon, 
+  ToolsIcon, 
+  BatteryIcon, 
+  SpeedometerIcon,
+  CategoriaIcon,
+  InteractiveIcon,
+  categoriaIcons,
+  getCategoriaIcon 
+} from './ui/motor-icons'
+
+// Estados de carga y feedback visual
+export {
+  Skeleton,
+  KPICardSkeleton,
+  TableSkeleton,
+  ContextualLoader,
+  EmptyState,
+  LoadingOverlay,
+  ProgressBar,
+  useLoadingState
+} from './ui/loading-states'
