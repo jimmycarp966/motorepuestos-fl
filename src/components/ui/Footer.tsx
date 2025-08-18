@@ -15,10 +15,10 @@ export const Footer: React.FC = () => {
       boxShadow: '0 -1px 3px 0 rgba(0, 0, 0, 0.1)'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        {/* Logo SISTEMAS */}
+        {/* Logo Sirius */}
         <img 
-          src="/logo-sistemas.png" 
-          alt="Sistemas Logo" 
+          src="/assets/sirius-logo.png" 
+          alt="Sirius Logo" 
           style={{ 
             width: '40px', 
             height: '40px',
@@ -31,7 +31,7 @@ export const Footer: React.FC = () => {
           color: '#64748b',
           fontFamily: 'Inter, system-ui, sans-serif'
         }}>
-          Desarrollado por Sistemas
+          Sirius - Sistema de Gestión Inteligente - Todos los derechos reservados
         </span>
       </div>
     </footer>

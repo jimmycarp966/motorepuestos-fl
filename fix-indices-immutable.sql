@@ -26,15 +26,16 @@ END $$;
 
 -- Índice simple en created_at (sin función DATE)
 CREATE INDEX IF NOT EXISTS idx_movimientos_caja_created_at ON movimientos_caja(created_at);
-RAISE NOTICE '✅ Creado índice idx_movimientos_caja_created_at';
 
 -- Índice compuesto empleado_id + created_at
 CREATE INDEX IF NOT EXISTS idx_movimientos_caja_empleado_created_at ON movimientos_caja(empleado_id, created_at);
-RAISE NOTICE '✅ Creado índice idx_movimientos_caja_empleado_created_at';
 
 -- Índice para consultas por fecha específica (mejor alternativa)
 CREATE INDEX IF NOT EXISTS idx_movimientos_caja_date_trunc_day ON movimientos_caja(date_trunc('day', created_at));
-RAISE NOTICE '✅ Creado índice idx_movimientos_caja_date_trunc_day';
+
+DO $$ BEGIN 
+  RAISE NOTICE '✅ Creados índices básicos para movimientos_caja';
+END $$;
 
 -- ================================
 -- CREAR FUNCIÓN IMMUTABLE PARA EXTRAER FECHA (si es necesaria)
@@ -46,15 +47,20 @@ RETURNS DATE
 LANGUAGE SQL
 IMMUTABLE
 STRICT
-AS $$
+AS $extract_fn$
   SELECT timestamp_input::DATE;
-$$;
+$extract_fn$;
 
-RAISE NOTICE '✅ Creada función immutable extract_date_immutable';
+DO $$ BEGIN 
+  RAISE NOTICE '✅ Creada función immutable extract_date_immutable';
+END $$;
 
 -- Ahora podemos crear índice con función immutable si es necesario
 CREATE INDEX IF NOT EXISTS idx_movimientos_caja_fecha_immutable ON movimientos_caja(extract_date_immutable(created_at));
-RAISE NOTICE '✅ Creado índice con función immutable';
+
+DO $$ BEGIN 
+  RAISE NOTICE '✅ Creado índice con función immutable';
+END $$;
 
 -- ================================
 -- ÍNDICES ADICIONALES PARA PERFORMANCE
@@ -110,7 +116,9 @@ CREATE INDEX IF NOT EXISTS idx_empleados_activo ON empleados(activo);
 CREATE INDEX IF NOT EXISTS idx_empleados_rol ON empleados(rol);
 CREATE INDEX IF NOT EXISTS idx_empleados_email ON empleados(email);
 
-RAISE NOTICE '✅ Creados índices adicionales para performance';
+DO $$ BEGIN 
+  RAISE NOTICE '✅ Creados índices adicionales para performance';
+END $$;
 
 -- ================================
 -- VERIFICACIÓN FINAL DE ÍNDICES

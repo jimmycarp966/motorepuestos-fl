@@ -1,7 +1,7 @@
 {
-  "short_name": "Motorepuestos FL",
-  "name": "Motorepuestos F.L. - Sistema de Gestión",
-  "description": "Sistema completo de gestión para motorepuestos con capacidades offline",
+  "short_name": "Sirius",
+  "name": "Sirius - Sistema de Gestión Inteligente",
+  "description": "Sistema inteligente de gestión empresarial con capacidades offline",
   "icons": [
     {
       "src": "favicon.ico",
@@ -9,13 +9,13 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo-sistemas.png",
+      "src": "assets/sirius-logo.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "logo-sistemas.png",
+      "src": "assets/sirius-logo.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
@@ -32,7 +32,7 @@
   "categories": ["business", "productivity"],
   "screenshots": [
     {
-      "src": "logo-sistemas.png",
+      "src": "assets/sirius-logo.png",
       "type": "image/png",
       "sizes": "720x1280",
       "form_factor": "narrow"
@@ -46,7 +46,7 @@
       "url": "/?action=nueva-venta",
       "icons": [
         {
-          "src": "logo-sistemas.png",
+          "src": "assets/sirius-logo.png",
           "sizes": "96x96"
         }
       ]
@@ -58,7 +58,7 @@
       "url": "/?action=stock",
       "icons": [
         {
-          "src": "logo-sistemas.png",
+          "src": "assets/sirius-logo.png",
           "sizes": "96x96"
         }
       ]
@@ -70,7 +70,7 @@
       "url": "/?action=dashboard",
       "icons": [
         {
-          "src": "logo-sistemas.png",
+          "src": "assets/sirius-logo.png",
           "sizes": "96x96"
         }
       ]

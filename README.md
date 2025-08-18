@@ -1,12 +1,12 @@
-# 🏍️ Sistema de Gestión para Motorepuestos FL
+# ⭐ Sirius - Sistema de Gestión Inteligente
 
-Sistema completo de gestión empresarial adaptado específicamente para tiendas de motorepuestos, con interfaz moderna y funcionalidades avanzadas.
+Sistema inteligente de gestión empresarial con interfaz moderna y funcionalidades avanzadas. Desarrollado para adaptarse a cualquier tipo de negocio.
 
 ## ✨ Características Principales
 
 ### 🎯 **Gestión Completa del Negocio**
 - **Dashboard Inteligente** - KPIs y métricas en tiempo real
-- **Gestión de Productos** - Catálogo completo con categorías específicas de motorepuestos
+- **Gestión de Productos** - Catálogo completo con categorías personalizables
 - **Sistema de Ventas** - Registro de ventas con múltiples productos
 - **Control de Caja** - Movimientos de ingresos y egresos
 - **Gestión de Clientes** - Base de datos de clientes con historial
@@ -14,7 +14,7 @@ Sistema completo de gestión empresarial adaptado específicamente para tiendas 
 - **Reportes Avanzados** - Análisis y estadísticas del negocio
 
 ### 🎨 **Diseño Moderno**
-- **Colores Azul Claro** - Paleta adaptada para motorepuestos
+- **Colores Profesionales** - Paleta azul moderna y elegante
 - **Degradados Elegantes** - Diseño visual atractivo
 - **Interfaz Responsive** - Funciona en desktop, tablet y móvil
 - **Animaciones Suaves** - Experiencia de usuario fluida
@@ -36,8 +36,8 @@ Sistema completo de gestión empresarial adaptado específicamente para tiendas 
 
 ### **1. Clonar el Repositorio**
 ```bash
-git clone https://github.com/tu-usuario/motorepuestos-fl.git
-cd motorepuestos-fl/client
+git clone https://github.com/tu-usuario/sirius-sistema.git
+cd sirius-sistema
 ```
 
 ### **2. Instalar Dependencias**
@@ -55,7 +55,7 @@ Crear archivo `.env` en la carpeta `client`:
 ```env
 VITE_SUPABASE_URL=tu_supabase_url
 VITE_SUPABASE_ANON_KEY=tu_supabase_anon_key
-VITE_APP_NAME=Motorepuestos F.L.
+VITE_APP_NAME=Sirius
 VITE_APP_VERSION=1.0.0
 ```
 
@@ -115,7 +115,7 @@ npm start
 
 ## 🎨 Categorías de Productos
 
-El sistema incluye categorías específicas para motorepuestos:
+El sistema incluye categorías de productos personalizables:
 
 - **Motores** - Partes del motor
 - **Frenos** - Sistema de frenado
@@ -250,10 +250,10 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 ## 📞 Soporte
 
 ### **Canales de Soporte**
-- **Email**: soporte@motorepuestos-fl.com
-- **Documentación**: docs.motorepuestos-fl.com
+- **Email**: soporte@sirius-sistema.com
+- **Documentación**: docs.sirius-sistema.com
 - **Issues**: GitHub Issues
 
 ---
 
-**🏍️ Desarrollado con ❤️ para motorepuestos de todo el mundo**
+**⭐ Desarrollado con ❤️ para empresas de todo el mundo**

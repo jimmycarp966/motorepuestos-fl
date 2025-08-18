@@ -121,10 +121,20 @@ export const Sidebar: React.FC = () => {
       `}>
         {/* Header del sidebar */}
         <div className="p-8 pb-6 bg-gradient-to-br from-blue-500 to-purple-600 text-white border-b border-white/10">
-          <div className="mb-4">
-            <h1 className="text-xl font-bold leading-tight tracking-tight">
-              Motorepuestos F.L.
-            </h1>
+          <div className="mb-4 flex items-center gap-3">
+            <img 
+              src="/assets/sirius-logo.png" 
+              alt="Sirius Logo" 
+              className="w-10 h-10 object-contain bg-white/10 rounded-lg p-1"
+            />
+            <div>
+              <h1 className="text-lg font-bold leading-tight tracking-tight">
+                Sirius
+              </h1>
+              <p className="text-xs opacity-90 font-medium">
+                Sistema de Gestión Inteligente
+              </p>
+            </div>
           </div>
           
           <div className="flex items-center gap-3">

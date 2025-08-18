@@ -86,8 +86,8 @@ export const LoginForm: React.FC = () => {
             border: '3px solid #667eea'
           }}>
             <img 
-              src="/logo-sistemas.png" 
-              alt="Sistemas Logo" 
+              src="/assets/sirius-logo.png" 
+              alt="Sirius Logo" 
               style={{ 
                 width: '80px', 
                 height: '80px',
@@ -102,7 +102,7 @@ export const LoginForm: React.FC = () => {
             color: '#1e293b',
             marginBottom: '0.5rem'
           }}>
-            Motorepuestos F.L.
+            Sirius
           </h1>
           
           <p style={{
@@ -110,7 +110,7 @@ export const LoginForm: React.FC = () => {
             color: '#64748b',
             margin: 0
           }}>
-            Sistema de Gestión
+            Sistema de Gestión Inteligente
           </p>
         </div>
 
@@ -319,7 +319,7 @@ export const LoginForm: React.FC = () => {
             color: '#9ca3af',
             margin: 0
           }}>
-            © 2024 Motorepuestos F.L. - Sistema de Gestión
+            © 2024 Sirius - Sistema de Gestión Inteligente - Todos los derechos reservados
           </p>
         </div>
 
