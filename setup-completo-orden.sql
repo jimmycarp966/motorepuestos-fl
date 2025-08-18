@@ -7,7 +7,8 @@
 -- PASO 1: CREAR TABLAS FALTANTES
 -- ================================
 
-\echo '🚀 PASO 1: Creando tablas faltantes...'
+-- 🚀 PASO 1: Creando tablas faltantes...
+DO $$ BEGIN RAISE NOTICE '🚀 PASO 1: Creando tablas faltantes...'; END $$;
 
 -- Primero los arqueos (sin dependencias circulares)
 CREATE TABLE IF NOT EXISTS arqueos_caja (
@@ -109,13 +110,13 @@ CREATE TABLE IF NOT EXISTS notificaciones_sistema (
   expires_at TIMESTAMP WITH TIME ZONE
 );
 
-\echo '✅ Tablas creadas exitosamente'
+DO $$ BEGIN RAISE NOTICE '✅ Tablas creadas exitosamente'; END $$;
 
 -- ================================
 -- PASO 2: AGREGAR COLUMNAS FALTANTES
 -- ================================
 
-\echo '🔧 PASO 2: Agregando columnas faltantes...'
+DO $$ BEGIN RAISE NOTICE '🔧 PASO 2: Agregando columnas faltantes...'; END $$;
 
 DO $$ 
 BEGIN
@@ -147,13 +148,13 @@ BEGIN
   END IF;
 END $$;
 
-\echo '✅ Columnas agregadas exitosamente'
+DO $$ BEGIN RAISE NOTICE '✅ Columnas agregadas exitosamente'; END $$;
 
 -- ================================
 -- PASO 3: FUNCIONES HELPER PARA RLS
 -- ================================
 
-\echo '🔐 PASO 3: Creando funciones helper para RLS...'
+DO $$ BEGIN RAISE NOTICE '🔐 PASO 3: Creando funciones helper para RLS...'; END $$;
 
 -- Función para obtener el rol del usuario actual
 CREATE OR REPLACE FUNCTION get_user_role()
@@ -197,13 +198,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-\echo '✅ Funciones RLS creadas exitosamente'
+DO $$ BEGIN RAISE NOTICE '✅ Funciones RLS creadas exitosamente'; END $$;
 
 -- ================================
 -- PASO 4: CREAR ÍNDICES
 -- ================================
 
-\echo '⚡ PASO 4: Creando índices...'
+DO $$ BEGIN RAISE NOTICE '⚡ PASO 4: Creando índices...'; END $$;
 
 -- Índices para cajas_diarias
 CREATE INDEX IF NOT EXISTS idx_cajas_diarias_empleado_fecha ON cajas_diarias(empleado_id, fecha);
@@ -224,13 +225,13 @@ CREATE INDEX IF NOT EXISTS idx_notificaciones_leida ON notificaciones(leida);
 CREATE INDEX IF NOT EXISTS idx_movimientos_caja_empleado_fecha ON movimientos_caja(empleado_id, DATE(created_at));
 CREATE INDEX IF NOT EXISTS idx_movimientos_caja_referencia ON movimientos_caja(referencia_id, referencia_tipo);
 
-\echo '✅ Índices creados exitosamente'
+DO $$ BEGIN RAISE NOTICE '✅ Índices creados exitosamente'; END $$;
 
 -- ================================
 -- PASO 5: CREAR TRIGGERS
 -- ================================
 
-\echo '🔄 PASO 5: Creando triggers...'
+DO $$ BEGIN RAISE NOTICE '🔄 PASO 5: Creando triggers...'; END $$;
 
 -- Función para actualizar updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -260,13 +261,13 @@ CREATE TRIGGER update_notificaciones_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
-\echo '✅ Triggers creados exitosamente'
+DO $$ BEGIN RAISE NOTICE '✅ Triggers creados exitosamente'; END $$;
 
 -- ================================
 -- PASO 6: HABILITAR RLS Y CREAR POLÍTICAS
 -- ================================
 
-\echo '🛡️ PASO 6: Configurando Row Level Security...'
+DO $$ BEGIN RAISE NOTICE '🛡️ PASO 6: Configurando Row Level Security...'; END $$;
 
 -- Habilitar RLS
 ALTER TABLE cajas_diarias ENABLE ROW LEVEL SECURITY;
@@ -313,13 +314,13 @@ FOR SELECT USING (
   get_user_role() IN ('Administrador', 'Gerente')
 );
 
-\echo '✅ RLS configurado exitosamente'
+DO $$ BEGIN RAISE NOTICE '✅ RLS configurado exitosamente'; END $$;
 
 -- ================================
 -- PASO 7: VERIFICACIÓN FINAL
 -- ================================
 
-\echo '🔍 PASO 7: Verificación final...'
+DO $$ BEGIN RAISE NOTICE '🔍 PASO 7: Verificación final...'; END $$;
 
 DO $$
 DECLARE
@@ -348,11 +349,14 @@ BEGIN
   END IF;
 END $$;
 
-\echo ''
-\echo '🚀 SETUP COMPLETO FINALIZADO'
-\echo '=============================='
-\echo '✅ Todas las dependencias están listas'
-\echo '✅ Ahora puedes ejecutar:'
-\echo '   - supabase-edge-functions.sql'
-\echo '   - supabase-rls-security.sql (políticas adicionales)'
-\echo ''
+DO $$ 
+BEGIN 
+  RAISE NOTICE '';
+  RAISE NOTICE '🚀 SETUP COMPLETO FINALIZADO';
+  RAISE NOTICE '==============================';
+  RAISE NOTICE '✅ Todas las dependencias están listas';
+  RAISE NOTICE '✅ Ahora puedes ejecutar:';
+  RAISE NOTICE '   - supabase-edge-functions.sql';
+  RAISE NOTICE '   - supabase-rls-security.sql (políticas adicionales)';
+  RAISE NOTICE '';
+END $$;
