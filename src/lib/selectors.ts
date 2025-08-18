@@ -467,63 +467,6 @@ export const useVentasFiltered = (filters: VentasFilters = {}) => {
   )
 }
 
-// Selector granular para productos con filtros avanzados
-export const useProductosFiltered = (filters: ProductosFilters = {}) => {
-  const stableFilters = useStableFilter(filters)
-  
-  return useAppStore(
-    useCallback((state: AppStore) => {
-      const productos = state.productos || []
-      
-      const filtered = productos.filter(producto => {
-        // Filtro de búsqueda
-        if (stableFilters.searchTerm) {
-          const term = stableFilters.searchTerm.toLowerCase()
-          const searchableText = `${producto.nombre} ${producto.codigo_sku} ${producto.categoria}`.toLowerCase()
-          if (!searchableText.includes(term)) return false
-        }
-        
-        // Filtros específicos
-        if (stableFilters.categoria && producto.categoria !== stableFilters.categoria) return false
-        if (stableFilters.activo !== undefined && producto.activo !== stableFilters.activo) return false
-        
-        // Filtros de stock
-        if (stableFilters.stockBajo && producto.stock > producto.stock_minimo) return false
-        if (stableFilters.sinStock && producto.stock > 0) return false
-        
-        // Filtros de precio
-        if (stableFilters.precioMin && producto.precio_minorista < stableFilters.precioMin) return false
-        if (stableFilters.precioMax && producto.precio_minorista > stableFilters.precioMax) return false
-        
-        return true
-      })
-      
-      return {
-        productos: filtered,
-        total: filtered.length,
-        stockBajo: filtered.filter(p => p.stock <= p.stock_minimo).length,
-        sinStock: filtered.filter(p => p.stock === 0).length,
-        valorTotal: filtered.reduce((sum, p) => sum + (p.precio_minorista * p.stock), 0),
-        loading: state.loading,
-        error: state.error
-      }
-    }, [stableFilters]),
-    shallow
-  )
-}
-
-// Selector para categorías únicas de productos
-export const useCategorias = () => {
-  return useAppStore(
-    useCallback((state: AppStore) => {
-      const productos = state.productos || []
-      const categorias = Array.from(new Set(productos.map(p => p.categoria)))
-      return categorias.sort()
-    }, []),
-    shallow
-  )
-}
-
 // ================================
 // SELECTORES PARA NOTIFICACIONES
 // ================================

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import { cn } from '../../lib/utils'
 import { Loader2, Package, DollarSign, Users, ShoppingCart } from 'lucide-react'
 import { MotorCard } from './motor-card'
@@ -224,13 +224,11 @@ export const ProgressBar: React.FC<{
 
 // Hook para manejar estados de carga
 export const useLoadingState = (initialState = false) => {
-  const [isLoading, setIsLoading] = React.useState(initialState)
-  const [error, setError] = React.useState<string | null>(null)
-  const [success, setSuccess] = React.useState(false)
+  const [isLoading, setIsLoading] = useState(initialState)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
   
-  const withLoading = React.useCallback(async <T>(
-    operation: () => Promise<T>
-  ): Promise<T | null> => {
+  const wrapAsyncFunction = useCallback(async (operation: () => Promise<any>): Promise<any> => {
     setIsLoading(true)
     setError(null)
     setSuccess(false)
@@ -240,17 +238,17 @@ export const useLoadingState = (initialState = false) => {
       setSuccess(true)
       setTimeout(() => setSuccess(false), 2000)
       return result
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error desconocido'
+    } catch (err: any) {
+      const errorMessage = err?.message || 'Error desconocido'
       setError(errorMessage)
       setTimeout(() => setError(null), 5000)
-      return null
+      throw err // Re-throw to allow caller to handle
     } finally {
       setIsLoading(false)
     }
   }, [])
   
-  const reset = React.useCallback(() => {
+  const reset = useCallback(() => {
     setIsLoading(false)
     setError(null)
     setSuccess(false)
@@ -260,7 +258,7 @@ export const useLoadingState = (initialState = false) => {
     isLoading,
     error,
     success,
-    withLoading,
+    wrapAsyncFunction,
     reset
   }
 }

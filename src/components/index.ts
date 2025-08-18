@@ -37,8 +37,6 @@ export { Card } from './ui/card'
 export { Input } from './ui/input'
 export { Textarea } from './ui/textarea'
 export { NotificationsContainer } from './ui/notifications'
-export { DebugButton } from './ui/DebugButton'
-export { DebugVentasCompleto } from './ui/DebugVentasCompleto'
 
 // Nuevos componentes UI mejorados
 export { MotorCard } from './ui/motor-card'
@@ -73,3 +71,7 @@ export {
   ProgressBar,
   useLoadingState
 } from './ui/loading-states'
+
+// Componentes responsive y búsqueda
+export { default as ResponsiveTable } from './ui/responsive-table'
+export { default as GlobalSearch } from './ui/global-search'
