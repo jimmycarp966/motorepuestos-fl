@@ -638,7 +638,7 @@ CREATE POLICY "error_log_select_policy" ON error_log
 FOR SELECT USING (
   EXISTS (
     SELECT 1 FROM empleados 
-    WHERE id = (auth.jwt() ->> 'user_metadata' ->> 'empleado_id')::UUID 
+    WHERE id = (auth.jwt() -> 'user_metadata' ->> 'empleado_id')::UUID 
     AND rol = 'Administrador'
   )
 );
@@ -648,10 +648,10 @@ ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "audit_log_select_policy" ON audit_log
 FOR SELECT USING (
-  empleado_id = (auth.jwt() ->> 'user_metadata' ->> 'empleado_id')::UUID OR
+  empleado_id = (auth.jwt() -> 'user_metadata' ->> 'empleado_id')::UUID OR
   EXISTS (
     SELECT 1 FROM empleados 
-    WHERE id = (auth.jwt() ->> 'user_metadata' ->> 'empleado_id')::UUID 
+    WHERE id = (auth.jwt() -> 'user_metadata' ->> 'empleado_id')::UUID 
     AND rol IN ('Administrador', 'Gerente')
   )
 );
@@ -661,13 +661,13 @@ ALTER TABLE notificaciones_sistema ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "notificaciones_sistema_select_policy" ON notificaciones_sistema
 FOR SELECT USING (
-  empleado_id = (auth.jwt() ->> 'user_metadata' ->> 'empleado_id')::UUID OR
+  empleado_id = (auth.jwt() -> 'user_metadata' ->> 'empleado_id')::UUID OR
   empleado_id IS NULL -- Notificaciones globales
 );
 
 CREATE POLICY "notificaciones_sistema_update_policy" ON notificaciones_sistema
 FOR UPDATE USING (
-  empleado_id = (auth.jwt() ->> 'user_metadata' ->> 'empleado_id')::UUID
+  empleado_id = (auth.jwt() -> 'user_metadata' ->> 'empleado_id')::UUID
 );
 
 -- ================================

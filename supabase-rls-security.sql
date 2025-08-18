@@ -33,7 +33,7 @@ ALTER TABLE arqueos_caja ENABLE ROW LEVEL SECURITY;
 CREATE OR REPLACE FUNCTION get_user_role()
 RETURNS TEXT AS $$
 BEGIN
-  RETURN (auth.jwt() ->> 'user_metadata' ->> 'rol')::TEXT;
+  RETURN (auth.jwt() -> 'user_metadata' ->> 'rol')::TEXT;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -41,7 +41,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION get_current_employee_id()
 RETURNS UUID AS $$
 BEGIN
-  RETURN (auth.jwt() ->> 'user_metadata' ->> 'empleado_id')::UUID;
+  RETURN (auth.jwt() -> 'user_metadata' ->> 'empleado_id')::UUID;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
