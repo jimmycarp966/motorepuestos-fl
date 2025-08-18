@@ -74,24 +74,19 @@ export const LoginForm: React.FC = () => {
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
           <div style={{
-            width: '100px',
-            height: '100px',
-            borderRadius: '50%',
-            background: 'white',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            margin: '0 auto 1.5rem',
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
-            border: '3px solid #667eea'
+            margin: '0 auto 1.5rem'
           }}>
             <img 
               src="/assets/sirius-logo.png" 
               alt="Sirius Logo" 
               style={{ 
-                width: '80px', 
-                height: '80px',
-                objectFit: 'contain'
+                width: '120px', 
+                height: '120px',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))'
               }} 
             />
           </div>

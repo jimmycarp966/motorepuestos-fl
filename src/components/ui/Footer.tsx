@@ -20,9 +20,10 @@ export const Footer: React.FC = () => {
           src="/assets/sirius-logo.png" 
           alt="Sirius Logo" 
           style={{ 
-            width: '40px', 
-            height: '40px',
-            objectFit: 'contain'
+            width: '48px', 
+            height: '48px',
+            objectFit: 'contain',
+            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
           }} 
         />
         <span style={{
