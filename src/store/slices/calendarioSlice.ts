@@ -1,7 +1,6 @@
 import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
-import type { AppStore } from '../index'
-import type { CalendarioState, CreateEventoData } from '../types'
+import type { AppStore, CalendarioState, CreateEventoData } from '../types'
 
 const initialState: CalendarioState = {
   eventos: [],
@@ -9,7 +8,7 @@ const initialState: CalendarioState = {
   error: null,
 }
 
-export const calendarioSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'calendario' | 'fetchEventos' | 'createEvento' | 'updateEvento' | 'deleteEvento'>> = (set, get) => ({
+export const calendarioSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'fetchEventos' | 'createEvento' | 'updateEvento' | 'deleteEvento'> & { calendario: CalendarioState }> = (set, get) => ({
   calendario: initialState,
 
   fetchEventos: async () => {

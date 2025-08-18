@@ -32,7 +32,6 @@ export interface AppConfig {
   performance: {
     cacheEnabled: boolean
     cacheTTL: number
-    offlineEnabled: boolean
     paginationEnabled: boolean
   }
   
@@ -119,7 +118,6 @@ const defaultConfig: AppConfig = {
   performance: {
     cacheEnabled: true,
     cacheTTL: 300000, // 5 minutos
-    offlineEnabled: true,
     paginationEnabled: true
   },
   
@@ -181,8 +179,7 @@ const environmentConfig: Record<string, Partial<AppConfig>> = {
       notificationDuration: 1000 // Notificaciones rápidas en tests
     },
     performance: {
-      cacheEnabled: false, // Sin cache en tests
-      offlineEnabled: false
+      cacheEnabled: false // Sin cache en tests
     }
   }
 }
@@ -257,7 +254,6 @@ export const config = {
   // Performance
   cacheEnabled: appConfig.performance.cacheEnabled,
   cacheTTL: appConfig.performance.cacheTTL,
-  offlineEnabled: appConfig.performance.offlineEnabled,
   
   // Security
   sessionTimeout: appConfig.security.sessionTimeout,

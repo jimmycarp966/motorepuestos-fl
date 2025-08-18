@@ -25,69 +25,12 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
       })
 
       if (error) {
-        // Manejar error de email no confirmado
+        // Si el email no está confirmado, continuar con el login de Supabase Auth
         if (error.message.includes('Email not confirmed')) {
-          // Crear empleado automáticamente si no existe
-          const { data: empleadoData, error: empleadoError } = await supabase
-            .from('empleados')
-            .select('*')
-            .eq('email', email)
-            .eq('activo', true)
-            .single()
-
-          if (empleadoError) {
-            // Si no existe el empleado, crearlo
-            const { data: newEmpleado, error: createError } = await supabase
-              .from('empleados')
-              .insert([{
-                nombre: 'Usuario de Prueba',
-                email: email,
-                rol: 'Administrador',
-                permisos_modulos: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'],
-                activo: true,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              }])
-              .select('id, nombre, email, rol, permisos_modulos, activo, created_at, updated_at')
-              .single()
-
-            if (createError) {
-              console.error('Error creando empleado:', createError)
-              // Continuar con el login aunque no se pueda crear el empleado
-            } else {
-      
-            }
-          }
-
-          // Permitir login aunque el email no esté confirmado
-          set(() => ({
-            auth: {
-              session: null, // No hay sesión válida
-              user: { 
-                id: 'temp-user',
-                nombre: 'Usuario de Prueba',
-                email: email,
-                rol: 'Administrador',
-                permisos_modulos: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'], // Permisos por defecto
-                activo: true,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              },
-              loading: false,
-            }
-          }))
-
-          // Notificar éxito con advertencia
-          get().addNotification({
-            id: Date.now().toString(),
-            type: 'warning',
-            title: 'Sesión iniciada (modo prueba)',
-            message: 'Email no confirmado, pero puedes usar el sistema en modo prueba',
-          })
-
-          return
+          console.warn('Email no confirmado, pero continuando con el login')
+        } else {
+          throw error
         }
-        throw error
       }
 
               // Obtener datos del empleado con permisos
@@ -100,49 +43,32 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
             .single()
 
         if (empleadoError) {
-          // Si no existe el empleado, crearlo
-          const { data: newEmpleado, error: createError } = await supabase
-            .from('empleados')
-            .insert([{
-              nombre: 'Usuario de Prueba',
-              email: data.user.email,
-              rol: 'Administrador',
-              permisos_modulos: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'],
-              activo: true,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }])
-            .select('id, nombre, email, rol, permisos_modulos, activo, created_at, updated_at')
-            .single()
+          console.warn('Empleado no encontrado en BD, usando datos de Auth básicos')
+          // No crear empleado automáticamente, solo usar datos básicos de Auth
+          set(() => ({
+            auth: {
+              session: data.session,
+              user: {
+                id: data.user.id,
+                nombre: data.user.user_metadata?.nombre || 'Usuario Auth',
+                email: data.user.email || '',
+                rol: 'Cajero', // Rol limitado por defecto
+                permisos_modulos: ['dashboard', 'ventas'], // Solo permisos básicos
+                activo: true,
+                created_at: data.user.created_at,
+                updated_at: data.user.updated_at || data.user.created_at
+              },
+              loading: false,
+            }
+          }))
 
-          if (createError) {
-            console.error('Error creando empleado:', createError)
-            // Usar datos del usuario de Auth
-                         set(() => ({
-               auth: {
-                 session: data.session,
-                 user: {
-                   id: data.user.id,
-                   nombre: data.user.user_metadata?.nombre || 'Usuario',
-                   email: data.user.email || '',
-                   rol: data.user.user_metadata?.rol || 'Administrador',
-                   permisos_modulos: ['dashboard', 'empleados', 'productos', 'clientes', 'ventas', 'caja', 'calendario'], // Permisos por defecto
-                   activo: true,
-                   created_at: data.user.created_at,
-                   updated_at: data.user.updated_at || data.user.created_at
-                 },
-                 loading: false,
-               }
-             }))
-          } else {
-            set(() => ({
-              auth: {
-                session: data.session,
-                user: newEmpleado,
-                loading: false,
-              }
-            }))
-          }
+          // Notificar que debe crear el empleado manualmente
+          get().addNotification({
+            id: Date.now().toString(),
+            type: 'warning',
+            title: 'Usuario sin empleado asociado',
+            message: 'Contacta al administrador para configurar tu empleado en el sistema',
+          })
         } else {
           set(() => ({
             auth: {
@@ -226,13 +152,9 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
 
       const { data: { session }, error } = await supabase.auth.getSession()
       
-      if (error) {
-        console.error('❌ Auth: Error obteniendo sesión:', error)
-        throw error
-      }
+      if (error) throw error
 
       if (session?.user) {
-
         // Obtener datos del empleado
         const { data: empleadoData, error: empleadoError } = await supabase
           .from('empleados')
@@ -241,12 +163,8 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
           .eq('activo', true)
           .single()
 
-        if (empleadoError) {
-          console.error('❌ Auth: Error obteniendo empleado:', empleadoError)
-          throw empleadoError
-        }
+        if (empleadoError) throw empleadoError
 
-        
         set(() => ({
           auth: {
             session,
@@ -255,7 +173,6 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
           }
         }))
       } else {
-
         set(() => ({
           auth: {
             session: null,
@@ -266,7 +183,6 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
       }
 
     } catch (error) {
-      console.error('❌ Auth: Error en checkAuth:', error)
       set(() => ({
         auth: {
           session: null,
@@ -275,13 +191,13 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
         }
       }))
       
-      // Notificar error solo si no es un error de "no hay sesión"
+      // Solo notificar errores críticos de conexión
       if (error instanceof Error && !error.message.includes('No session')) {
         get().addNotification({
           id: Date.now().toString(),
           type: 'error',
           title: 'Error de conexión',
-          message: 'No se pudo verificar la autenticación. Verificando conexión...',
+          message: 'No se pudo verificar la autenticación',
         })
       }
     }

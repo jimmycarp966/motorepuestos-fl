@@ -1,30 +1,6 @@
 import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
-import type { AppStore } from '../index'
-
-export interface CajaDiaria {
-  id: string
-  fecha: string
-  apertura: number
-  cierre: number
-  total_ingresos: number
-  total_egresos: number
-  saldo_final: number
-  ventas_count: number
-  ventas_total: number
-  movimientos_count: number
-  empleado_id: string
-  empleado_nombre: string
-  estado: 'abierta' | 'cerrada'
-  created_at: string
-  updated_at: string
-}
-
-export interface CajaHistorialState {
-  cajasDiarias: CajaDiaria[]
-  loading: boolean
-  error: string | null
-}
+import type { AppStore, CajaHistorialState } from '../types'
 
 const initialState: CajaHistorialState = {
   cajasDiarias: [],
@@ -61,8 +37,21 @@ export const cajaHistorialSlice: StateCreator<AppStore, [], [], Pick<AppStore, '
       if (error) throw error
 
       const cajasProcesadas = data?.map(caja => ({
-        ...caja,
-        empleado_nombre: caja.empleado?.nombre || 'N/A'
+        id: caja.id,
+        fecha: caja.fecha,
+        apertura: caja.apertura || 0,
+        cierre: caja.cierre || 0,
+        total_ingresos: caja.total_ingresos || 0,
+        total_egresos: caja.total_egresos || 0,
+        saldo_final: caja.saldo_final || 0,
+        ventas_count: caja.ventas_count || 0,
+        ventas_total: caja.ventas_total || 0,
+        movimientos_count: caja.movimientos_count || 0,
+        empleado_id: caja.empleado_id,
+        empleado_nombre: caja.empleado?.nombre || 'N/A',
+        estado: caja.estado,
+        created_at: caja.created_at,
+        updated_at: caja.updated_at
       })) || []
 
       set((state) => ({

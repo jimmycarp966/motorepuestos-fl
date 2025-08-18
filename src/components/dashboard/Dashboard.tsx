@@ -7,6 +7,7 @@ import {
   useLoadingStates,
   useErrorStates
 } from '../../lib/selectors'
+
 import { 
   TrendingUp, 
   DollarSign, 
@@ -259,6 +260,7 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div style={{ padding: '1rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
+
       {/* Header del Dashboard */}
       <div style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ 

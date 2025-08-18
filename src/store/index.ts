@@ -8,6 +8,8 @@ import { empleadosSlice } from './slices/empleadosSlice'
 import { cajaSlice } from './slices/cajaSlice'
 import { reportesSlice } from './slices/reportesSlice'
 import { arqueoSlice } from './slices/arqueoSlice'
+import { calendarioSlice } from './slices/calendarioSlice'
+import { cajaHistorialSlice } from './slices/cajaHistorialSlice'
 import { uiSlice } from './slices/uiSlice'
 import { notificationsSlice } from './slices/notificationsSlice'
 import { ErrorHandler } from '../lib/errorHandler'
@@ -26,6 +28,8 @@ export const useAppStore = create<AppStore>()(
         ...cajaSlice(...a),
         ...reportesSlice(...a),
         ...arqueoSlice(...a),
+        ...calendarioSlice(...a),
+        ...cajaHistorialSlice(...a),
         ...uiSlice(...a),
         ...notificationsSlice(...a),
       }

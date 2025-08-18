@@ -46,8 +46,11 @@ export const useDashboardKPIs = (): DashboardKPIs => {
       const unaSemanaPasada = DateUtils.subtractDays(fechaHoy, 7)
       const unMesPasado = DateUtils.subtractDays(fechaHoy, 30)
 
-      // Filtrar ventas de hoy
-      const ventasHoy = state.ventas.filter(v => DateUtils.isToday(v.fecha))
+      // Filtrar ventas de hoy - asegurar que funcione con fechas completas
+      const ventasHoy = state.ventas.filter(v => {
+        const ventaFecha = typeof v.fecha === 'string' ? v.fecha.split('T')[0] : v.fecha
+        return ventaFecha === fechaHoy
+      })
       
       // Filtrar ventas de la semana
       const ventasSemanaPasada = state.ventas.filter(v => v.fecha >= unaSemanaPasada)
@@ -205,7 +208,10 @@ export const useVentasStats = (): VentasStats => {
       const inicioSemana = DateUtils.subtractDays(fechaHoy, 7)
       const inicioMes = DateUtils.subtractDays(fechaHoy, 30)
 
-      const ventasHoy = state.ventas.filter(v => DateUtils.isToday(v.fecha))
+      const ventasHoy = state.ventas.filter(v => {
+        const ventaFecha = typeof v.fecha === 'string' ? v.fecha.split('T')[0] : v.fecha
+        return ventaFecha === fechaHoy
+      })
       const ventasSemana = state.ventas.filter(v => v.fecha >= inicioSemana)
       const ventasMes = state.ventas.filter(v => v.fecha >= inicioMes)
 
@@ -352,11 +358,11 @@ export const useEstadoCaja = () => {
 export const useLoadingStates = () => {
   return useAppStore(
     useCallback((state: AppStore) => ({
-      productos: state.loading || false, // ProductosSlice tiene loading en root
-      ventas: state.loading || false,    // VentasSlice tiene loading en root  
-      clientes: state.clientes?.loading || false, // ClientesSlice tiene state anidado
-      empleados: state.empleados?.loading || false, // EmpleadosSlice tiene state anidado
-      caja: state.caja?.loading || false  // CajaSlice tiene state anidado
+      productos: state.loading || false,
+      ventas: state.loading || false,    
+      clientes: state.clientes?.loading || false,
+      empleados: state.empleados?.loading || false,
+      caja: state.caja?.loading || false
     }), []),
     shallow
   )
@@ -366,11 +372,11 @@ export const useLoadingStates = () => {
 export const useErrorStates = () => {
   return useAppStore(
     useCallback((state: AppStore) => ({
-      productos: state.error || null,     // ProductosSlice tiene error en root
-      ventas: state.error || null,        // VentasSlice tiene error en root
-      clientes: state.clientes?.error || null, // ClientesSlice tiene state anidado
-      empleados: state.empleados?.error || null, // EmpleadosSlice tiene state anidado
-      caja: state.caja?.error || null     // CajaSlice tiene state anidado
+      productos: state.error || null,
+      ventas: state.error || null,
+      clientes: state.clientes?.error || null,
+      empleados: state.empleados?.error || null,
+      caja: state.caja?.error || null
     }), []),
     shallow
   )

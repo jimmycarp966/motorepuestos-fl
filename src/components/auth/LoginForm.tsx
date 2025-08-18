@@ -86,7 +86,7 @@ export const LoginForm: React.FC = () => {
             border: '3px solid #667eea'
           }}>
             <img 
-              src="/LOGO SISTEMAS.png" 
+              src="/logo-sistemas.png" 
               alt="Sistemas Logo" 
               style={{ 
                 width: '80px', 

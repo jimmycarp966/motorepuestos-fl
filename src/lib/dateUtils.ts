@@ -6,11 +6,14 @@
 export class DateUtils {
   /**
    * Obtiene la fecha actual en formato YYYY-MM-DD
-   * Usa la zona horaria local del servidor
+   * Usa la zona horaria local (no UTC)
    */
   static getCurrentDate(): string {
     const now = new Date()
-    return now.toISOString().split('T')[0]
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   }
 
   /**
@@ -93,7 +96,19 @@ export class DateUtils {
    */
   static isToday(date: string | Date): boolean {
     const today = this.getCurrentDate()
-    const dateStr = typeof date === 'string' ? date : date.toISOString().split('T')[0]
+    let dateStr: string
+    
+    if (typeof date === 'string') {
+      // Si es string, extraer solo la parte de fecha
+      dateStr = date.split('T')[0]
+    } else {
+      // Si es Date, usar zona horaria local
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      dateStr = `${year}-${month}-${day}`
+    }
+    
     return dateStr === today
   }
 

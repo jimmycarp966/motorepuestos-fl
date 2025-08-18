@@ -197,9 +197,18 @@ export interface CajaDiaria {
   fecha: string
   empleado_id: string
   estado: 'abierta' | 'cerrada'
+  apertura: number
+  cierre: number
   saldo_inicial: number
-  saldo_final?: number
+  saldo_final: number
+  total_ingresos: number
+  total_egresos: number
+  ventas_count: number
+  ventas_total: number
+  movimientos_count: number
+  empleado_nombre: string
   created_at: string
+  updated_at: string
   empleado?: Empleado
 }
 
@@ -279,22 +288,11 @@ export interface NotificationsState {
   notifications: Notification[]
 }
 
-// Tipos para Caja Historial
+// Reutilizar CajaDiaria existente para el historial
 export interface CajaHistorialState {
-  cajasDiarias: CajaHistorialItem[];
+  cajasDiarias: CajaDiaria[];
   loading: boolean;
   error: string | null;
-}
-
-export interface CajaHistorialItem {
-  fecha: string;
-  empleado: string;
-  apertura: number;
-  cierre: number;
-  total_ingresos: number;
-  total_egresos: number;
-  total_ventas: number;
-  estado: 'abierta' | 'cerrada';
 }
 
 // Tipos para Reportes
@@ -381,6 +379,43 @@ export interface ReportesActions {
 }
 
 export type ReportesSlice = ReportesState & ReportesActions;
+
+// Tipos para calendario
+export interface EventoCalendario {
+  id: string
+  titulo: string
+  descripcion: string
+  fecha_inicio: string
+  fecha_fin: string
+  tipo: 'venta' | 'compra' | 'mantenimiento' | 'reunion' | 'otro'
+  empleado_id: string
+  created_at: string
+  updated_at: string
+  empleado?: Empleado
+}
+
+export interface CreateEventoData {
+  titulo: string
+  descripcion: string
+  fecha_inicio: string
+  fecha_fin: string
+  tipo: 'venta' | 'compra' | 'mantenimiento' | 'reunion' | 'otro'
+}
+
+export interface CalendarioState {
+  eventos: EventoCalendario[]
+  loading: boolean
+  error: string | null
+}
+
+export interface CalendarioActions {
+  fetchEventos: () => Promise<void>
+  createEvento: (data: CreateEventoData) => Promise<void>
+  updateEvento: (id: string, data: Partial<CreateEventoData>) => Promise<void>
+  deleteEvento: (id: string) => Promise<void>
+}
+
+export type CalendarioSlice = CalendarioState & CalendarioActions;
 
 // Tipos para arqueo de caja
 export interface ArqueoCajaData {
@@ -495,6 +530,13 @@ export interface NotificationsSlice {
   clearNotifications: () => void
 }
 
+export interface CajaHistorialActions {
+  fetchHistorialCajas: (fechaInicio?: string, fechaFin?: string) => Promise<void>
+  obtenerResumenCaja: (fecha: string) => Promise<any>
+}
+
+export type CajaHistorialSlice = CajaHistorialState & CajaHistorialActions;
+
 export interface AppStore extends 
   AuthSlice, 
   ProductosSlice, 
@@ -504,5 +546,9 @@ export interface AppStore extends
   CajaSlice, 
   ReportesSlice,
   ArqueoSlice,
+  CalendarioSlice,
   UISlice, 
-  NotificationsSlice {}
+  NotificationsSlice {
+  // Propiedades adicionales para slices que no están en el store principal
+  cajaHistorial: CajaHistorialState
+}

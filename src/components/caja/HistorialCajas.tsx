@@ -6,106 +6,27 @@ import { Badge } from '../ui/badge'
 import { Calendar, DollarSign, TrendingUp, TrendingDown, Users, Receipt } from 'lucide-react'
 import { DateUtils } from '../../lib/dateUtils'
 
-interface CajaHistorial {
-  fecha: string
-  ingresos: number
-  egresos: number
-  saldo: number
-  ventas: number
-  arqueoCompletado: boolean
-  empleados: string[]
-}
-
 export const HistorialCajas: React.FC = () => {
-  const [historial, setHistorial] = useState<CajaHistorial[]>([])
-  const [loading, setLoading] = useState(false)
+  const cajaHistorial = useAppStore((state) => state.cajaHistorial)
+  const fetchHistorialCajas = useAppStore((state) => state.fetchHistorialCajas)
+  const obtenerResumenCaja = useAppStore((state) => state.obtenerResumenCaja)
+  
   const [fechaSeleccionada, setFechaSeleccionada] = useState<string | null>(null)
   const [detalleDia, setDetalleDia] = useState<any>(null)
-  
-  const { supabase } = useAppStore()
-
-  // Cargar historial de cajas
-  const cargarHistorial = async () => {
-    setLoading(true)
-    try {
-      // Obtener todas las fechas con actividad
-      const { data: fechasActividad, error } = await supabase
-        .from('movimientos_caja')
-        .select('fecha')
-        .order('fecha', { ascending: false })
-
-      if (error) throw error
-
-      // Procesar cada fecha
-      const historialData: CajaHistorial[] = []
-      
-      for (const fecha of fechasActividad || []) {
-        const fechaStr = DateUtils.formatDate(fecha.fecha)
-        
-        // Obtener movimientos del día
-        const { data: movimientos } = await supabase
-          .from('movimientos_caja')
-          .select('*')
-          .eq('fecha', fechaStr)
-
-        // Obtener ventas del día
-        const { data: ventas } = await supabase
-          .from('ventas')
-          .select('*')
-          .eq('fecha', fechaStr)
-
-        // Obtener arqueo del día
-        const { data: arqueo } = await supabase
-          .from('arqueos_caja')
-          .select('*')
-          .eq('fecha', fechaStr)
-
-        const ingresos = movimientos?.filter(m => m.tipo === 'ingreso').reduce((sum, m) => sum + m.monto, 0) || 0
-        const egresos = movimientos?.filter(m => m.tipo === 'egreso').reduce((sum, m) => sum + m.monto, 0) || 0
-        const saldo = ingresos - egresos
-
-        historialData.push({
-          fecha: fechaStr,
-          ingresos,
-          egresos,
-          saldo,
-          ventas: ventas?.length || 0,
-          arqueoCompletado: arqueo?.[0]?.completado || false,
-          empleados: [...new Set(movimientos?.map(m => m.empleado_id) || [])]
-        })
-      }
-
-      setHistorial(historialData)
-    } catch (error) {
-      console.error('Error cargando historial:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   // Cargar detalle de un día específico
   const cargarDetalleDia = async (fecha: string) => {
     try {
-      const [movimientos, ventas, arqueo] = await Promise.all([
-        supabase.from('movimientos_caja').select('*, empleado:empleados(nombre)').eq('fecha', fecha),
-        supabase.from('ventas').select('*, cliente:clientes(nombre), empleado:empleados(nombre)').eq('fecha', fecha),
-        supabase.from('arqueos_caja').select('*').eq('fecha', fecha)
-      ])
-
-      setDetalleDia({
-        fecha,
-        movimientos: movimientos.data || [],
-        ventas: ventas.data || [],
-        arqueo: arqueo.data?.[0] || null
-      })
+      const resumen = await obtenerResumenCaja(fecha)
+      setDetalleDia(resumen)
     } catch (error) {
       console.error('Error cargando detalle:', error)
     }
   }
 
   useEffect(() => {
-    cargarHistorial()
-  }, [])
+    fetchHistorialCajas()
+  }, [fetchHistorialCajas])
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-AR', {
@@ -127,20 +48,26 @@ export const HistorialCajas: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-900">Historial de Cajas</h2>
           <p className="text-gray-600">Resumen de todas las cajas cerradas</p>
         </div>
-        <Button onClick={cargarHistorial} disabled={loading}>
+        <Button onClick={() => fetchHistorialCajas()} disabled={cajaHistorial.loading}>
           <Receipt className="w-4 h-4 mr-2" />
           Actualizar
         </Button>
       </div>
 
-      {loading ? (
+      {cajaHistorial.loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-2 text-gray-600">Cargando historial...</p>
         </div>
+      ) : cajaHistorial.cajasDiarias.length === 0 ? (
+        <div className="text-center py-12">
+          <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No hay historial de cajas</h3>
+          <p className="text-gray-600">Las cajas cerradas aparecerán aquí</p>
+        </div>
       ) : (
         <div className="grid gap-4">
-          {historial.map((caja) => (
+          {cajaHistorial.cajasDiarias.map((caja) => (
             <Card key={caja.fecha} className="hover:shadow-md transition-shadow">
               <CardHeader>
                 <div className="flex justify-between items-start">
@@ -150,12 +77,12 @@ export const HistorialCajas: React.FC = () => {
                       {DateUtils.formatDate(caja.fecha, 'dd/MM/yyyy')}
                     </CardTitle>
                     <CardDescription>
-                      {caja.empleados.length} empleado(s) trabajaron este día
+                      Empleado: {caja.empleado_nombre}
                     </CardDescription>
                   </div>
                   <div className="flex gap-2">
-                    <Badge variant={caja.arqueoCompletado ? "default" : "secondary"}>
-                      {caja.arqueoCompletado ? 'Arqueo Completado' : 'Sin Arqueo'}
+                    <Badge variant={caja.estado === 'cerrada' ? "default" : "secondary"}>
+                      {caja.estado === 'cerrada' ? 'Cerrada' : 'Abierta'}
                     </Badge>
                     <Button
                       variant="outline"
@@ -177,7 +104,7 @@ export const HistorialCajas: React.FC = () => {
                       <TrendingUp className="w-4 h-4" />
                       <span className="font-semibold">Ingresos</span>
                     </div>
-                    <p className="text-lg font-bold">{formatCurrency(caja.ingresos)}</p>
+                    <p className="text-lg font-bold">{formatCurrency(caja.total_ingresos)}</p>
                   </div>
                   
                   <div className="text-center">
@@ -185,16 +112,16 @@ export const HistorialCajas: React.FC = () => {
                       <TrendingDown className="w-4 h-4" />
                       <span className="font-semibold">Egresos</span>
                     </div>
-                    <p className="text-lg font-bold">{formatCurrency(caja.egresos)}</p>
+                    <p className="text-lg font-bold">{formatCurrency(caja.total_egresos)}</p>
                   </div>
                   
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1">
                       <DollarSign className="w-4 h-4" />
-                      <span className="font-semibold">Saldo</span>
+                      <span className="font-semibold">Saldo Final</span>
                     </div>
-                    <p className={`text-lg font-bold ${getSaldoColor(caja.saldo)}`}>
-                      {formatCurrency(caja.saldo)}
+                    <p className={`text-lg font-bold ${getSaldoColor(caja.saldo_final)}`}>
+                      {formatCurrency(caja.saldo_final)}
                     </p>
                   </div>
                   
@@ -203,7 +130,8 @@ export const HistorialCajas: React.FC = () => {
                       <Receipt className="w-4 h-4" />
                       <span className="font-semibold">Ventas</span>
                     </div>
-                    <p className="text-lg font-bold">{caja.ventas}</p>
+                    <p className="text-lg font-bold">{caja.ventas_count}</p>
+                    <p className="text-sm text-gray-600">{formatCurrency(caja.total_ventas)}</p>
                   </div>
                 </div>
               </CardContent>

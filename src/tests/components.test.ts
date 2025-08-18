@@ -4,7 +4,6 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { cacheManager } from '../lib/cacheManager'
-import { offlineManager } from '../lib/offlineManager'
 import { config } from '../lib/config'
 
 describe('Sistema de Cache', () => {
@@ -29,20 +28,20 @@ describe('Sistema de Cache', () => {
     expect(retrieved).toBeNull()
   })
 
-  it('debería invalidar cache por tags', () => {
-    cacheManager.set('producto-1', { id: 1 }, { tags: ['productos'] })
-    cacheManager.set('producto-2', { id: 2 }, { tags: ['productos'] })
+  it('debería eliminar entradas del cache', () => {
+    cacheManager.set('producto-1', { id: 1 })
+    cacheManager.set('producto-2', { id: 2 })
     
     // Verificar que están en cache
     expect(cacheManager.get('producto-1')).toBeTruthy()
     expect(cacheManager.get('producto-2')).toBeTruthy()
     
-    // Invalidar por tag
-    cacheManager.invalidateByTag('productos')
+    // Eliminar una entrada
+    cacheManager.delete('producto-1')
     
-    // Verificar que ya no están
+    // Verificar que se eliminó
     expect(cacheManager.get('producto-1')).toBeNull()
-    expect(cacheManager.get('producto-2')).toBeNull()
+    expect(cacheManager.get('producto-2')).toBeTruthy()
   })
 
   it('debería proporcionar estadísticas del cache', () => {
@@ -61,57 +60,7 @@ describe('Sistema de Cache', () => {
   })
 })
 
-describe('Sistema Offline', () => {
-  it('debería crear una instancia del offline manager', () => {
-    expect(offlineManager).toBeDefined()
-    expect(typeof offlineManager.registrarVentaOffline).toBe('function')
-    expect(typeof offlineManager.getVentasOfflinePendientes).toBe('function')
-  })
 
-  it('debería detectar el estado de conexión', () => {
-    const isOnline = offlineManager.isOnline()
-    expect(typeof isOnline).toBe('boolean')
-  })
-
-  it('debería poder registrar venta offline', async () => {
-    const ventaOffline = {
-      empleado_id: 'test-empleado-id',
-      items: [
-        {
-          producto_id: 'prod-1',
-          cantidad: 2,
-          precio_unitario: 100,
-          subtotal: 200,
-          tipo_precio: 'minorista' as const
-        }
-      ],
-      total: 200,
-      metodo_pago: 'efectivo' as const,
-      tipo_precio: 'minorista' as const,
-      fecha: '2024-01-01'
-    }
-
-    const ventaId = await offlineManager.registrarVentaOffline(ventaOffline)
-    
-    expect(ventaId).toBeDefined()
-    expect(typeof ventaId).toBe('string')
-    expect(ventaId).toContain('offline_')
-  })
-
-  it('debería mantener lista de ventas offline', async () => {
-    const ventasPendientes = offlineManager.getVentasOfflinePendientes()
-    expect(Array.isArray(ventasPendientes)).toBe(true)
-  })
-
-  it('debería obtener el estado del offline manager', () => {
-    const state = offlineManager.getState()
-    
-    expect(state).toBeDefined()
-    expect(typeof state.isOnline).toBe('boolean')
-    expect(Array.isArray(state.pendingOperations)).toBe(true)
-    expect(Array.isArray(state.offlineVentas)).toBe(true)
-  })
-})
 
 describe('Configuración del Sistema', () => {
   it('debería tener configuración válida para tests', () => {
