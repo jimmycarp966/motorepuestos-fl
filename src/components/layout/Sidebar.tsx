@@ -115,7 +115,7 @@ export const Sidebar: React.FC = () => {
 
       {/* Sidebar */}
       <div className={`
-        fixed top-0 left-0 h-full bg-white border-r border-gray-200 z-50 w-70
+        fixed top-0 left-0 h-full bg-white border-r border-gray-200 z-50 w-[280px]
         flex flex-col shadow-xl transition-transform duration-300 ease-in-out
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
