@@ -53,6 +53,8 @@ export const VentasTableModern: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showClientSearch, setShowClientSearch] = useState(false)
   const [clientSearchTerm, setClientSearchTerm] = useState('')
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1)
 
   const searchInputRef = useRef<HTMLInputElement>(null)
 
@@ -112,6 +114,11 @@ export const VentasTableModern: React.FC = () => {
       setCartItems([...cartItems, newItem])
     }
 
+    // Limpiar búsqueda y ocultar sugerencias
+    setSearchTerm('')
+    setShowSuggestions(false)
+    setSelectedSuggestionIndex(-1)
+
     // Notification
     addNotification({
       id: Date.now().toString(),
@@ -120,6 +127,35 @@ export const VentasTableModern: React.FC = () => {
       message: `${producto.nombre} x${cantidad}`,
       duration: 2000
     })
+
+    // Volver a enfocar el input
+    setTimeout(() => {
+      searchInputRef.current?.focus()
+    }, 100)
+  }
+
+  // Manejar teclas en el buscador
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (selectedSuggestionIndex >= 0 && filteredProductos[selectedSuggestionIndex]) {
+        handleProductSelect(filteredProductos[selectedSuggestionIndex])
+      } else if (filteredProductos.length > 0) {
+        handleProductSelect(filteredProductos[0])
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setSelectedSuggestionIndex(prev => 
+        prev < filteredProductos.length - 1 ? prev + 1 : prev
+      )
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1)
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false)
+      setSelectedSuggestionIndex(-1)
+      setSearchTerm('')
+    }
   }
 
   const handleUpdateQuantity = (index: number, newCantidad: number) => {
@@ -239,7 +275,12 @@ export const VentasTableModern: React.FC = () => {
               <Input
                 ref={searchInputRef}
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value)
+                  setShowSuggestions(e.target.value.length > 0)
+                  setSelectedSuggestionIndex(-1)
+                }}
+                onKeyDown={handleKeyDown}
                 placeholder="Ingrese el código de barras o el nombre del producto"
                 className="pl-10"
                 style={{
@@ -249,12 +290,60 @@ export const VentasTableModern: React.FC = () => {
                 onFocus={(e) => {
                   e.target.style.borderColor = '#0ea5e9'
                   e.target.style.boxShadow = '0 0 0 3px rgba(14, 165, 233, 0.1)'
+                  if (searchTerm.length > 0) {
+                    setShowSuggestions(true)
+                  }
                 }}
                 onBlur={(e) => {
                   e.target.style.borderColor = '#cbd5e1'
                   e.target.style.boxShadow = 'none'
+                  // Delay para permitir clicks en sugerencias
+                  setTimeout(() => setShowSuggestions(false), 200)
                 }}
               />
+              
+              {/* Dropdown de sugerencias */}
+              {showSuggestions && searchTerm.length > 0 && filteredProductos.length > 0 && (
+                <div className="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto mt-1">
+                  {filteredProductos.slice(0, 8).map((producto, index) => {
+                    const precio = tipoPrecio === 'mayorista' ? producto.precio_mayorista : producto.precio_minorista
+                    const enCarrito = cartItems.find(item => item.producto.id === producto.id)
+                    
+                    return (
+                      <div
+                        key={producto.id}
+                        className={`p-3 cursor-pointer border-b border-slate-100 last:border-b-0 hover:bg-slate-50 ${
+                          index === selectedSuggestionIndex ? 'bg-blue-50 border-blue-200' : ''
+                        }`}
+                        onClick={() => handleProductSelect(producto)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            {getCategoryIcon(producto.categoria)}
+                            <div>
+                              <div className="font-medium text-slate-900">{producto.nombre}</div>
+                              <div className="text-sm text-slate-500">{producto.codigo_sku} • {producto.categoria}</div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-semibold" style={{ color: '#0ea5e9' }}>
+                              S/. {precio.toFixed(2)}
+                            </div>
+                            <div className="text-sm text-slate-500">
+                              Stock: {producto.stock}
+                              {enCarrito && (
+                                <span className="ml-2 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
+                                  En carrito: {enCarrito.cantidad}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           </div>
           
@@ -348,210 +437,147 @@ export const VentasTableModern: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3">
-          {/* Productos - 2/3 del espacio */}
-          <div className="lg:col-span-2 border-r border-slate-200">
-            {/* Tabla de productos */}
-            <div className="overflow-hidden">
-              <table className="w-full">
-                <thead style={{ backgroundColor: '#f1f5f9' }}>
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      Código
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      Producto
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      Stock
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      Precio
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      Acción
-                    </th>
-                  </tr>
-                </thead>
-              </table>
-              
-              <div className="max-h-96 overflow-y-auto">
+        {/* Todo el espacio para el carrito - amplio como una tabla */}
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold text-slate-800 flex items-center">
+              <ShoppingCart className="w-6 h-6 mr-3" style={{ color: '#0ea5e9' }} />
+              Carrito de Compras ({cartItems.length} productos)
+            </h3>
+            {cartItems.length > 0 && (
+              <Button
+                onClick={() => setCartItems([])}
+                variant="outline"
+                className="text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Vaciar Carrito
+              </Button>
+            )}
+          </div>
+
+          {cartItems.length === 0 ? (
+            <div className="text-center py-16">
+              <ShoppingCart className="w-20 h-20 text-slate-400 mx-auto mb-4" />
+              <h3 className="text-xl font-medium text-slate-600 mb-2">Carrito vacío</h3>
+              <p className="text-slate-500">Usa el buscador de arriba para agregar productos</p>
+              <p className="text-slate-400 text-sm mt-2">Escribe el código de barras o nombre del producto</p>
+            </div>
+          ) : (
+            <>
+              {/* Tabla del carrito - estilo amplio */}
+              <div className="overflow-hidden rounded-lg border border-slate-200">
                 <table className="w-full">
-                  <tbody className="divide-y divide-slate-200">
-                    {filteredProductos?.map((producto) => {
-                      const precio = tipoPrecio === 'mayorista' ? producto.precio_mayorista : producto.precio_minorista
-                      const enCarrito = cartItems.find(item => item.producto.id === producto.id)
-                      const stockDisponible = producto.stock - (enCarrito?.cantidad || 0)
-                      
-                      return (
-                        <tr
-                          key={producto.id}
-                          className="hover:bg-slate-50 transition-colors duration-150"
-                        >
-                          <td className="px-4 py-3 text-sm font-mono text-slate-600">
-                            {producto.codigo_sku}
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center space-x-2">
-                              {getCategoryIcon(producto.categoria)}
-                              <div>
-                                <div className="text-sm font-medium text-slate-900">
-                                  {producto.nombre}
-                                </div>
-                                <div className="text-xs text-slate-500">
-                                  {producto.categoria}
-                                </div>
+                  <thead style={{ backgroundColor: '#f8fafc' }}>
+                    <tr>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Código</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Producto</th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold text-slate-700">Cantidad</th>
+                      <th className="px-6 py-4 text-right text-sm font-semibold text-slate-700">Precio Unit.</th>
+                      <th className="px-6 py-4 text-right text-sm font-semibold text-slate-700">Total</th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold text-slate-700">Opciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 bg-white">
+                    {cartItems.map((item, index) => (
+                      <tr key={`${item.producto.id}-${index}`} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-6 py-4">
+                          <span className="font-mono text-sm text-slate-600">
+                            {item.producto.codigo_sku}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center space-x-3">
+                            {getCategoryIcon(item.producto.categoria)}
+                            <div>
+                              <div className="font-medium text-slate-900">
+                                {item.producto.nombre}
+                              </div>
+                              <div className="text-sm text-slate-500">
+                                {item.producto.categoria}
                               </div>
                             </div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                              stockDisponible > 10 
-                                ? 'bg-green-100 text-green-800' 
-                                : stockDisponible > 0 
-                                ? 'bg-yellow-100 text-yellow-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {stockDisponible} {producto.unidad_medida}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-center space-x-3">
+                            <Button
+                              onClick={() => handleUpdateQuantity(index, item.cantidad - 1)}
+                              size="sm"
+                              variant="outline"
+                              className="w-8 h-8 p-0 rounded-full"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </Button>
+                            
+                            <span className="text-lg font-semibold text-slate-800 w-12 text-center">
+                              {item.cantidad}
                             </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="text-lg font-semibold" style={{ color: '#0ea5e9' }}>
-                              S/. {precio.toFixed(2)}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center space-x-2">
-                              {enCarrito && (
-                                <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
-                                  {enCarrito.cantidad}
-                                </span>
-                              )}
-                              <Button
-                                onClick={() => handleProductSelect(producto)}
-                                disabled={stockDisponible <= 0}
-                                size="sm"
-                                className="flex items-center space-x-1"
-                              >
-                                <Plus className="w-4 h-4" />
-                                <span>Agregar</span>
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      )
-                    })}
+                            
+                            <Button
+                              onClick={() => handleUpdateQuantity(index, item.cantidad + 1)}
+                              size="sm"
+                              variant="outline"
+                              className="w-8 h-8 p-0 rounded-full"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <span className="text-lg font-semibold" style={{ color: '#0ea5e9' }}>
+                            S/. {item.precio_unitario.toFixed(2)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <span className="text-lg font-bold text-slate-900">
+                            S/. {item.subtotal.toFixed(2)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <Button
+                            onClick={() => handleRemoveItem(index)}
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
 
-              {filteredProductos?.length === 0 && (
-                <div className="text-center py-12">
-                  <Package className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-slate-600 mb-2">No se encontraron productos</h3>
-                  <p className="text-slate-500">Intenta cambiar los términos de búsqueda</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Carrito - 1/3 del espacio */}
-          <div className="lg:col-span-1 bg-slate-50">
-            <div className="p-4">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center">
-                <ShoppingCart className="w-5 h-5 mr-2" style={{ color: '#0ea5e9' }} />
-                Carrito de Compras ({cartItems.length})
-              </h3>
-
-              {cartItems.length === 0 ? (
-                <div className="text-center py-8">
-                  <ShoppingCart className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-                  <p className="text-slate-500 text-sm">Carrito vacío</p>
-                  <p className="text-slate-400 text-xs">Agrega productos para comenzar</p>
-                </div>
-              ) : (
-                <div className="space-y-3 max-h-80 overflow-y-auto">
-                  {cartItems.map((item, index) => (
-                    <div
-                      key={`${item.producto.id}-${index}`}
-                      className="bg-white rounded-lg p-3 border border-slate-200 shadow-sm"
+              {/* Método de pago dentro del carrito */}
+              <div className="mt-6 bg-slate-50 rounded-lg p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium">Método de Pago</Label>
+                    <select
+                      value={metodoPago}
+                      onChange={(e) => setMetodoPago(e.target.value as any)}
+                      className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg"
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-slate-800 text-sm">
-                            {item.producto.nombre}
-                          </h4>
-                          <p className="text-xs text-slate-500 font-mono">
-                            {item.producto.codigo_sku}
-                          </p>
-                          <p className="text-sm font-semibold" style={{ color: '#0ea5e9' }}>
-                            S/. {item.precio_unitario.toFixed(2)} c/u
-                          </p>
-                        </div>
-                        <Button
-                          onClick={() => handleRemoveItem(index)}
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-500 hover:text-red-700 ml-2 p-1"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            onClick={() => handleUpdateQuantity(index, item.cantidad - 1)}
-                            size="sm"
-                            variant="outline"
-                            className="w-7 h-7 p-0"
-                          >
-                            <Minus className="w-3 h-3" />
-                          </Button>
-                          
-                          <span className="text-base font-semibold text-slate-800 w-8 text-center">
-                            {item.cantidad}
-                          </span>
-                          
-                          <Button
-                            onClick={() => handleUpdateQuantity(index, item.cantidad + 1)}
-                            size="sm"
-                            variant="outline"
-                            className="w-7 h-7 p-0"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </Button>
-                        </div>
-                        
-                        <div className="text-right">
-                          <div className="text-base font-bold text-slate-800">
-                            S/. {item.subtotal.toFixed(2)}
-                          </div>
-                        </div>
+                      <option value="efectivo">💵 Efectivo</option>
+                      <option value="tarjeta">💳 Tarjeta</option>
+                      <option value="transferencia">🏦 Transferencia</option>
+                      <option value="cuenta_corriente">📋 Cuenta Corriente</option>
+                    </select>
+                  </div>
+                  <div className="flex items-end">
+                    <div className="text-right w-full">
+                      <div className="text-sm text-slate-600">Total de la Venta</div>
+                      <div className="text-2xl font-bold" style={{ color: '#0ea5e9' }}>
+                        S/. {calculateTotal().toFixed(2)}
                       </div>
                     </div>
-                  ))}
+                  </div>
                 </div>
-              )}
-
-              {/* Método de pago */}
-              {cartItems.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-slate-200">
-                  <Label className="text-sm font-medium">Método de Pago</Label>
-                  <select
-                    value={metodoPago}
-                    onChange={(e) => setMetodoPago(e.target.value as any)}
-                    className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg text-sm"
-                  >
-                    <option value="efectivo">💵 Efectivo</option>
-                    <option value="tarjeta">💳 Tarjeta</option>
-                    <option value="transferencia">🏦 Transferencia</option>
-                    <option value="cuenta_corriente">📋 Cuenta Corriente</option>
-                  </select>
-                </div>
-              )}
-            </div>
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
