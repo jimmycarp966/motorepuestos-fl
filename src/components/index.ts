@@ -19,6 +19,7 @@ export { ClienteForm } from './clientes/ClienteForm'
 // Ventas
 export { VentasTable } from './ventas/VentasTable'
 export { VentasModernView } from './ventas/VentasModernView'
+export { VentasTableModern } from './ventas/VentasTableModern'
 
 // Caja
 export { CajaTable } from './caja/CajaTable'
