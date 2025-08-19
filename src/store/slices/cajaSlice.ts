@@ -369,7 +369,7 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
           }
         }
 
-        // Actualizar ventas en el store para que el dashboard se actualice
+        // Actualizar ventas en el store y en la base de datos
         // Buscar la venta correspondiente al movimiento y actualizar su método de pago
         const ventas = get().ventas
         const ventaActualizada = ventas.find(v => {
@@ -385,6 +385,16 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
         })
 
         if (ventaActualizada) {
+          // Actualizar la venta en la base de datos
+          const { error: errorVenta } = await supabase
+            .from('ventas')
+            .update({ metodo_pago: datosActualizados.metodo_pago })
+            .eq('id', ventaActualizada.id)
+
+          if (errorVenta) {
+            console.warn('Error al actualizar venta en BD:', errorVenta)
+          }
+
           // Actualizar la venta en el store
           set((state) => ({
             ventas: state.ventas.map(v => 
