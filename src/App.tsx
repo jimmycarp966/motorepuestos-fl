@@ -3,6 +3,7 @@ import { useAppStore } from './store'
 import { initializeCalendarSync } from './lib/calendarSync'
 import { LoginForm } from './components/auth/LoginForm'
 import { Sidebar } from './components/layout/Sidebar'
+import { usePermissionGuard } from './hooks/usePermissionGuard'
 
 import { Dashboard } from './components/dashboard/Dashboard'
 import { EmpleadosTable } from './components/empleados/EmpleadosTable'
@@ -22,6 +23,8 @@ function App() {
   const loading = useAppStore((state) => state.auth.loading)
   const checkAuth = useAppStore((state) => state.checkAuth)
   const currentModule = useAppStore((state) => state.ui.currentModule)
+  const setCurrentModule = useAppStore((state) => state.setCurrentModule)
+  const permissions = usePermissionGuard()
   
   // Estado de debug y manejo de errores
   const [debugInfo, setDebugInfo] = useState({
@@ -71,6 +74,17 @@ function App() {
       initializeCalendarSync(useAppStore)
     }
   }, [user])
+
+  // Establecer el primer módulo disponible cuando el usuario se autentica
+  useEffect(() => {
+    if (user && currentModule === 'dashboard') {
+      const firstAvailableModule = permissions.getFirstAvailableModule()
+      if (firstAvailableModule !== 'dashboard') {
+        console.log(`🔄 [App] Redirigiendo a primer módulo disponible: ${firstAvailableModule}`)
+        setCurrentModule(firstAvailableModule)
+      }
+    }
+  }, [user, currentModule, permissions, setCurrentModule])
 
   // Cargar datos según el módulo activo
   useEffect(() => {

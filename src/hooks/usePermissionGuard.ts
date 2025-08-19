@@ -30,6 +30,7 @@ export interface UserPermissions {
   canPerform: (module: ModuleName, permission: Permission) => boolean
   checkModuleAccess: (module: ModuleName) => PermissionCheck
   getAccessibleModules: () => ModuleName[]
+  getFirstAvailableModule: () => ModuleName
   isAdmin: boolean
   isManager: boolean
   currentUser: AuthenticatedUser | null
@@ -308,6 +309,23 @@ export function usePermissionGuard(): UserPermissions {
     return modules.filter(module => canAccess(module))
   }, [isAuthenticated, canAccess])
 
+  // Obtener el primer módulo disponible (prioridad: ventas, clientes, caja, productos, empleados, reportes, dashboard)
+  const getFirstAvailableModule = useCallback((): ModuleName => {
+    if (!isAuthenticated) return 'dashboard'
+    
+    const priorityModules: ModuleName[] = [
+      'ventas', 'clientes', 'caja', 'productos', 'empleados', 'reportes', 'dashboard'
+    ]
+    
+    for (const module of priorityModules) {
+      if (canAccess(module)) {
+        return module
+      }
+    }
+    
+    return 'dashboard' // Fallback
+  }, [isAuthenticated, canAccess])
+
   // Verificaciones de rol específicas
   const isAdmin = useMemo(() => user?.rol === 'Administrador', [user])
   const isManager = useMemo(() => user?.rol === 'Gerente' || isAdmin, [user, isAdmin])
@@ -318,6 +336,7 @@ export function usePermissionGuard(): UserPermissions {
     canPerform,
     checkModuleAccess,
     getAccessibleModules,
+    getFirstAvailableModule,
     isAdmin,
     isManager,
     currentUser: user

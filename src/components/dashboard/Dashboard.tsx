@@ -33,7 +33,6 @@ import {
   ContextualLoader,
   SpeedometerIcon 
 } from '../index'
-import { PermissionsDebug } from '../ui/PermissionsDebug'
 
 // Función para formatear venta para mostrar productos vendidos
 const formatearVentaParaMostrar = (venta: any) => {
@@ -330,9 +329,6 @@ export const Dashboard: React.FC = () => {
       backgroundColor: '#000000',
       minHeight: '100vh'
     }}>
-
-      {/* Debug de Permisos - Solo visible en desarrollo */}
-      <PermissionsDebug />
 
       {/* Header del Dashboard */}
       <div style={{ marginBottom: 'clamp(1rem, 3vw, 1.5rem)' }}>
