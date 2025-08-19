@@ -233,7 +233,8 @@ export const VentasTableModern: React.FC = () => {
         items: cartItems.map(item => ({
           producto_id: item.producto.id,
           cantidad: item.cantidad,
-          precio_unitario: item.precio_unitario
+          precio_unitario: item.precio_unitario,
+          subtotal: item.subtotal
         }))
       }
 

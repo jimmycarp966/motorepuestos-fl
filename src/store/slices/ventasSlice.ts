@@ -125,15 +125,21 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
 
              // 2. PREPARAR DATOS
              const total = ventaData.items.reduce((sum, item) => sum + item.subtotal, 0)
+             console.log('🔍 Debug - Items:', ventaData.items)
+             console.log('🔍 Debug - Total calculado:', total)
+             console.log('🔍 Debug - Tipo de total:', typeof total)
+             
              const ventaCompleta = {
                cliente_id: ventaData.cliente_id,
                tipo_precio: ventaData.tipo_precio,
                metodo_pago: ventaData.metodo_pago,
-               total,
+               total: Number(total), // Asegurar que sea número
                fecha: fechaHoy,
                estado: 'completada',
                empleado_id: empleadoId,
              }
+             
+             console.log('🔍 Debug - Venta completa:', ventaCompleta)
 
              // 3. TRANSACCIÓN ATÓMICA (simulada con compensación)
              let ventaCreada: any = null
