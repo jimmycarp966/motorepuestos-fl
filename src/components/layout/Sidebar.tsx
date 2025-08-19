@@ -185,15 +185,6 @@ export const Sidebar: React.FC = () => {
                     </div>
                     <span>{item.label}</span>
                   </div>
-                  
-                  {/* Mostrar shortcut */}
-                  <div className={`
-                    text-xs px-2 py-1 rounded-md font-mono opacity-60 transition-opacity
-                    ${isActive ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30' : 'bg-dark-bg-secondary text-dark-text-secondary border border-dark-border'}
-                    group-hover:opacity-100
-                  `}>
-                    {item.shortcut}
-                  </div>
                 </button>
               )
             })}
@@ -202,20 +193,6 @@ export const Sidebar: React.FC = () => {
 
         {/* Footer del sidebar */}
         <div className="p-3 sm:p-6 border-t border-dark-border bg-dark-bg-primary">
-          {/* Ayuda de shortcuts */}
-          <div className="mb-4 p-3 bg-dark-bg-secondary rounded-lg border border-dark-border">
-            <div className="flex items-center gap-2 mb-2">
-              <Keyboard size={14} className="text-primary-500" />
-              <span className="text-xs font-medium text-dark-text-primary">Atajos Rápidos</span>
-            </div>
-            <div className="text-xs text-dark-text-secondary space-y-1">
-              <div>F1-F7: Navegación</div>
-              <div>F9: Refrescar</div>
-              <div>F10: Buscar (Ventas)</div>
-              <div>F11: Finalizar Venta</div>
-            </div>
-          </div>
-          
           <div className="flex items-center gap-2 mb-4 p-3 bg-dark-bg-secondary rounded-lg border border-dark-border">
             <div className="w-2 h-2 rounded-full bg-success-500 shadow-glow-blue animate-pulse" />
             <span className="text-sm text-dark-text-primary">
