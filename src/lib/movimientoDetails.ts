@@ -24,45 +24,20 @@ export interface MovimientoDetalle {
 export async function obtenerDetallesMovimiento(movimiento: MovimientoCaja): Promise<MovimientoDetalle> {
   const concepto = movimiento.concepto.toLowerCase()
   
-  // Si el concepto contiene "venta", buscar detalles de la venta
-  if (concepto.includes('venta') || concepto.includes('venta #')) {
-    try {
-      // Extraer ID de venta del concepto (asumiendo formato "Venta #123")
-      const ventaMatch = concepto.match(/venta\s*#?(\d+)/i)
-      if (ventaMatch) {
-        const ventaId = ventaMatch[1]
-        
-        const { data: venta, error } = await supabase
-          .from('ventas')
-          .select(`
-            *,
-            items:venta_items(
-              cantidad,
-              precio_unitario,
-              subtotal,
-              producto:productos(nombre, codigo_sku, categoria)
-            )
-          `)
-          .eq('id', ventaId)
-          .single()
-
-        if (!error && venta) {
-          return {
-            ...movimiento,
-            detalles: {
-              tipo: 'venta',
-              items: venta.items?.map(item => ({
-                nombre: item.producto?.nombre || 'Producto desconocido',
-                cantidad: item.cantidad,
-                precio: item.precio_unitario,
-                codigo_sku: item.producto?.codigo_sku
-              })) || []
-            }
-          }
-        }
+  // Si el concepto parece ser una venta (contiene "x" para cantidades o productos)
+  if (concepto.includes(' x') || concepto.includes('más') || 
+      (movimiento.tipo === 'ingreso' && !concepto.includes('gasto') && !concepto.includes('pago'))) {
+    
+    // El concepto ya contiene los productos vendidos, no necesitamos buscar en BD
+    const productos = parsearProductosDelConcepto(movimiento.concepto)
+    
+    return {
+      ...movimiento,
+      detalles: {
+        tipo: 'venta',
+        items: productos,
+        descripcion: movimiento.concepto
       }
-    } catch (error) {
-      console.warn('Error al obtener detalles de venta:', error)
     }
   }
   
@@ -108,6 +83,12 @@ export function formatearDetallesMovimiento(detalles: MovimientoDetalle): string
 
   switch (detalles.detalles.tipo) {
     case 'venta':
+      // Si el concepto ya contiene los productos, usarlo directamente
+      if (detalles.detalles.descripcion) {
+        return detalles.detalles.descripcion
+      }
+      
+      // Fallback para casos donde aún tenemos items
       if (detalles.detalles.items && detalles.detalles.items.length > 0) {
         const items = detalles.detalles.items
         if (items.length === 1) {
@@ -130,6 +111,50 @@ export function formatearDetallesMovimiento(detalles: MovimientoDetalle): string
     default:
       return detalles.concepto
   }
+}
+
+// Función para parsear productos del concepto
+function parsearProductosDelConcepto(concepto: string): Array<{
+  nombre: string
+  cantidad: number
+  precio: number
+  codigo_sku?: string
+}> {
+  const productos: Array<{
+    nombre: string
+    cantidad: number
+    precio: number
+    codigo_sku?: string
+  }> = []
+  
+  // Si contiene "más", es una venta con múltiples productos
+  if (concepto.includes('más')) {
+    // Extraer el primer producto
+    const match = concepto.match(/^(.+?)\s+x(\d+)/)
+    if (match) {
+      productos.push({
+        nombre: match[1].trim(),
+        cantidad: parseInt(match[2]),
+        precio: 0 // No tenemos el precio individual
+      })
+    }
+  } else {
+    // Separar por comas y procesar cada producto
+    const partes = concepto.split(',').map(p => p.trim())
+    
+    for (const parte of partes) {
+      const match = parte.match(/^(.+?)\s+x(\d+)$/)
+      if (match) {
+        productos.push({
+          nombre: match[1].trim(),
+          cantidad: parseInt(match[2]),
+          precio: 0 // No tenemos el precio individual
+        })
+      }
+    }
+  }
+  
+  return productos
 }
 
 export function obtenerIconoMovimiento(detalles: MovimientoDetalle): string {

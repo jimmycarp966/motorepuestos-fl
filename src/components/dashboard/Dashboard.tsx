@@ -34,6 +34,27 @@ import {
   SpeedometerIcon 
 } from '../index'
 
+// Función para formatear venta para mostrar productos vendidos
+const formatearVentaParaMostrar = (venta: any) => {
+  if (!venta.items || venta.items.length === 0) {
+    return 'Venta de productos'
+  }
+  
+  const productos = venta.items.map((item: any) => {
+    const nombreProducto = item.producto?.nombre || 'Producto desconocido'
+    return `${nombreProducto} x${item.cantidad}`
+  })
+  
+  if (productos.length === 1) {
+    return productos[0]
+  } else if (productos.length <= 3) {
+    return productos.join(', ')
+  } else {
+    const primerProducto = productos[0]
+    return `${primerProducto} +${productos.length - 1} más`
+  }
+}
+
 export const Dashboard: React.FC = () => {
   // Usar selectores optimizados con validaciones
   const kpis = useDashboardKPIs()
@@ -501,7 +522,7 @@ export const Dashboard: React.FC = () => {
                       color: '#FFFFFF',
                       marginBottom: '0.25rem'
                     }}>
-                      Venta #{venta.id}
+                      {formatearVentaParaMostrar(venta)}
                     </div>
                     <div style={{ 
                       fontSize: '0.75rem', 

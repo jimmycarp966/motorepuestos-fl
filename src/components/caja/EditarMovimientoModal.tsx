@@ -8,7 +8,9 @@ import {
   Save, 
   DollarSign,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  CreditCard,
+  Receipt
 } from 'lucide-react'
 import type { MovimientoCaja } from '../../store/types'
 
@@ -25,9 +27,28 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
   onClose,
   onSave
 }) => {
-  const [concepto, setConcepto] = useState(movimiento?.concepto || '')
-  const [monto, setMonto] = useState(movimiento?.monto?.toString() || '')
+  const [concepto, setConcepto] = useState('')
+  const [monto, setMonto] = useState('')
+  const [metodoPago, setMetodoPago] = useState('efectivo')
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Actualizar estado cuando cambia el movimiento
+  React.useEffect(() => {
+    if (movimiento) {
+      setConcepto(movimiento.concepto)
+      setMonto(movimiento.monto.toString())
+      setMetodoPago(movimiento.metodo_pago)
+    }
+  }, [movimiento])
+
+  // Opciones de método de pago
+  const metodosPago = [
+    { value: 'efectivo', label: 'Efectivo', icon: DollarSign },
+    { value: 'transferencia', label: 'Transferencia', icon: DollarSign },
+    { value: 'debito', label: 'Débito', icon: CreditCard },
+    { value: 'credito', label: 'Crédito', icon: CreditCard },
+    { value: 'cuenta_corriente', label: 'Cuenta Corriente', icon: Receipt }
+  ]
 
   if (!isOpen || !movimiento) return null
 
@@ -38,7 +59,8 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
     try {
       const datosActualizados: Partial<MovimientoCaja> = {
         concepto: concepto.trim(),
-        monto: parseFloat(monto)
+        monto: parseFloat(monto),
+        metodo_pago: metodoPago
       }
 
       await onSave(datosActualizados)
@@ -53,6 +75,7 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
   const handleCancel = () => {
     setConcepto(movimiento.concepto)
     setMonto(movimiento.monto.toString())
+    setMetodoPago(movimiento.metodo_pago)
     onClose()
   }
 
@@ -124,6 +147,30 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
             </div>
           </div>
 
+          <div>
+            <Label htmlFor="metodo-pago">Método de Pago</Label>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {metodosPago.map((metodo) => {
+                const Icon = metodo.icon
+                return (
+                  <button
+                    key={metodo.value}
+                    type="button"
+                    onClick={() => setMetodoPago(metodo.value)}
+                    className={`p-3 rounded-lg border-2 transition-all duration-200 flex items-center justify-center space-x-2 ${
+                      metodoPago === metodo.value
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-sm font-medium">{metodo.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           <div className="flex items-center justify-end space-x-3 pt-4">
             <Button
               type="button"
@@ -135,7 +182,7 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !concepto.trim() || !monto}
+              disabled={isSubmitting || !concepto.trim() || !monto || !metodoPago}
               className="bg-blue-600 hover:bg-blue-700"
             >
               {isSubmitting ? (

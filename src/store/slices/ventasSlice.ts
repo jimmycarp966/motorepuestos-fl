@@ -190,7 +190,24 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
 
                // Registrar ingreso en caja SOLO si NO es cuenta corriente
                if (ventaData.metodo_pago !== 'cuenta_corriente') {
-                 const concepto = `Venta #${venta.id}`
+                 // Generar concepto descriptivo con productos vendidos
+                 const productosVendidos = ventaData.items.map(item => {
+                   // Buscar el nombre del producto en los items
+                   const producto = get().productos.find(p => p.id === item.producto_id)
+                   const nombreProducto = producto?.nombre || 'Producto desconocido'
+                   return `${nombreProducto} x${item.cantidad}`
+                 })
+                 
+                 let concepto = ''
+                 if (productosVendidos.length === 1) {
+                   concepto = productosVendidos[0]
+                 } else if (productosVendidos.length <= 3) {
+                   concepto = productosVendidos.join(', ')
+                 } else {
+                   const primerProducto = productosVendidos[0]
+                   concepto = `${primerProducto} +${productosVendidos.length - 1} más`
+                 }
+                 
                  try {
                    const { error: errorCaja } = await supabase
                      .from('movimientos_caja')
