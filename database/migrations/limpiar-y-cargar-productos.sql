@@ -3,8 +3,14 @@
 
 -- ===== LIMPIAR TABLAS =====
 
--- 1. Limpiar ventas y sus detalles
-DELETE FROM detalles_venta;
+-- 1. Limpiar ventas (si existe la tabla detalles_venta)
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'detalles_venta') THEN
+        DELETE FROM detalles_venta;
+    END IF;
+END $$;
+
 DELETE FROM ventas;
 
 -- 2. Limpiar caja y movimientos
@@ -17,29 +23,57 @@ DELETE FROM clientes;
 -- 4. Limpiar productos
 DELETE FROM productos;
 
--- 5. Limpiar arqueos
-DELETE FROM arqueos;
+-- 5. Limpiar arqueos (si existe)
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'arqueos') THEN
+        DELETE FROM arqueos;
+    END IF;
+END $$;
 
--- 6. Limpiar facturación AFIP
-DELETE FROM facturas_afip;
+-- 6. Limpiar facturación AFIP (si existe)
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'facturas_afip') THEN
+        DELETE FROM facturas_afip;
+    END IF;
+END $$;
 
--- 7. Limpiar cuenta corriente
-DELETE FROM movimientos_cuenta_corriente;
-DELETE FROM cuentas_corrientes;
+-- 7. Limpiar cuenta corriente (si existe)
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'movimientos_cuenta_corriente') THEN
+        DELETE FROM movimientos_cuenta_corriente;
+    END IF;
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'cuentas_corrientes') THEN
+        DELETE FROM cuentas_corrientes;
+    END IF;
+END $$;
 
 -- ===== RESETEAR SECUENCIAS =====
 
--- Resetear secuencias de IDs
-ALTER SEQUENCE IF EXISTS productos_id_seq RESTART WITH 1;
-ALTER SEQUENCE IF EXISTS ventas_id_seq RESTART WITH 1;
-ALTER SEQUENCE IF EXISTS detalles_venta_id_seq RESTART WITH 1;
-ALTER SEQUENCE IF EXISTS clientes_id_seq RESTART WITH 1;
-ALTER SEQUENCE IF EXISTS cajas_id_seq RESTART WITH 1;
-ALTER SEQUENCE IF EXISTS movimientos_caja_id_seq RESTART WITH 1;
-ALTER SEQUENCE IF EXISTS arqueos_id_seq RESTART WITH 1;
-ALTER SEQUENCE IF EXISTS facturas_afip_id_seq RESTART WITH 1;
-ALTER SEQUENCE IF EXISTS cuentas_corrientes_id_seq RESTART WITH 1;
-ALTER SEQUENCE IF EXISTS movimientos_cuenta_corriente_id_seq RESTART WITH 1;
+-- Resetear secuencias de IDs (solo las que existen)
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'productos_id_seq') THEN
+        ALTER SEQUENCE productos_id_seq RESTART WITH 1;
+    END IF;
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'ventas_id_seq') THEN
+        ALTER SEQUENCE ventas_id_seq RESTART WITH 1;
+    END IF;
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'detalles_venta_id_seq') THEN
+        ALTER SEQUENCE detalles_venta_id_seq RESTART WITH 1;
+    END IF;
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'clientes_id_seq') THEN
+        ALTER SEQUENCE clientes_id_seq RESTART WITH 1;
+    END IF;
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'cajas_id_seq') THEN
+        ALTER SEQUENCE cajas_id_seq RESTART WITH 1;
+    END IF;
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'movimientos_caja_id_seq') THEN
+        ALTER SEQUENCE movimientos_caja_id_seq RESTART WITH 1;
+    END IF;
+END $$;
 
 -- ===== CARGAR PRODUCTOS DESDE PRODUC.TXT =====
 
@@ -106,15 +140,11 @@ SELECT 'productos' as tabla, COUNT(*) as registros FROM productos
 UNION ALL
 SELECT 'ventas' as tabla, COUNT(*) as registros FROM ventas
 UNION ALL
-SELECT 'detalles_venta' as tabla, COUNT(*) as registros FROM detalles_venta
-UNION ALL
 SELECT 'clientes' as tabla, COUNT(*) as registros FROM clientes
 UNION ALL
 SELECT 'cajas' as tabla, COUNT(*) as registros FROM cajas
 UNION ALL
 SELECT 'movimientos_caja' as tabla, COUNT(*) as registros FROM movimientos_caja
-UNION ALL
-SELECT 'arqueos' as tabla, COUNT(*) as registros FROM arqueos
 UNION ALL
 SELECT 'empleados' as tabla, COUNT(*) as registros FROM empleados;
 
