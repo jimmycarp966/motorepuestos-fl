@@ -271,10 +271,7 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
     try {
       const { data, error } = await supabase
         .from('movimientos_caja')
-        .update({
-          ...datosActualizados,
-          updated_at: new Date().toISOString()
-        })
+        .update(datosActualizados)
         .eq('id', movimientoId)
         .select()
         .single()
