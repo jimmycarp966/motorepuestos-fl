@@ -69,6 +69,33 @@ export const VentasTableModern: React.FC = () => {
     searchInputRef.current?.focus()
   }, [])
 
+  // Atajos de teclado
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // F10 - Enfocar búsqueda de productos
+      if (e.key === 'F10') {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+        addNotification({
+          id: Date.now().toString(),
+          type: 'info',
+          title: '🔍 Búsqueda activada',
+          message: 'Campo de búsqueda enfocado',
+          duration: 1500
+        })
+      }
+      
+      // F12 - Finalizar venta (solo si hay productos en el carrito)
+      if (e.key === 'F12' && cartItems.length > 0) {
+        e.preventDefault()
+        handleFinalizarVenta()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [cartItems.length])
+
   // Filtrar productos
   const filteredProductos = useSearchFilter({
     data: productos || [],

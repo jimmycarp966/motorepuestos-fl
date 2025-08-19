@@ -126,7 +126,9 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
              // 2. PREPARAR DATOS
              const total = ventaData.items.reduce((sum, item) => sum + item.subtotal, 0)
              const ventaCompleta = {
-               ...ventaData,
+               cliente_id: ventaData.cliente_id,
+               tipo_precio: ventaData.tipo_precio,
+               metodo_pago: ventaData.metodo_pago,
                total,
                fecha: fechaHoy,
                estado: 'completada',

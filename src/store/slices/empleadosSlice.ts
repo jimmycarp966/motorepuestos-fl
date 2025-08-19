@@ -116,15 +116,15 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
             permisos_modulos: MODULOS_DISPONIBLES.map(modulo => modulo.modulo)
           }
         }
-        // Si tiene permisos pero no incluye los del rol, agregarlos
-        if (empleado.permisos_modulos && empleado.permisos_modulos.length > 0) {
+        // Si no tiene permisos específicos, usar los del rol como fallback
+        if (!empleado.permisos_modulos || empleado.permisos_modulos.length === 0) {
           const permisosDelRol = get().getEmpleadoPermissions(empleado.rol)
-          const permisosCompletos = [...new Set([...empleado.permisos_modulos, ...permisosDelRol])]
           return {
             ...empleado,
-            permisos_modulos: permisosCompletos
+            permisos_modulos: permisosDelRol
           }
         }
+        // Si ya tiene permisos específicos, respetarlos tal como están
         return empleado
       })
 
@@ -197,6 +197,8 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
           permisosCompletos = permisosDelRol
         }
       }
+      
+      // Si se seleccionaron permisos específicos, usarlos tal como están (sin agregar permisos del rol)
 
       // 3. Crear empleado en tabla empleados usando el ID del usuario auth
       const { data: empleadoDataResult, error: empleadoError } = await supabase
@@ -285,6 +287,8 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
           permisosCompletos = permisosDelRol
         }
       }
+      
+      // Si se seleccionaron permisos específicos, usarlos tal como están (sin agregar permisos del rol)
 
       // 3. Actualizar empleado en tabla empleados
       const { data, error } = await supabase

@@ -73,7 +73,7 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
     const todosLosModulos = modulosInfo.map(modulo => modulo.id)
     setAvailableModulos(todosLosModulos)
     
-    // Solo sugerir módulos del rol si no hay módulos seleccionados previamente
+    // Solo sugerir módulos del rol si es un empleado nuevo y no hay módulos seleccionados previamente
     if (selectedRol && !empleado && selectedModulos.length === 0) {
       const permisosSugeridos = getEmpleadoPermissions(selectedRol)
       setSelectedModulos(permisosSugeridos)
@@ -84,11 +84,13 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
   // Cargar datos del empleado si es edición
   useEffect(() => {
     if (empleado) {
-      // Aquí deberías cargar los datos completos del empleado desde la base de datos
-      // Por ahora usamos valores por defecto
-      setValue('salario', 0)
-      setValue('permisos_modulos', ['dashboard'])
-      setSelectedModulos(['dashboard'])
+      // Cargar los datos reales del empleado
+      setValue('salario', (empleado as any).salario || 0)
+      
+      // Cargar los permisos reales del empleado
+      const permisosReales = (empleado as any).permisos_modulos || []
+      setValue('permisos_modulos', permisosReales)
+      setSelectedModulos(permisosReales)
     }
   }, [empleado, setValue])
 
