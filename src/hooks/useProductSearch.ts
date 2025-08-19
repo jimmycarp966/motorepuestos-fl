@@ -130,11 +130,16 @@ export function useProductSearch({
   // Scroll automático al elemento seleccionado
   useEffect(() => {
     if (selectedIndex >= 0 && selectedProductRef.current && containerRef.current) {
-      selectedProductRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'nearest'
-      })
+      // Usar setTimeout para asegurar que el DOM se haya actualizado
+      setTimeout(() => {
+        if (selectedProductRef.current) {
+          selectedProductRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'nearest'
+          })
+        }
+      }, 0)
     }
   }, [selectedIndex])
 

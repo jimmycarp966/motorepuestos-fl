@@ -41,6 +41,49 @@ export async function obtenerDetallesMovimiento(movimiento: MovimientoCaja): Pro
     }
   }
   
+  // Si el concepto contiene "venta #" (formato antiguo), buscar detalles de la venta
+  if (concepto.includes('venta') || concepto.includes('venta #')) {
+    try {
+      // Extraer ID de venta del concepto (asumiendo formato "Venta #123")
+      const ventaMatch = concepto.match(/venta\s*#?([a-f0-9-]+)/i)
+      if (ventaMatch) {
+        const ventaId = ventaMatch[1]
+        
+        const { data: venta, error } = await supabase
+          .from('ventas')
+          .select(`
+            *,
+            items:venta_items(
+              cantidad,
+              precio_unitario,
+              subtotal,
+              producto:productos(nombre, codigo_sku, categoria)
+            )
+          `)
+          .eq('id', ventaId)
+          .single()
+
+        if (!error && venta) {
+          return {
+            ...movimiento,
+            detalles: {
+              tipo: 'venta',
+              items: venta.items?.map(item => ({
+                nombre: item.producto?.nombre || 'Producto desconocido',
+                cantidad: item.cantidad,
+                precio: item.precio_unitario,
+                codigo_sku: item.producto?.codigo_sku
+              })) || [],
+              descripcion: formatearProductosVenta(venta.items || [])
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Error al obtener detalles de venta:', error)
+    }
+  }
+  
   // Si el concepto contiene "gasto", buscar detalles del gasto
   if (concepto.includes('gasto') || concepto.includes('pago') || concepto.includes('compra')) {
     return {
@@ -110,6 +153,27 @@ export function formatearDetallesMovimiento(detalles: MovimientoDetalle): string
       
     default:
       return detalles.concepto
+  }
+}
+
+// Función para formatear productos de una venta
+function formatearProductosVenta(items: any[]): string {
+  if (!items || items.length === 0) {
+    return 'Venta de productos'
+  }
+  
+  const productos = items.map(item => {
+    const nombreProducto = item.producto?.nombre || 'Producto desconocido'
+    return `${nombreProducto} x${item.cantidad}`
+  })
+  
+  if (productos.length === 1) {
+    return productos[0]
+  } else if (productos.length <= 3) {
+    return productos.join(', ')
+  } else {
+    const primerProducto = productos[0]
+    return `${primerProducto} +${productos.length - 1} más`
   }
 }
 
