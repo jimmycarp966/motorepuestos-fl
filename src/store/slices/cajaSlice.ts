@@ -269,6 +269,10 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
     }
 
     try {
+      // Obtener el movimiento actual antes de actualizarlo
+      const movimientoActual = get().caja.movimientos.find(mov => mov.id === movimientoId)
+      if (!movimientoActual) throw new Error('Movimiento no encontrado')
+
       const { data, error } = await supabase
         .from('movimientos_caja')
         .update(datosActualizados)
@@ -287,6 +291,84 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
           )
         }
       }))
+
+      // Si se cambió el método de pago, actualizar arqueos pendientes
+      if (datosActualizados.metodo_pago && 
+          datosActualizados.metodo_pago !== movimientoActual.metodo_pago) {
+        
+        // Obtener arqueo pendiente del día actual
+        const fechaHoy = new Date().toISOString().split('T')[0]
+        const { data: arqueoPendiente } = await supabase
+          .from('arqueos_caja')
+          .select('*')
+          .eq('fecha', fechaHoy)
+          .eq('empleado_id', currentUser.id)
+          .eq('completado', false)
+          .single()
+
+        if (arqueoPendiente) {
+          // Calcular la diferencia en el monto
+          const monto = movimientoActual.monto
+          const metodoAnterior = movimientoActual.metodo_pago
+          const metodoNuevo = datosActualizados.metodo_pago
+
+          // Actualizar montos esperados del arqueo
+          let efectivoEsperado = arqueoPendiente.efectivo_esperado
+          let tarjetaEsperado = arqueoPendiente.tarjeta_esperado
+          let transferenciaEsperado = arqueoPendiente.transferencia_esperado
+
+          // Descontar del método anterior
+          switch (metodoAnterior) {
+            case 'efectivo':
+              efectivoEsperado -= monto
+              break
+            case 'tarjeta':
+              tarjetaEsperado -= monto
+              break
+            case 'transferencia':
+              transferenciaEsperado -= monto
+              break
+          }
+
+          // Sumar al método nuevo
+          switch (metodoNuevo) {
+            case 'efectivo':
+              efectivoEsperado += monto
+              break
+            case 'tarjeta':
+              tarjetaEsperado += monto
+              break
+            case 'transferencia':
+              transferenciaEsperado += monto
+              break
+          }
+
+          // Actualizar arqueo en base de datos
+          await supabase
+            .from('arqueos_caja')
+            .update({
+              efectivo_esperado: efectivoEsperado,
+              tarjeta_esperado: tarjetaEsperado,
+              transferencia_esperado: transferenciaEsperado,
+              total_esperado: efectivoEsperado + tarjetaEsperado + transferenciaEsperado
+            })
+            .eq('id', arqueoPendiente.id)
+
+          // Actualizar estado local del arqueo si está abierto
+          const arqueoActual = get().arqueoActual
+          if (arqueoActual && arqueoActual.fecha === fechaHoy) {
+            set((state) => ({
+              arqueoActual: {
+                ...state.arqueoActual!,
+                efectivo_esperado,
+                tarjeta_esperado,
+                transferencia_esperado,
+                total_esperado: efectivoEsperado + tarjetaEsperado + transferenciaEsperado
+              }
+            }))
+          }
+        }
+      }
 
       return data
     } catch (error: any) {
