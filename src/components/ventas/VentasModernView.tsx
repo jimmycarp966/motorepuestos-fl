@@ -222,13 +222,13 @@ export const VentasModernView: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen" style={{ backgroundColor: '#f8fafc' }}>
+    <div className="flex h-screen bg-dark-bg-primary">
       {/* Panel Principal - Productos */}
       <div className="flex-1 flex flex-col">
         {/* Header de búsqueda y filtros */}
         <div className="bg-dark-bg-secondary shadow-dark-sm border-b border-dark-border p-6">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold" style={{ color: '#0ea5e9' }}>
+            <h1 className="text-2xl font-bold text-primary-500">
               🏪 Punto de Venta - Motorepuestos
             </h1>
             <div className="flex items-center space-x-2">

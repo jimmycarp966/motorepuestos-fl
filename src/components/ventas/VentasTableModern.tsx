@@ -424,15 +424,15 @@ export const VentasTableModern: React.FC = () => {
       {/* Card principal único - Como en la imagen */}
       <div className="bg-dark-bg-secondary rounded-xl shadow-dark-lg border border-dark-border overflow-hidden">
         {/* Header del card */}
-        <div className="border-b border-dark-border p-4" style={{ backgroundColor: '#f8fafc' }}>
+        <div className="border-b border-dark-border p-4 bg-dark-bg-tertiary">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-dark-text-primary flex items-center">
-              <Package className="w-5 h-5 mr-2" style={{ color: '#0ea5e9' }} />
+              <Package className="w-5 h-5 mr-2 text-primary-500" />
               Productos Disponibles
             </h2>
             <div className="flex items-center space-x-2">
               <span className="text-sm text-dark-text-secondary">Total Venta:</span>
-              <span className="text-xl font-bold" style={{ color: '#0ea5e9' }}>
+              <span className="text-xl font-bold text-primary-500">
                 S/. {calculateTotal().toFixed(2)}
               </span>
             </div>
@@ -470,7 +470,7 @@ export const VentasTableModern: React.FC = () => {
               {/* Tabla del carrito - estilo amplio */}
               <div className="overflow-hidden rounded-lg border border-dark-border">
                 <table className="w-full">
-                  <thead style={{ backgroundColor: '#f8fafc' }}>
+                  <thead className="bg-dark-bg-tertiary">
                     <tr>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-dark-text-secondary">Código</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-dark-text-secondary">Producto</th>
@@ -527,7 +527,7 @@ export const VentasTableModern: React.FC = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <span className="text-lg font-semibold" style={{ color: '#0ea5e9' }}>
+                          <span className="text-lg font-semibold text-primary-500">
                             S/. {item.precio_unitario.toFixed(2)}
                           </span>
                         </td>
