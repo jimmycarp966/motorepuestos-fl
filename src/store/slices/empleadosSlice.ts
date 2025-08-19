@@ -136,13 +136,15 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
         }
       }))
 
-      // Notificar éxito
-      get().addNotification({
-        id: Date.now().toString(),
-        type: 'success',
-        title: 'Empleados cargados',
-        message: `Se cargaron ${empleadosProcesados.length} empleados exitosamente`,
-      })
+      // Notificar éxito solo si hay empleados
+      if (empleadosProcesados.length > 0) {
+        get().addNotification({
+          id: Date.now().toString(),
+          type: 'success',
+          title: '✅ Empleados cargados',
+          message: `${empleadosProcesados.length} empleado${empleadosProcesados.length > 1 ? 's' : ''} disponible${empleadosProcesados.length > 1 ? 's' : ''}`,
+        })
+      }
 
     } catch (error: any) {
       set((state) => ({
@@ -228,8 +230,8 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
       get().addNotification({
         id: Date.now().toString(),
         type: 'success',
-        title: 'Empleado creado',
-        message: `Empleado ${empleadoData.nombre} creado exitosamente con acceso al sistema`,
+        title: '✅ Empleado creado',
+        message: `${empleadoData.nombre} ahora tiene acceso al sistema`,
       })
 
     } catch (error: any) {
@@ -245,7 +247,7 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
       get().addNotification({
         id: Date.now().toString(),
         type: 'error',
-        title: 'Error al crear empleado',
+        title: '❌ Error al crear empleado',
         message: error.message,
       })
     }
@@ -317,8 +319,8 @@ export const empleadosSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'empl
       get().addNotification({
         id: Date.now().toString(),
         type: 'success',
-        title: 'Empleado actualizado',
-        message: `Empleado ${empleadoData.nombre || 'actualizado'} exitosamente`,
+        title: '✅ Empleado actualizado',
+        message: `Los datos de ${empleadoData.nombre || 'el empleado'} han sido actualizados`,
       })
 
     } catch (error: any) {

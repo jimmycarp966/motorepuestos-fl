@@ -265,6 +265,12 @@ module.exports = {
         'glow-blue-lg': '0 0 40px rgba(41, 121, 255, 0.4)',
         'glow-violet': '0 0 20px rgba(124, 77, 255, 0.3)',
         'glow-violet-lg': '0 0 40px rgba(124, 77, 255, 0.4)',
+        'glow-green': '0 0 20px rgba(76, 175, 80, 0.3)',
+        'glow-green-lg': '0 0 40px rgba(76, 175, 80, 0.4)',
+        'glow-red': '0 0 20px rgba(244, 67, 54, 0.3)',
+        'glow-red-lg': '0 0 40px rgba(244, 67, 54, 0.4)',
+        'glow-orange': '0 0 20px rgba(255, 152, 0, 0.3)',
+        'glow-orange-lg': '0 0 40px rgba(255, 152, 0, 0.4)',
         
         // Sombras suaves para elementos
         'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.3), 0 10px 20px -2px rgba(0, 0, 0, 0.1)',

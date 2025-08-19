@@ -20,8 +20,11 @@ export const EmpleadosTable: React.FC = () => {
   const [editingEmpleado, setEditingEmpleado] = useState<AuthenticatedUser | null>(null)
 
   useEffect(() => {
-    fetchEmpleados()
-  }, [fetchEmpleados])
+    // Solo cargar empleados si no están ya cargados
+    if (empleados.length === 0 && !loading) {
+      fetchEmpleados()
+    }
+  }, [fetchEmpleados, empleados.length, loading])
 
   const canManage = Boolean(user && canManageModule(user.rol, 'empleados'))
 

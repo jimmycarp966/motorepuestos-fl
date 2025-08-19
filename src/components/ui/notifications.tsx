@@ -11,10 +11,10 @@ const notificationIcons = {
 }
 
 const notificationStyles = {
-  success: 'bg-success-500/20 border-success-500 text-success-500',
-  error: 'bg-danger-500/20 border-danger-500 text-danger-500',
-  warning: 'bg-warning-500/20 border-warning-500 text-warning-500',
-  info: 'bg-primary-500/20 border-primary-500 text-primary-500',
+  success: 'bg-success-500/10 border-success-500/30 text-success-500 shadow-glow-green',
+  error: 'bg-danger-500/10 border-danger-500/30 text-danger-500 shadow-glow-red',
+  warning: 'bg-warning-500/10 border-warning-500/30 text-warning-500 shadow-glow-orange',
+  info: 'bg-primary-500/10 border-primary-500/30 text-primary-500 shadow-glow-blue',
 }
 
 export const NotificationsContainer: React.FC = () => {
@@ -24,25 +24,37 @@ export const NotificationsContainer: React.FC = () => {
   if (notifications.length === 0) return null
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
-      {notifications.map((notification) => {
+    <div className="fixed top-4 right-4 z-50 space-y-3 max-w-sm">
+      {notifications.map((notification, index) => {
         const Icon = notificationIcons[notification.type]
         return (
           <div
             key={notification.id}
             className={cn(
-              'flex items-start p-4 rounded-lg border shadow-lg transition-all duration-300',
-              notificationStyles[notification.type]
+              'flex items-start p-4 rounded-xl border bg-dark-bg-secondary backdrop-blur-sm transition-all duration-500 ease-out transform',
+              notificationStyles[notification.type],
+              'animate-in slide-in-from-right-full fade-in-0',
+              'hover:scale-[1.02] hover:shadow-lg'
             )}
+            style={{
+              animationDelay: `${index * 100}ms`,
+              animationFillMode: 'both'
+            }}
           >
-            <Icon className="w-5 h-5 mt-0.5 mr-3 flex-shrink-0" />
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-current/20 mr-3 flex-shrink-0">
+              <Icon className="w-4 h-4" />
+            </div>
             <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-sm">{notification.title}</h4>
-              <p className="text-sm mt-1">{notification.message}</p>
+              <h4 className="font-semibold text-sm text-dark-text-primary mb-1">
+                {notification.title}
+              </h4>
+              <p className="text-sm text-dark-text-secondary leading-relaxed">
+                {notification.message}
+              </p>
             </div>
             <button
               onClick={() => removeNotification(notification.id)}
-              className="ml-3 text-dark-text-secondary hover:text-dark-text-primary transition-colors"
+              className="ml-3 p-1 rounded-full hover:bg-dark-bg-tertiary transition-colors duration-200 text-dark-text-secondary hover:text-dark-text-primary"
             >
               <X className="w-4 h-4" />
             </button>
