@@ -78,7 +78,7 @@ export const InputStatusCheck: React.FC = () => {
       case 'partial':
         return <AlertCircle className="w-5 h-5 text-yellow-500" />
       default:
-        return <XCircle className="w-5 h-5 text-gray-400" />
+        return <XCircle className="w-5 h-5 text-dark-text-secondary" />
     }
   }
 
@@ -101,8 +101,8 @@ export const InputStatusCheck: React.FC = () => {
   const percentage = Math.round((completedCount / totalCount) * 100)
 
   return (
-    <div className="max-w-6xl mx-auto p-8 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
-      <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+    <div className="max-w-6xl mx-auto p-8 bg-gradient-to-br from-dark-bg-primary to-dark-bg-secondary min-h-screen">
+      <div className="bg-dark-bg-secondary rounded-2xl shadow-dark-xl p-8 border border-dark-border">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-slate-800 mb-2">
@@ -118,7 +118,7 @@ export const InputStatusCheck: React.FC = () => {
               <span>Progreso general</span>
               <span>{percentage}%</span>
             </div>
-            <div className="w-full bg-slate-200 rounded-full h-3">
+            <div className="w-full bg-dark-bg-tertiary rounded-full h-3">
               <div 
                 className="bg-gradient-to-r from-moto-blue to-moto-orange h-3 rounded-full transition-all duration-500"
                 style={{ width: `${percentage}%` }}
@@ -185,7 +185,7 @@ export const InputStatusCheck: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-white rounded-lg border border-slate-200">
+          <div className="mt-6 p-4 bg-dark-bg-secondary rounded-lg border border-dark-border">
             <h4 className="font-medium text-slate-700 mb-2">✨ Beneficios Implementados:</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-slate-600">
               <div>• Contraste mejorado en todos los inputs</div>

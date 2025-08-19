@@ -112,10 +112,10 @@ export const ResponsiveTable = <T extends Record<string, any>>({
             <div className="space-y-3">
               {visibleColumns.map((column) => (
                 <div key={column.key} className="flex justify-between items-start">
-                  <span className="text-sm font-medium text-gray-600 min-w-0 mr-3">
+                  <span className="text-sm font-medium text-dark-text-secondary min-w-0 mr-3">
                     {column.title}
                   </span>
-                  <div className="text-sm text-gray-900 text-right flex-1 min-w-0">
+                  <div className="text-sm text-dark-text-primary text-right flex-1 min-w-0">
                     {column.mobileRender 
                       ? column.mobileRender(item[column.key], item)
                       : column.render 
@@ -130,7 +130,7 @@ export const ResponsiveTable = <T extends Record<string, any>>({
               {hiddenColumns.length > 0 && (
                 <button
                   onClick={() => toggleRowExpansion(key)}
-                  className="flex items-center justify-center w-full pt-3 border-t border-gray-200 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                  className="flex items-center justify-center w-full pt-3 border-t border-dark-border text-sm text-dark-text-secondary hover:text-dark-text-primary transition-colors"
                 >
                   {isExpanded ? (
                     <>
@@ -149,13 +149,13 @@ export const ResponsiveTable = <T extends Record<string, any>>({
 
             {/* Contenido expandible */}
             {isExpanded && hiddenColumns.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
+              <div className="mt-4 pt-4 border-t border-dark-border space-y-3">
                 {hiddenColumns.map((column) => (
                   <div key={column.key} className="flex justify-between items-start">
-                    <span className="text-sm font-medium text-gray-600 min-w-0 mr-3">
+                    <span className="text-sm font-medium text-dark-text-secondary min-w-0 mr-3">
                       {column.title}
                     </span>
-                    <div className="text-sm text-gray-900 text-right flex-1 min-w-0">
+                    <div className="text-sm text-dark-text-primary text-right flex-1 min-w-0">
                       {column.mobileRender 
                         ? column.mobileRender(item[column.key], item)
                         : column.render 
@@ -170,7 +170,7 @@ export const ResponsiveTable = <T extends Record<string, any>>({
 
             {/* Acciones en mobile */}
             {actions.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="mt-4 pt-4 border-t border-dark-border">
                 <div className="flex flex-wrap gap-2">
                   {actions
                     .filter(action => !action.hideOnMobile)
@@ -209,13 +209,13 @@ export const ResponsiveTable = <T extends Record<string, any>>({
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-gray-200">
+          <tr className="border-b border-dark-border">
             {columns.map((column) => (
               <th
                 key={column.key}
                 className={cn(
-                  "px-4 py-3 text-left text-sm font-semibold text-gray-900",
-                  column.sortable && "cursor-pointer hover:bg-gray-50",
+                  "px-4 py-3 text-left text-sm font-semibold text-dark-text-primary",
+                  column.sortable && "cursor-pointer hover:bg-dark-bg-tertiary",
                   column.width && `w-[${column.width}]`
                 )}
                 onClick={() => column.sortable && handleSort(column.key)}
@@ -231,7 +231,7 @@ export const ResponsiveTable = <T extends Record<string, any>>({
               </th>
             ))}
             {actions.length > 0 && (
-              <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900 w-32">
+              <th className="px-4 py-3 text-right text-sm font-semibold text-dark-text-primary w-32">
                 Acciones
               </th>
             )}
@@ -241,10 +241,10 @@ export const ResponsiveTable = <T extends Record<string, any>>({
           {data.map((item, index) => (
             <tr 
               key={itemKey(item, index)} 
-              className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              className="border-b border-dark-border hover:bg-dark-bg-tertiary transition-colors"
             >
               {columns.map((column) => (
-                <td key={column.key} className="px-4 py-3 text-sm text-gray-900">
+                <td key={column.key} className="px-4 py-3 text-sm text-dark-text-primary">
                   {column.render 
                     ? column.render(item[column.key], item, index)
                     : item[column.key]
@@ -286,7 +286,7 @@ export const ResponsiveTable = <T extends Record<string, any>>({
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-moto-blue"></div>
-        <span className="ml-3 text-gray-600">Cargando...</span>
+        <span className="ml-3 text-dark-text-secondary">Cargando...</span>
       </div>
     )
   }
@@ -295,7 +295,7 @@ export const ResponsiveTable = <T extends Record<string, any>>({
   if (data.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">{emptyMessage}</p>
+        <p className="text-dark-text-secondary">{emptyMessage}</p>
       </div>
     )
   }
@@ -313,7 +313,7 @@ export const ResponsiveTable = <T extends Record<string, any>>({
               setSearchTerm(e.target.value)
               onSearch?.(e.target.value)
             }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-moto-blue focus:border-transparent"
+            className="w-full px-3 py-2 border border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
       )}
@@ -348,7 +348,7 @@ const MobileActionsDropdown: React.FC<{
             className="fixed inset-0 z-10" 
             onClick={() => setIsOpen(false)} 
           />
-          <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
+          <div className="absolute right-0 top-full mt-1 w-48 bg-dark-bg-secondary rounded-lg shadow-dark-lg border border-dark-border z-20">
             {actions.map((action, index) => (
               <button
                 key={index}
@@ -356,7 +356,7 @@ const MobileActionsDropdown: React.FC<{
                   action.onClick(item)
                   setIsOpen(false)
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg flex items-center"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-dark-bg-tertiary first:rounded-t-lg last:rounded-b-lg flex items-center"
               >
                 {action.icon && <action.icon className="w-4 h-4 mr-2" />}
                 {action.label}
@@ -392,7 +392,7 @@ const DesktopActionsDropdown: React.FC<{
             className="fixed inset-0 z-10" 
             onClick={() => setIsOpen(false)} 
           />
-          <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
+          <div className="absolute right-0 top-full mt-1 w-48 bg-dark-bg-secondary rounded-lg shadow-dark-lg border border-dark-border z-20">
             {actions.map((action, index) => (
               <button
                 key={index}
@@ -400,7 +400,7 @@ const DesktopActionsDropdown: React.FC<{
                   action.onClick(item)
                   setIsOpen(false)
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg flex items-center"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-dark-bg-tertiary first:rounded-t-lg last:rounded-b-lg flex items-center"
               >
                 {action.icon && <action.icon className="w-4 h-4 mr-2" />}
                 {action.label}

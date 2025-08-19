@@ -80,9 +80,9 @@ export const ProductosTable: React.FC = () => {
 
   // Función para obtener color de stock
   const getStockColor = (stock: number, stockMinimo: number) => {
-    if (stock <= 0) return 'text-red-600 bg-red-100'
-    if (stock <= stockMinimo) return 'text-yellow-600 bg-yellow-100'
-    return 'text-green-600 bg-green-100'
+    if (stock <= 0) return 'text-danger-500 bg-danger-500/20 border border-danger-500/30'
+    if (stock <= stockMinimo) return 'text-warning-500 bg-warning-500/20 border border-warning-500/30'
+    return 'text-success-500 bg-success-500/20 border border-success-500/30'
   }
 
   // Función para obtener icono de stock
@@ -99,7 +99,7 @@ export const ProductosTable: React.FC = () => {
       title: 'Código SKU',
       width: '140px',
       render: (value) => (
-        <div className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+        <div className="font-mono text-sm bg-dark-bg-tertiary px-2 py-1 rounded border border-dark-border">
           {value}
         </div>
       )
@@ -109,9 +109,9 @@ export const ProductosTable: React.FC = () => {
       title: 'Nombre',
       render: (value, item) => (
         <div>
-          <div className="font-medium text-gray-900">{value}</div>
+          <div className="font-medium text-dark-text-primary">{value}</div>
           {item.descripcion && (
-            <div className="text-sm text-gray-500 truncate max-w-xs">
+            <div className="text-sm text-dark-text-secondary truncate max-w-xs">
               {item.descripcion}
             </div>
           )}
@@ -124,8 +124,8 @@ export const ProductosTable: React.FC = () => {
       width: '120px',
       render: (value) => (
         <div className="flex items-center">
-          <Tag className="w-4 h-4 mr-2 text-gray-400" />
-          <span className="text-sm">{value}</span>
+          <Tag className="w-4 h-4 mr-2 text-primary-500" />
+          <span className="text-sm text-dark-text-primary">{value}</span>
         </div>
       )
     },
@@ -145,7 +145,7 @@ export const ProductosTable: React.FC = () => {
       title: 'Precio',
       width: '100px',
       render: (value) => (
-        <div className="flex items-center text-green-600 font-medium">
+        <div className="flex items-center text-success-500 font-medium">
           <DollarSign className="w-4 h-4 mr-1" />
           {value.toLocaleString()}
         </div>
@@ -156,7 +156,7 @@ export const ProductosTable: React.FC = () => {
       title: 'Unidad',
       width: '80px',
       render: (value) => (
-        <span className="text-sm text-gray-600">{value}</span>
+        <span className="text-sm text-dark-text-secondary">{value}</span>
       )
     }
   ]
@@ -189,15 +189,15 @@ export const ProductosTable: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* Filtros adicionales */}
-      <div className="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-lg border">
+      <div className="flex flex-col sm:flex-row gap-4 bg-dark-bg-secondary p-4 rounded-lg border border-dark-border">
         {/* Filtro por Categoría */}
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">Categoría:</span>
+          <Filter className="w-4 h-4 text-dark-text-secondary" />
+          <span className="text-sm font-medium text-dark-text-primary">Categoría:</span>
           <select
             value={categoriaFilter}
             onChange={(e) => handleCategoriaChange(e.target.value)}
-            className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-3 py-1 border border-dark-border rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">Todas las categorías</option>
             {categorias.map(categoria => (
@@ -208,7 +208,7 @@ export const ProductosTable: React.FC = () => {
 
         {/* Filtros de Stock */}
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">Stock:</span>
+          <span className="text-sm font-medium text-dark-text-primary">Stock:</span>
           <div className="flex gap-2">
             <Button
               variant={stockFilter === 'all' ? 'default' : 'outline'}

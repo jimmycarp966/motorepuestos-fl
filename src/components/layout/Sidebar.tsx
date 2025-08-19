@@ -20,13 +20,13 @@ import {
 
 
 const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: '#667eea', shortcut: 'F1' },
-  { id: 'ventas', label: 'Ventas', icon: ShoppingCart, color: '#fa709a', shortcut: 'F2' },
-  { id: 'productos', label: 'Productos', icon: Package, color: '#4facfe', shortcut: 'F3' },
-  { id: 'clientes', label: 'Clientes', icon: UserCheck, color: '#43e97b', shortcut: 'F4' },
-  { id: 'empleados', label: 'Empleados', icon: Users, color: '#f093fb', shortcut: 'F5' },
-  { id: 'caja', label: 'Caja', icon: DollarSign, color: '#ffecd2', shortcut: 'F6' },
-  { id: 'reportes', label: 'Reportes', icon: BarChart3, color: '#a8edea', shortcut: 'F7' },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: '#2979FF', shortcut: 'F1' },
+  { id: 'ventas', label: 'Ventas', icon: ShoppingCart, color: '#7C4DFF', shortcut: 'F2' },
+  { id: 'productos', label: 'Productos', icon: Package, color: '#2979FF', shortcut: 'F3' },
+  { id: 'clientes', label: 'Clientes', icon: UserCheck, color: '#4CAF50', shortcut: 'F4' },
+  { id: 'empleados', label: 'Empleados', icon: Users, color: '#7C4DFF', shortcut: 'F5' },
+  { id: 'caja', label: 'Caja', icon: DollarSign, color: '#FF9800', shortcut: 'F6' },
+  { id: 'reportes', label: 'Reportes', icon: BarChart3, color: '#2979FF', shortcut: 'F7' },
 ]
 
 export const Sidebar: React.FC = () => {
@@ -105,43 +105,43 @@ export const Sidebar: React.FC = () => {
       {/* Botón de toggle para móviles */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-dark-bg-secondary rounded-lg shadow-dark-lg border border-dark-border hover:bg-dark-bg-tertiary transition-colors"
       >
-        {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
+        {isMobileOpen ? <X size={24} className="text-dark-text-primary" /> : <Menu size={24} className="text-dark-text-primary" />}
       </button>
 
       {/* Overlay para móviles */}
       {isMobileOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-75 z-40"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <div className={`
-        fixed top-0 left-0 h-full bg-white border-r border-gray-200 z-50 
+        fixed top-0 left-0 h-full bg-dark-bg-primary border-r border-dark-border z-50 
         w-[min(280px,85vw)] sm:w-[280px]
-        flex flex-col shadow-xl transition-transform duration-300 ease-in-out
+        flex flex-col shadow-dark-xl transition-transform duration-300 ease-in-out
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Header del sidebar */}
-        <div className="p-4 sm:p-8 pb-4 sm:pb-6 bg-gradient-to-br from-blue-500 to-purple-600 text-white border-b border-white/10">
+        <div className="p-4 sm:p-8 pb-4 sm:pb-6 bg-gradient-to-br from-primary-500 to-secondary-500 text-white border-b border-dark-border">
           <div className="mb-3 sm:mb-4">
-            <h1 className="text-lg sm:text-xl font-bold leading-tight tracking-tight">
+            <h1 className="text-lg sm:text-xl font-bold leading-tight tracking-tight text-white">
               Motorepuestos F.L.
             </h1>
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-semibold">
+            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-semibold text-white shadow-glow-blue">
               {user.nombre.charAt(0).toUpperCase()}
             </div>
             <div>
-              <div className="text-base font-semibold mb-1">
+              <div className="text-base font-semibold mb-1 text-white">
                 {user.nombre}
               </div>
-              <div className="text-sm opacity-90 bg-white/20 px-2 py-1 rounded inline-block">
+              <div className="text-sm opacity-90 bg-white/20 px-2 py-1 rounded inline-block text-white">
                 {user.rol}
               </div>
             </div>
@@ -149,9 +149,9 @@ export const Sidebar: React.FC = () => {
         </div>
 
         {/* Navegación */}
-        <nav className="flex-1 p-3 sm:p-6 overflow-y-auto">
+        <nav className="flex-1 p-3 sm:p-6 overflow-y-auto bg-dark-bg-primary">
           <div className="mb-4">
-            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 pl-2">
+            <div className="text-xs font-semibold text-dark-text-secondary uppercase tracking-wider mb-3 pl-2">
               Navegación
             </div>
             
@@ -167,19 +167,19 @@ export const Sidebar: React.FC = () => {
                     w-full flex items-center justify-between px-4 py-3 text-left rounded-xl
                     transition-all duration-200 mb-2 font-medium text-sm relative group
                     ${isActive 
-                      ? 'text-blue-600 bg-blue-50 font-semibold' 
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:translate-x-1'
+                      ? 'text-primary-500 bg-primary-500/20 font-semibold border border-primary-500/30 shadow-glow-blue' 
+                      : 'text-dark-text-secondary hover:text-dark-text-primary hover:bg-dark-bg-tertiary hover:translate-x-1 border border-transparent'
                     }
                   `}
                 >
                   {isActive && (
-                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-3/5 bg-blue-600 rounded-r" />
+                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-3/5 bg-primary-500 rounded-r shadow-glow-blue" />
                   )}
                   
                   <div className="flex items-center gap-3">
                     <div className={`
                       w-5 h-5 flex items-center justify-center
-                      ${isActive ? 'text-blue-600' : 'text-gray-400'}
+                      ${isActive ? 'text-primary-500' : 'text-dark-text-secondary group-hover:text-dark-text-primary'}
                     `}>
                       <Icon size={20} />
                     </div>
@@ -189,7 +189,7 @@ export const Sidebar: React.FC = () => {
                   {/* Mostrar shortcut */}
                   <div className={`
                     text-xs px-2 py-1 rounded-md font-mono opacity-60 transition-opacity
-                    ${isActive ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}
+                    ${isActive ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30' : 'bg-dark-bg-secondary text-dark-text-secondary border border-dark-border'}
                     group-hover:opacity-100
                   `}>
                     {item.shortcut}
@@ -201,14 +201,14 @@ export const Sidebar: React.FC = () => {
         </nav>
 
         {/* Footer del sidebar */}
-        <div className="p-3 sm:p-6 border-t border-gray-200 bg-gray-50">
+        <div className="p-3 sm:p-6 border-t border-dark-border bg-dark-bg-primary">
           {/* Ayuda de shortcuts */}
-          <div className="mb-4 p-3 bg-white rounded-lg border border-gray-200">
+          <div className="mb-4 p-3 bg-dark-bg-secondary rounded-lg border border-dark-border">
             <div className="flex items-center gap-2 mb-2">
-              <Keyboard size={14} className="text-blue-600" />
-              <span className="text-xs font-medium text-gray-700">Atajos Rápidos</span>
+              <Keyboard size={14} className="text-primary-500" />
+              <span className="text-xs font-medium text-dark-text-primary">Atajos Rápidos</span>
             </div>
-            <div className="text-xs text-gray-500 space-y-1">
+            <div className="text-xs text-dark-text-secondary space-y-1">
               <div>F1-F7: Navegación</div>
               <div>F9: Refrescar</div>
               <div>F10: Buscar (Ventas)</div>
@@ -216,16 +216,16 @@ export const Sidebar: React.FC = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-2 mb-4 p-3 bg-white rounded-lg border border-gray-200">
-            <div className="w-2 h-2 rounded-full bg-green-500" />
-            <span className="text-sm text-gray-600">
+          <div className="flex items-center gap-2 mb-4 p-3 bg-dark-bg-secondary rounded-lg border border-dark-border">
+            <div className="w-2 h-2 rounded-full bg-success-500 shadow-glow-blue animate-pulse" />
+            <span className="text-sm text-dark-text-primary">
               Sistema activo
             </span>
           </div>
           
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-lg bg-white text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 transition-all duration-200 text-sm font-medium"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-dark-border rounded-lg bg-dark-bg-secondary text-dark-text-primary hover:bg-dark-bg-tertiary hover:border-dark-border-light hover:text-white transition-all duration-200 text-sm font-medium shadow-dark-sm hover:shadow-dark-md"
           >
             <LogOut size={16} />
             Cerrar Sesión

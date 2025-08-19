@@ -378,25 +378,25 @@ export const VentasTable: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Venta Rápida</h1>
-          <p className="text-gray-600">Agrega productos y finaliza la venta</p>
+          <h1 className="text-2xl font-bold text-dark-text-primary">Venta Rápida</h1>
+          <p className="text-dark-text-secondary">Agrega productos y finaliza la venta</p>
         </div>
       </div>
 
       {/* Alerta de arqueo completado */}
       {arqueoCompletadoHoy && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-warning-500/20 border border-warning-500/30 rounded-lg p-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5 text-warning-500" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-yellow-800">
+              <h3 className="text-sm font-medium text-warning-500">
                 Sistema Bloqueado - Arqueo Completado
               </h3>
-              <div className="mt-2 text-sm text-yellow-700">
+              <div className="mt-2 text-sm text-warning-500">
                 <p>
                   El arqueo de caja ha sido completado para el día de hoy. 
                   No se pueden registrar nuevas ventas hasta mañana.
@@ -413,13 +413,13 @@ export const VentasTable: React.FC = () => {
           {/* Búsqueda rápida de productos */}
           <Card className="p-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900 flex items-center">
-                <Search className="w-5 h-5 mr-2 text-blue-600" />
+              <h3 className="text-lg font-medium text-dark-text-primary flex items-center">
+                <Search className="w-5 h-5 mr-2 text-primary-500" />
                 Búsqueda Rápida
               </h3>
-              <div className="flex items-center gap-1 text-xs text-gray-500">
+              <div className="flex items-center gap-1 text-xs text-dark-text-secondary">
                 <Keyboard size={14} />
-                <span className="bg-gray-100 px-2 py-1 rounded font-mono">F10</span>
+                <span className="bg-dark-bg-tertiary px-2 py-1 rounded font-mono border border-dark-border">F10</span>
               </div>
             </div>
             
@@ -441,29 +441,29 @@ export const VentasTable: React.FC = () => {
               
               {/* Sugerencias de productos */}
               {showProductSuggestions && filteredProductos.length > 0 && (
-                <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 bg-dark-bg-tertiary border border-dark-border rounded-lg shadow-dark-lg z-50 max-h-80 overflow-y-auto">
                   {filteredProductos.map((producto, index) => (
                     <div
                       key={producto.id}
-                      className={`p-2 cursor-pointer hover:bg-gray-50 transition-colors ${
-                        index === selectedSuggestionIndex ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                      className={`p-2 cursor-pointer hover:bg-dark-bg-secondary transition-colors ${
+                        index === selectedSuggestionIndex ? 'bg-primary-500/20 border-l-4 border-primary-500' : ''
                       }`}
                       onClick={() => handleProductSelect(producto)}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                            <div className="w-6 h-6 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
                               <Package className="w-3 h-3 text-white" />
                             </div>
                             <div>
-                              <h4 className="font-medium text-gray-900 text-sm leading-tight">{producto.nombre}</h4>
-                              <p className="text-xs text-gray-500">{producto.codigo_sku}</p>
+                              <h4 className="font-medium text-dark-text-primary text-sm leading-tight">{producto.nombre}</h4>
+                              <p className="text-xs text-dark-text-secondary">{producto.codigo_sku}</p>
                             </div>
                           </div>
                         </div>
                                                  <div className="text-right">
-                           <p className="font-bold text-green-600 text-sm">
+                           <p className="font-bold text-success-500 text-sm">
                              ${producto.precio_minorista?.toFixed(2)}
                            </p>
                            <div className="flex items-center justify-end gap-1 mt-1">
@@ -471,7 +471,7 @@ export const VentasTable: React.FC = () => {
                                producto.stock <= 0 ? 'text-red-600 bg-red-100' :
                                producto.stock <= 5 ? 'text-orange-600 bg-orange-100' :
                                producto.stock <= 10 ? 'text-yellow-600 bg-yellow-100' :
-                               'text-gray-500'
+                               'text-dark-text-secondary'
                              }`}>
                                Stock: {producto.stock}
                              </span>
@@ -487,14 +487,14 @@ export const VentasTable: React.FC = () => {
               )}
             </div>
             
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-dark-text-secondary mt-2">
               Presiona Enter para agregar el primer producto, o usa las flechas para navegar
             </p>
           </Card>
 
           {/* Carrito en tiempo real */}
           <Card className="p-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <h3 className="text-lg font-medium text-dark-text-primary mb-4 flex items-center">
               <ShoppingCart className="w-5 h-5 mr-2" />
               Carrito ({cartItems.length} productos)
             </h3>
@@ -504,14 +504,14 @@ export const VentasTable: React.FC = () => {
                 {/* Lista de productos */}
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {cartItems.map((item, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center gap-3 p-3 bg-dark-bg-tertiary rounded-lg">
                       <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
                         <Package className="w-4 h-4 text-white" />
                       </div>
                       
                       <div className="flex-1">
-                        <h4 className="font-medium text-gray-900 text-sm">{item.producto.nombre}</h4>
-                        <p className="text-xs text-gray-500">{item.producto.codigo_sku}</p>
+                        <h4 className="font-medium text-dark-text-primary text-sm">{item.producto.nombre}</h4>
+                        <p className="text-xs text-dark-text-secondary">{item.producto.codigo_sku}</p>
                         <p className="text-xs text-blue-600 font-medium">
                           {item.tipo_precio === 'mayorista' ? 'Mayorista' : 'Minorista'}
                         </p>
@@ -561,15 +561,15 @@ export const VentasTable: React.FC = () => {
 
                 {/* Total */}
                 <div className="border-t pt-3">
-                  <div className="flex justify-between items-center text-lg font-bold text-gray-900">
+                  <div className="flex justify-between items-center text-lg font-bold text-dark-text-primary">
                     <span>Total:</span>
                     <span className="text-green-600">${total.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <ShoppingCart className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <div className="text-center py-8 text-dark-text-secondary">
+                <ShoppingCart className="w-12 h-12 mx-auto mb-4 text-dark-border" />
                 <p className="text-sm">Busca y agrega productos para comenzar</p>
               </div>
             )}
@@ -593,7 +593,7 @@ export const VentasTable: React.FC = () => {
             <>
               {/* Cliente */}
               <Card className="p-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                <h3 className="text-lg font-medium text-dark-text-primary mb-4 flex items-center">
                   <Users className="w-5 h-5 mr-2 text-blue-600" />
                   Cliente (Opcional)
                 </h3>
@@ -602,10 +602,10 @@ export const VentasTable: React.FC = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                       <div>
-                        <p className="font-medium text-gray-900">{selectedCliente.nombre}</p>
-                        <p className="text-sm text-gray-500">{selectedCliente.email}</p>
+                        <p className="font-medium text-dark-text-primary">{selectedCliente.nombre}</p>
+                        <p className="text-sm text-dark-text-secondary">{selectedCliente.email}</p>
                         {selectedCliente.telefono && (
-                          <p className="text-sm text-gray-500">{selectedCliente.telefono}</p>
+                          <p className="text-sm text-dark-text-secondary">{selectedCliente.telefono}</p>
                         )}
                       </div>
                       <Button
@@ -628,7 +628,7 @@ export const VentasTable: React.FC = () => {
                       <Search className="w-4 h-4 mr-2" />
                       Buscar Cliente
                     </Button>
-                    <p className="text-sm text-gray-500 text-center">
+                    <p className="text-sm text-dark-text-secondary text-center">
                       O continúa sin cliente
                     </p>
                   </div>
@@ -637,7 +637,7 @@ export const VentasTable: React.FC = () => {
 
               {/* Método de pago */}
               <Card className="p-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                <h3 className="text-lg font-medium text-dark-text-primary mb-4 flex items-center">
                   <CreditCard className="w-5 h-5 mr-2 text-green-600" />
                   Método de Pago
                 </h3>
@@ -685,8 +685,8 @@ export const VentasTable: React.FC = () => {
               <Card className="p-4">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">Finalizar Venta</span>
-                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                    <span className="text-sm font-medium text-dark-text-primary">Finalizar Venta</span>
+                    <div className="flex items-center gap-1 text-xs text-dark-text-secondary">
                       <Keyboard size={12} />
                       <span className="bg-gray-100 px-1.5 py-0.5 rounded font-mono">F11</span>
                     </div>
@@ -762,7 +762,7 @@ export const VentasTable: React.FC = () => {
           <Card className="w-full max-w-2xl max-h-[80vh] overflow-hidden">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                <h2 className="text-xl font-bold text-dark-text-primary flex items-center">
                   <Users className="w-5 h-5 mr-2 text-blue-600" />
                   Buscar Cliente
                 </h2>
@@ -778,7 +778,7 @@ export const VentasTable: React.FC = () => {
               {/* Buscador */}
               <div className="mb-6">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-text-secondary w-4 h-4" />
                   <Input
                     type="text"
                     placeholder="Buscar clientes por nombre, email, teléfono..."
@@ -800,14 +800,14 @@ export const VentasTable: React.FC = () => {
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-medium text-gray-900">{cliente.nombre}</h4>
-                          <p className="text-sm text-gray-500">{cliente.email}</p>
+                          <h4 className="font-medium text-dark-text-primary">{cliente.nombre}</h4>
+                          <p className="text-sm text-dark-text-secondary">{cliente.email}</p>
                           {cliente.telefono && (
-                            <p className="text-sm text-gray-500">{cliente.telefono}</p>
+                            <p className="text-sm text-dark-text-secondary">{cliente.telefono}</p>
                           )}
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-dark-text-secondary">
                             {cliente.activo ? 'Activo' : 'Inactivo'}
                           </p>
                         </div>
@@ -815,8 +815,8 @@ export const VentasTable: React.FC = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <Users className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                  <div className="text-center py-8 text-dark-text-secondary">
+                    <Users className="w-12 h-12 mx-auto mb-4 text-dark-border" />
                     <p>No se encontraron clientes</p>
                   </div>
                 )}

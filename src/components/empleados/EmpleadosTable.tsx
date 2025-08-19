@@ -49,13 +49,13 @@ export const EmpleadosTable: React.FC = () => {
 
   const getRolBadgeColor = (rol: string) => {
     switch (rol) {
-      case 'Administrador': return 'bg-red-100 text-red-800'
-      case 'Cajero': return 'bg-blue-100 text-blue-800'
-      case 'Vendedor': return 'bg-green-100 text-green-800'
-      case 'Gerente': return 'bg-purple-100 text-purple-800'
-      case 'Técnico': return 'bg-orange-100 text-orange-800'
-      case 'Almacén': return 'bg-yellow-100 text-yellow-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'Administrador': return 'bg-danger-500/20 text-danger-500 border border-danger-500/30'
+      case 'Cajero': return 'bg-primary-500/20 text-primary-500 border border-primary-500/30'
+      case 'Vendedor': return 'bg-success-500/20 text-success-500 border border-success-500/30'
+      case 'Gerente': return 'bg-secondary-500/20 text-secondary-500 border border-secondary-500/30'
+      case 'Técnico': return 'bg-warning-500/20 text-warning-500 border border-warning-500/30'
+      case 'Almacén': return 'bg-warning-500/20 text-warning-500 border border-warning-500/30'
+      default: return 'bg-dark-bg-tertiary text-dark-text-secondary border border-dark-border'
     }
   }
 
@@ -95,13 +95,12 @@ export const EmpleadosTable: React.FC = () => {
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
-          <CardTitle>Gestión de Empleados</CardTitle>
+          <CardTitle className="text-dark-text-primary">Gestión de Empleados</CardTitle>
           <div className="flex space-x-2">
             {canManage && (
               <Button 
                 onClick={() => setShowForm(true)}
-                className="!bg-green-600 !hover:bg-green-700 !text-white !border-0"
-                style={{ backgroundColor: '#059669', color: 'white', border: 'none' }}
+                variant="default"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Nuevo Empleado
@@ -110,7 +109,7 @@ export const EmpleadosTable: React.FC = () => {
           </div>
         </div>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-500 w-4 h-4" />
           <Input
             placeholder="Buscar empleados..."
             value={searchTerm}
@@ -121,46 +120,46 @@ export const EmpleadosTable: React.FC = () => {
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="text-center py-8">Cargando empleados...</div>
+          <div className="text-center py-8 text-dark-text-secondary">Cargando empleados...</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left p-2 text-gray-900 font-semibold">Nombre</th>
-                  <th className="text-left p-2 text-gray-900 font-semibold">Email</th>
-                  <th className="text-left p-2 text-gray-900 font-semibold">Rol</th>
-                  <th className="text-left p-2 text-gray-900 font-semibold">Salario</th>
-                  <th className="text-left p-2 text-gray-900 font-semibold">Permisos</th>
-                  <th className="text-left p-2 text-gray-900 font-semibold">Estado</th>
-                  {canManage && <th className="text-left p-2 text-gray-900 font-semibold">Acciones</th>}
+                <tr className="border-b border-dark-border">
+                  <th className="text-left p-2 text-dark-text-primary font-semibold">Nombre</th>
+                  <th className="text-left p-2 text-dark-text-primary font-semibold">Email</th>
+                  <th className="text-left p-2 text-dark-text-primary font-semibold">Rol</th>
+                  <th className="text-left p-2 text-dark-text-primary font-semibold">Salario</th>
+                  <th className="text-left p-2 text-dark-text-primary font-semibold">Permisos</th>
+                  <th className="text-left p-2 text-dark-text-primary font-semibold">Estado</th>
+                  {canManage && <th className="text-left p-2 text-dark-text-primary font-semibold">Acciones</th>}
                 </tr>
               </thead>
               <tbody>
                 {filteredEmpleados.map((empleado) => (
-                  <tr key={empleado.id} className="border-b hover:bg-gray-50">
-                    <td className="p-2 font-medium text-gray-900">{empleado.nombre}</td>
-                    <td className="p-2 text-gray-600">{empleado.email}</td>
+                  <tr key={empleado.id} className="border-b border-dark-border hover:bg-dark-bg-tertiary transition-colors">
+                    <td className="p-2 font-medium text-dark-text-primary">{empleado.nombre}</td>
+                    <td className="p-2 text-dark-text-secondary">{empleado.email}</td>
                                          <td className="p-2">
                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRolBadgeColor(empleado.rol)}`}>
                          {empleado.rol}
                        </span>
                      </td>
                      <td className="p-2">
-                       <span className="font-mono text-sm text-gray-900">
+                       <span className="font-mono text-sm text-dark-text-primary">
                          {formatSalario((empleado as any).salario || 0)}
                        </span>
                      </td>
                     <td className="p-2">
-                      <span className="text-xs text-gray-700 bg-gray-100 px-2 py-1 rounded font-medium">
+                      <span className="text-xs text-dark-text-secondary bg-dark-bg-tertiary px-2 py-1 rounded font-medium border border-dark-border">
                         {getModulosText((empleado as any).permisos_modulos || [])}
                       </span>
                     </td>
                     <td className="p-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         empleado.activo 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-success-500/20 text-success-500 border border-success-500/30' 
+                          : 'bg-danger-500/20 text-danger-500 border border-danger-500/30'
                       }`}>
                         {empleado.activo ? 'Activo' : 'Inactivo'}
                       </span>
@@ -171,8 +170,7 @@ export const EmpleadosTable: React.FC = () => {
                           <Button
                             size="sm"
                             onClick={() => handleEdit(empleado)}
-                            className="!bg-blue-600 !hover:bg-blue-700 !text-white !border-0"
-                            style={{ backgroundColor: '#2563eb', color: 'white', border: 'none' }}
+                            variant="outline"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
@@ -180,8 +178,7 @@ export const EmpleadosTable: React.FC = () => {
                             size="sm"
                             onClick={() => handleDelete(empleado.id)}
                             disabled={empleado.id === user?.id}
-                            className="!bg-red-600 !hover:bg-red-700 !text-white !border-0 disabled:opacity-50"
-                            style={{ backgroundColor: '#dc2626', color: 'white', border: 'none' }}
+                            variant="destructive"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -193,7 +190,7 @@ export const EmpleadosTable: React.FC = () => {
               </tbody>
             </table>
             {filteredEmpleados.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-dark-text-secondary">
                 No se encontraron empleados
               </div>
             )}

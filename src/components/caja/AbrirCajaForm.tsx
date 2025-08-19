@@ -76,7 +76,7 @@ export const AbrirCajaForm: React.FC<AbrirCajaFormProps> = ({
       <Card className="w-full max-w-md">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+            <h2 className="text-xl font-bold text-dark-text-primary flex items-center">
               <Lock className="w-5 h-5 mr-2 text-green-600" />
               Abrir Caja
             </h2>
@@ -92,11 +92,11 @@ export const AbrirCajaForm: React.FC<AbrirCajaFormProps> = ({
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-dark-text-primary mb-2">
                 Monto Inicial (Efectivo)
               </label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-text-secondary w-4 h-4" />
                 <Input
                   type="number"
                   step="0.01"
@@ -109,7 +109,7 @@ export const AbrirCajaForm: React.FC<AbrirCajaFormProps> = ({
                   autoFocus
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-dark-text-secondary mt-1">
                 Ingresa el monto en efectivo con el que inicias la caja
               </p>
             </div>

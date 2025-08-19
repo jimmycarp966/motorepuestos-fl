@@ -122,9 +122,9 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
           )}
         >
           {/* Header con barra de búsqueda */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-dark-border">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-text-secondary w-5 h-5" />
               <input
                 ref={inputRef}
                 type="text"
@@ -239,7 +239,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ filters, setFilters }) =>
   }
 
   return (
-    <div className="mt-4 pt-4 border-t border-gray-100">
+    <div className="mt-4 pt-4 border-t border-dark-border">
       <div className="flex flex-wrap gap-2">
         {categories.map(category => (
           <Button
@@ -275,7 +275,7 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
 }) => (
   <div className="p-4">
     <div className="flex items-center justify-between mb-3">
-      <h3 className="text-sm font-semibold text-gray-700 flex items-center">
+      <h3 className="text-sm font-semibold text-dark-text-primary flex items-center">
         <Clock className="w-4 h-4 mr-2" />
         Búsquedas recientes
       </h3>
@@ -283,7 +283,7 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
         size="sm"
         variant="default"
         onClick={onClearHistory}
-        className="text-xs text-gray-500 hover:text-gray-700"
+        className="text-xs text-dark-text-secondary hover:text-dark-text-primary"
       >
         Limpiar
       </Button>
@@ -294,7 +294,7 @@ const SearchHistory: React.FC<SearchHistoryProps> = ({
         <button
           key={index}
           onClick={() => onSelectHistory(term)}
-          className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-sm text-gray-700 transition-colors"
+          className="w-full text-left px-3 py-2 rounded-lg hover:bg-dark-bg-tertiary text-sm text-dark-text-primary transition-colors"
         >
           {term}
         </button>
@@ -317,7 +317,7 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
   onSelectSuggestion
 }) => (
   <div className="p-4">
-    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+    <h3 className="text-sm font-semibold text-dark-text-primary mb-3 flex items-center">
       <Zap className="w-4 h-4 mr-2" />
       Búsquedas sugeridas
     </h3>
@@ -327,7 +327,7 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
         <button
           key={index}
           onClick={() => onSelectSuggestion(suggestion)}
-          className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-sm text-gray-600 transition-colors"
+          className="w-full text-left px-3 py-2 rounded-lg hover:bg-dark-bg-tertiary text-sm text-dark-text-secondary transition-colors"
         >
           {suggestion}
         </button>
@@ -369,7 +369,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             "mx-2 mb-1 p-3 rounded-lg transition-all duration-150 cursor-pointer",
             isSelected 
               ? "bg-moto-blue-50 border-l-4 border-moto-blue" 
-              : "hover:bg-gray-50"
+              : "hover:bg-dark-bg-tertiary"
           )}
           onClick={() => result.actions[0] && onExecuteAction(result.actions[0])}
         >
@@ -378,24 +378,24 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               {/* Header */}
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-lg">{result.icon}</span>
-                <h4 className="font-semibold text-gray-900 truncate">
+                <h4 className="font-semibold text-dark-text-primary truncate">
                   {result.highlighted?.title || result.title}
                 </h4>
-                <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600">
+                <span className="px-2 py-1 text-xs rounded-full bg-dark-bg-tertiary text-dark-text-secondary">
                   {result.category}
                 </span>
               </div>
 
               {/* Subtitle */}
               {result.subtitle && (
-                <p className="text-sm text-gray-600 mb-1">
+                <p className="text-sm text-dark-text-secondary mb-1">
                   {result.highlighted?.subtitle || result.subtitle}
                 </p>
               )}
 
               {/* Description */}
               {result.description && (
-                <p className="text-sm text-gray-500 line-clamp-2">
+                <p className="text-sm text-dark-text-secondary line-clamp-2">
                   {result.highlighted?.description || result.description}
                 </p>
               )}
@@ -442,13 +442,13 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                 <Star 
                   className={cn(
                     "w-4 h-4",
-                    isFavorite ? "fill-yellow-400 text-yellow-400" : "text-gray-400"
+                    isFavorite ? "fill-yellow-400 text-yellow-400" : "text-dark-text-secondary"
                   )} 
                 />
               </Button>
 
               {/* Relevance score */}
-              <div className="text-xs text-gray-400 text-center">
+              <div className="text-xs text-dark-text-secondary text-center">
                 {Math.round(result.relevance * 100)}%
               </div>
             </div>
@@ -470,15 +470,15 @@ interface EmptySearchStateProps {
 const EmptySearchState: React.FC<EmptySearchStateProps> = ({ searchTerm }) => (
   <div className="p-8 text-center">
     <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-      <Search className="w-8 h-8 text-gray-400" />
+      <Search className="w-8 h-8 text-dark-border" />
     </div>
-    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+    <h3 className="text-lg font-semibold text-dark-text-primary mb-2">
       Sin resultados
     </h3>
-    <p className="text-gray-600 mb-4">
+    <p className="text-dark-text-secondary mb-4">
       No encontramos resultados para "{searchTerm}"
     </p>
-    <div className="text-sm text-gray-500">
+    <div className="text-sm text-dark-text-secondary">
       <p>Intenta:</p>
       <ul className="mt-2 space-y-1">
         <li>• Verificar la ortografía</li>
@@ -494,8 +494,8 @@ const EmptySearchState: React.FC<EmptySearchStateProps> = ({ searchTerm }) => (
 // ================================
 
 const SearchFooter: React.FC = () => (
-  <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
-    <div className="flex items-center justify-between text-xs text-gray-500">
+  <div className="px-4 py-3 bg-dark-bg-tertiary border-t border-dark-border">
+    <div className="flex items-center justify-between text-xs text-dark-text-secondary">
       <div className="flex items-center gap-4">
         <span className="flex items-center gap-1">
           <ArrowRight className="w-3 h-3" />

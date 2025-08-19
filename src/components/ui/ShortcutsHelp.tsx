@@ -44,9 +44,9 @@ export const ShortcutsHelp: React.FC = () => {
       {/* Modal de ayuda */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
+          <div className="bg-dark-bg-secondary rounded-lg shadow-dark-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+            <div className="flex items-center justify-between p-4 border-b border-dark-border bg-gradient-to-r from-primary-600 to-secondary-600 text-white">
               <div className="flex items-center gap-2">
                 <Keyboard size={20} />
                 <h2 className="text-lg font-semibold">Atajos de Teclado</h2>
@@ -64,41 +64,41 @@ export const ShortcutsHelp: React.FC = () => {
               <div className="space-y-6">
                 {/* Navegación Global */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                  <h3 className="text-lg font-semibold text-dark-text-primary mb-3 flex items-center">
                     <HelpCircle size={16} className="mr-2 text-blue-600" />
                     Navegación Global
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <span className="text-sm text-gray-700">Dashboard</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Dashboard</span>
                       <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">F1</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <span className="text-sm text-gray-700">Ventas</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Ventas</span>
                       <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">F2</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <span className="text-sm text-gray-700">Productos</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Productos</span>
                       <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">F3</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <span className="text-sm text-gray-700">Clientes</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Clientes</span>
                       <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">F4</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <span className="text-sm text-gray-700">Empleados</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Empleados</span>
                       <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">F5</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <span className="text-sm text-gray-700">Caja</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Caja</span>
                       <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">F6</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <span className="text-sm text-gray-700">Reportes</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Reportes</span>
                       <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">F7</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                      <span className="text-sm text-gray-700">Refrescar App</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Refrescar App</span>
                       <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono">F9</kbd>
                     </div>
                   </div>
@@ -106,25 +106,25 @@ export const ShortcutsHelp: React.FC = () => {
 
                 {/* Ventas Específicos */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                  <h3 className="text-lg font-semibold text-dark-text-primary mb-3 flex items-center">
                     <HelpCircle size={16} className="mr-2 text-green-600" />
                     Módulo de Ventas
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <div className="flex items-center justify-between p-2 bg-green-50 rounded">
-                      <span className="text-sm text-gray-700">Buscar Producto</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Buscar Producto</span>
                       <kbd className="px-2 py-1 bg-green-200 rounded text-xs font-mono">F10</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-green-50 rounded">
-                      <span className="text-sm text-gray-700">Finalizar Venta</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Finalizar Venta</span>
                       <kbd className="px-2 py-1 bg-green-200 rounded text-xs font-mono">F11</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-green-50 rounded">
-                      <span className="text-sm text-gray-700">Cancelar/Limpiar</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Cancelar/Limpiar</span>
                       <kbd className="px-2 py-1 bg-green-200 rounded text-xs font-mono">Esc</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-green-50 rounded">
-                      <span className="text-sm text-gray-700">Seleccionar Producto</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Seleccionar Producto</span>
                       <kbd className="px-2 py-1 bg-green-200 rounded text-xs font-mono">Enter</kbd>
                     </div>
                   </div>
@@ -132,25 +132,25 @@ export const ShortcutsHelp: React.FC = () => {
 
                 {/* Acciones Generales */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                  <h3 className="text-lg font-semibold text-dark-text-primary mb-3 flex items-center">
                     <HelpCircle size={16} className="mr-2 text-purple-600" />
                     Acciones Comunes
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <div className="flex items-center justify-between p-2 bg-purple-50 rounded">
-                      <span className="text-sm text-gray-700">Nuevo Elemento</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Nuevo Elemento</span>
                       <kbd className="px-2 py-1 bg-purple-200 rounded text-xs font-mono">Ctrl + N</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-purple-50 rounded">
-                      <span className="text-sm text-gray-700">Guardar</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Guardar</span>
                       <kbd className="px-2 py-1 bg-purple-200 rounded text-xs font-mono">Ctrl + S</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-purple-50 rounded">
-                      <span className="text-sm text-gray-700">Refrescar</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Refrescar</span>
                       <kbd className="px-2 py-1 bg-purple-200 rounded text-xs font-mono">Ctrl + R</kbd>
                     </div>
-                    <div className="flex items-center justify-between p-2 bg-purple-50 rounded">
-                      <span className="text-sm text-gray-700">Cambiar Filtros</span>
+                    <div className="flex items-center justify-between p-2 bg-dark-bg-tertiary rounded">
+                      <span className="text-sm text-dark-text-primary">Cambiar Filtros</span>
                       <kbd className="px-2 py-1 bg-purple-200 rounded text-xs font-mono">Ctrl + F</kbd>
                     </div>
                   </div>
@@ -159,9 +159,9 @@ export const ShortcutsHelp: React.FC = () => {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-gray-200 bg-gray-50">
+            <div className="p-4 border-t border-dark-border bg-dark-bg-tertiary">
               <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-dark-text-secondary">
                   💡 <strong>Tip:</strong> Los atajos funcionan en toda la aplicación
                 </div>
                 <button

@@ -5,15 +5,16 @@ module.exports = {
     "./public/index.html"
   ],
   safelist: [
-    // Colores dinámicos usados en strings (Dashboard, Inventory, Products)
+    // Colores dinámicos usados en strings - Tema oscuro
     // Text colors
-    { pattern: /text-(red|green|blue|purple|yellow|orange|cyan|gray)-(100|200|300|400|500|600|700|800|900)/ },
+    { pattern: /text-(red|green|blue|purple|yellow|orange|cyan|gray|white|zinc|slate)-(100|200|300|400|500|600|700|800|900)/ },
     // Background colors
-    { pattern: /bg-(red|green|blue|purple|yellow|orange|cyan|gray)-(50|100|200|300|400|500|600|700|800|900)/ },
-    // Border colors (por si se usan dinámicos)
-    { pattern: /border-(red|green|blue|purple|yellow|orange|cyan|gray)-(100|200|300|400|500|600|700|800|900)/ },
+    { pattern: /bg-(red|green|blue|purple|yellow|orange|cyan|gray|black|zinc|slate)-(50|100|200|300|400|500|600|700|800|900)/ },
+    // Border colors
+    { pattern: /border-(red|green|blue|purple|yellow|orange|cyan|gray|zinc|slate)-(100|200|300|400|500|600|700|800|900)/ },
   ],
-  // Nota: darkMode intencionalmente no activado por pedido del usuario
+  // Tema oscuro por defecto
+  darkMode: 'class',
   theme: {
     extend: {
       // ===== BREAKPOINTS PERSONALIZADOS =====
@@ -43,7 +44,6 @@ module.exports = {
         'retina': {'raw': '(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)'},
         // Breakpoints para preferencias del usuario
         'motion-reduce': {'raw': '(prefers-reduced-motion: reduce)'},
-        'dark': {'raw': '(prefers-color-scheme: dark)'},
         'high-contrast': {'raw': '(prefers-contrast: high)'},
       },
 
@@ -54,113 +54,164 @@ module.exports = {
         '88': '22rem',
         '128': '32rem',
         '144': '36rem',
+        // Espaciado responsive
+        'responsive-1': 'clamp(0.25rem, 1vw, 0.5rem)',
+        'responsive-2': 'clamp(0.5rem, 1.5vw, 1rem)',
+        'responsive-3': 'clamp(0.75rem, 2vw, 1.5rem)',
+        'responsive-4': 'clamp(1rem, 2.5vw, 2rem)',
+        'responsive-6': 'clamp(1.5rem, 3vw, 3rem)',
+        'responsive-8': 'clamp(2rem, 4vw, 4rem)',
+        'responsive-12': 'clamp(3rem, 6vw, 6rem)',
+        'responsive-16': 'clamp(4rem, 8vw, 8rem)',
       },
 
-      // ===== COLORES PERSONALIZADOS =====
+      // ===== NUEVA PALETA DE COLORES TEMA OSCURO =====
       colors: {
-        // Colores principales para motorepuestos - Paleta mejorada
+        // Paleta base tema oscuro
+        dark: {
+          // Fondos
+          'bg-primary': '#000000',      // Negro puro
+          'bg-secondary': '#121212',    // Gris muy oscuro para tarjetas
+          'bg-tertiary': '#1E1E1E',     // Gris muy oscuro alternativo
+          
+          // Textos
+          'text-primary': '#FFFFFF',    // Blanco para títulos
+          'text-secondary': '#B0B0B0',  // Gris claro para textos secundarios
+          
+          // Acentos
+          'accent-blue': '#2979FF',     // Azul eléctrico
+          'accent-violet': '#7C4DFF',   // Violeta elegante
+          
+          // Estados
+          'success': '#4CAF50',         // Verde confirmación
+          'warning': '#FF9800',         // Naranja advertencia
+          'error': '#F44336',           // Rojo error
+          
+          // Bordes y separadores
+          'border': '#2C2C2C',          // Gris medio
+          'border-light': '#404040',    // Gris medio más claro
+        },
+
+        // Colores principales reconfigurados para tema oscuro
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe', 
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9', // Azul mecánico principal
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          50: '#e3f2fd',
+          100: '#bbdefb',
+          200: '#90caf9',
+          300: '#64b5f6',
+          400: '#42a5f5',
+          500: '#2979FF', // Azul eléctrico principal
+          600: '#1e88e5',
+          700: '#1976d2',
+          800: '#1565c0',
+          900: '#0d47a1',
           950: '#082f49',
         },
+        
         secondary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-          950: '#082f49',
+          50: '#f3e5f5',
+          100: '#e1bee7',
+          200: '#ce93d8',
+          300: '#ba68c8',
+          400: '#ab47bc',
+          500: '#7C4DFF', // Violeta elegante
+          600: '#8e24aa',
+          700: '#7b1fa2',
+          800: '#6a1b9a',
+          900: '#4a148c',
+          950: '#2e1065',
         },
-        accent: {
-          50: '#fefce8',
-          100: '#fef9c3',
-          200: '#fef08a',
-          300: '#fde047',
-          400: '#facc15',
-          500: '#eab308',
-          600: '#ca8a04',
-          700: '#a16207',
-          800: '#854d0e',
-          900: '#713f12',
-          950: '#422006',
-        },
+
+        // Colores de estado para tema oscuro
         success: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-          950: '#052e16',
+          50: '#e8f5e8',
+          100: '#c8e6c9',
+          200: '#a5d6a7',
+          300: '#81c784',
+          400: '#66bb6a',
+          500: '#4CAF50', // Verde confirmación
+          600: '#43a047',
+          700: '#388e3c',
+          800: '#2e7d32',
+          900: '#1b5e20',
+          950: '#0d4d14',
         },
+        
         warning: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
-          950: '#451a03',
+          50: '#fff8e1',
+          100: '#ffecb3',
+          200: '#ffe082',
+          300: '#ffd54f',
+          400: '#ffca28',
+          500: '#FF9800', // Naranja advertencia
+          600: '#fb8c00',
+          700: '#f57c00',
+          800: '#ef6c00',
+          900: '#e65100',
+          950: '#bf360c',
         },
+        
         danger: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
-          950: '#450a0a',
+          50: '#ffebee',
+          100: '#ffcdd2',
+          200: '#ef9a9a',
+          300: '#e57373',
+          400: '#ef5350',
+          500: '#F44336', // Rojo error
+          600: '#e53935',
+          700: '#d32f2f',
+          800: '#c62828',
+          900: '#b71c1c',
+          950: '#8e0000',
         },
-        // Colores específicos para motorepuestos - Paleta ampliada
+
+        // Grises para tema oscuro
+        gray: {
+          50: '#fafafa',
+          100: '#f5f5f5',
+          200: '#eeeeee',
+          300: '#e0e0e0',
+          400: '#bdbdbd',
+          500: '#9e9e9e',
+          600: '#757575',
+          700: '#616161',
+          800: '#424242',
+          850: '#2C2C2C', // Gris medio para bordes
+          900: '#212121',
+          925: '#1E1E1E', // Gris muy oscuro alternativo
+          950: '#121212', // Gris muy oscuro para tarjetas
+        },
+
+        // Colores específicos para motorepuestos - Tema oscuro
         moto: {
-          // Azules mecánicos
-          blue: '#0ea5e9',
-          lightBlue: '#38bdf8',
-          darkBlue: '#0369a1',
-          navy: '#1e293b',
+          // Azules mecánicos oscuros
+          blue: '#2979FF',
+          lightBlue: '#42a5f5',
+          darkBlue: '#1565c0',
+          navy: '#0d47a1',
           
-          // Naranjas de alta visibilidad
-          orange: '#ff6b35',
-          lightOrange: '#ff8c42',
-          darkOrange: '#e55a2b',
+          // Violetas elegantes
+          violet: '#7C4DFF',
+          lightViolet: '#9575cd',
+          darkViolet: '#512da8',
           
-          // Grises industriales
-          steel: '#64748b',
-          chrome: '#e2e8f0',
-          iron: '#475569',
-          carbon: '#334155',
+          // Fondos oscuros
+          bgPrimary: '#000000',
+          bgSecondary: '#121212',
+          bgTertiary: '#1E1E1E',
           
-          // Colores de estado
-          success: '#10b981',
-          warning: '#f59e0b',
-          error: '#ef4444',
-          info: '#0ea5e9',
+          // Textos
+          textPrimary: '#FFFFFF',
+          textSecondary: '#B0B0B0',
+          
+          // Bordes
+          border: '#2C2C2C',
+          borderLight: '#404040',
+          
+          // Estados oscuros
+          success: '#4CAF50',
+          warning: '#FF9800',
+          error: '#F44336',
+          info: '#2979FF',
         }
       },
 
@@ -191,23 +242,6 @@ module.exports = {
         'responsive-5xl': ['clamp(3rem, 6vw, 3.75rem)', { lineHeight: '1' }],
       },
 
-      // ===== ESPACIADO RESPONSIVE =====
-      spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-        '128': '32rem',
-        '144': '36rem',
-        // Espaciado responsive
-        'responsive-1': 'clamp(0.25rem, 1vw, 0.5rem)',
-        'responsive-2': 'clamp(0.5rem, 1.5vw, 1rem)',
-        'responsive-3': 'clamp(0.75rem, 2vw, 1.5rem)',
-        'responsive-4': 'clamp(1rem, 2.5vw, 2rem)',
-        'responsive-6': 'clamp(1.5rem, 3vw, 3rem)',
-        'responsive-8': 'clamp(2rem, 4vw, 4rem)',
-        'responsive-12': 'clamp(3rem, 6vw, 6rem)',
-        'responsive-16': 'clamp(4rem, 8vw, 8rem)',
-      },
-
       // ===== BORDES Y RADIOS =====
       borderRadius: {
         '4xl': '2rem',
@@ -218,18 +252,28 @@ module.exports = {
         'moto-xl': '20px',
       },
 
-      // ===== SOMBRAS PERSONALIZADAS =====
+      // ===== SOMBRAS TEMA OSCURO =====
       boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'medium': '0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        'strong': '0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 2px 10px -2px rgba(0, 0, 0, 0.05)',
-        'glow': '0 0 20px rgba(249, 115, 22, 0.3)',
-        'glow-lg': '0 0 40px rgba(249, 115, 22, 0.4)',
-        'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
-        'inner-medium': 'inset 0 4px 8px 0 rgba(0, 0, 0, 0.1)',
-        'moto': '0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06)',
-        'moto-lg': '0 10px 15px -3px rgba(59, 130, 246, 0.1), 0 4px 6px -2px rgba(59, 130, 246, 0.05)',
-        'moto-xl': '0 20px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04)',
+        // Sombras oscuras
+        'dark-sm': '0 1px 3px 0 rgba(0, 0, 0, 0.5)',
+        'dark-md': '0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.3)',
+        'dark-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -4px rgba(0, 0, 0, 0.4)',
+        'dark-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
+        
+        // Sombras de acento
+        'glow-blue': '0 0 20px rgba(41, 121, 255, 0.3)',
+        'glow-blue-lg': '0 0 40px rgba(41, 121, 255, 0.4)',
+        'glow-violet': '0 0 20px rgba(124, 77, 255, 0.3)',
+        'glow-violet-lg': '0 0 40px rgba(124, 77, 255, 0.4)',
+        
+        // Sombras suaves para elementos
+        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.3), 0 10px 20px -2px rgba(0, 0, 0, 0.1)',
+        'medium': '0 4px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
+        'strong': '0 10px 40px -10px rgba(0, 0, 0, 0.5), 0 2px 10px -2px rgba(0, 0, 0, 0.3)',
+        
+        // Sombras internas
+        'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.3)',
+        'inner-medium': 'inset 0 4px 8px 0 rgba(0, 0, 0, 0.4)',
       },
 
       // ===== ANIMACIONES PERSONALIZADAS =====
@@ -245,6 +289,7 @@ module.exports = {
         'wiggle': 'wiggle 1s ease-in-out infinite',
         'float': 'float 3s ease-in-out infinite',
         'shimmer': 'shimmer 2s linear infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
       },
 
       keyframes: {
@@ -284,6 +329,10 @@ module.exports = {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },
         },
+        glow: {
+          '0%': { boxShadow: '0 0 5px rgba(41, 121, 255, 0.3)' },
+          '100%': { boxShadow: '0 0 20px rgba(41, 121, 255, 0.6)' },
+        },
       },
 
       // ===== TRANSICIONES PERSONALIZADAS =====
@@ -301,21 +350,29 @@ module.exports = {
         'ease-in-quart': 'cubic-bezier(0.5, 0, 0.75, 0)',
       },
 
-      // ===== GRADIENTES PERSONALIZADOS =====
+      // ===== GRADIENTES TEMA OSCURO =====
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'gradient-primary': 'linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%)',
-        'gradient-secondary': 'linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%)',
-        'gradient-success': 'linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%)',
-        'gradient-warning': 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)',
-        'gradient-error': 'linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%)',
-        'gradient-glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
-        'gradient-moto': 'linear-gradient(135deg, #0ea5e9 0%, #ff6b35 100%)',
-        'gradient-moto-dark': 'linear-gradient(135deg, #0369a1 0%, #e55a2b 100%)',
-        'gradient-moto-hero': 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 50%, #ff6b35 100%)',
-        'gradient-moto-card': 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-        'gradient-moto-steel': 'linear-gradient(90deg, #64748b 0%, #475569 100%)',
+        
+        // Gradientes principales tema oscuro
+        'gradient-primary': 'linear-gradient(135deg, #2979FF 0%, #1565c0 50%, #0d47a1 100%)',
+        'gradient-secondary': 'linear-gradient(135deg, #7C4DFF 0%, #512da8 50%, #311b92 100%)',
+        'gradient-success': 'linear-gradient(135deg, #4CAF50 0%, #388e3c 50%, #2e7d32 100%)',
+        'gradient-warning': 'linear-gradient(135deg, #FF9800 0%, #f57c00 50%, #ef6c00 100%)',
+        'gradient-error': 'linear-gradient(135deg, #F44336 0%, #d32f2f 50%, #c62828 100%)',
+        
+        // Gradientes de fondo tema oscuro
+        'gradient-dark': 'linear-gradient(135deg, #000000 0%, #121212 50%, #1E1E1E 100%)',
+        'gradient-dark-subtle': 'linear-gradient(135deg, #121212 0%, #1E1E1E 100%)',
+        'gradient-glass-dark': 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)',
+        
+        // Gradientes específicos motorepuestos
+        'gradient-moto': 'linear-gradient(135deg, #2979FF 0%, #7C4DFF 100%)',
+        'gradient-moto-dark': 'linear-gradient(135deg, #1565c0 0%, #512da8 100%)',
+        'gradient-moto-hero': 'linear-gradient(135deg, #2979FF 0%, #42a5f5 50%, #7C4DFF 100%)',
+        'gradient-moto-card': 'linear-gradient(145deg, #121212 0%, #1E1E1E 100%)',
+        'gradient-moto-border': 'linear-gradient(90deg, #2C2C2C 0%, #404040 100%)',
       },
 
       // ===== FILTROS PERSONALIZADOS =====
@@ -394,6 +451,7 @@ module.exports = {
           '"Noto Color Emoji"',
         ],
         'mono': [
+          'JetBrains Mono',
           'ui-monospace',
           'SFMono-Regular',
           'Menlo',
@@ -403,27 +461,6 @@ module.exports = {
           '"Courier New"',
           'monospace',
         ],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
-      },
-
-      // ===== LINE HEIGHT RESPONSIVE =====
-      lineHeight: {
-        'extra-tight': '1.1',
-        'extra-loose': '2.5',
-        'responsive-tight': 'clamp(1.1, 1.2, 1.3)',
-        'responsive-normal': 'clamp(1.4, 1.5, 1.6)',
-        'responsive-loose': 'clamp(1.7, 1.8, 1.9)',
-      },
-
-      // ===== LETTER SPACING PERSONALIZADO =====
-      letterSpacing: {
-        'tighter': '-0.05em',
-        'tight': '-0.025em',
-        'normal': '0em',
-        'wide': '0.025em',
-        'wider': '0.05em',
-        'widest': '0.1em',
       },
 
       // ===== OPACITY PERSONALIZADA =====
@@ -446,248 +483,156 @@ module.exports = {
         '109': '1.09',
         '110': '1.1',
       },
-
-      // ===== ROTATE PERSONALIZADO =====
-      rotate: {
-        '1': '1deg',
-        '2': '2deg',
-        '3': '3deg',
-        '6': '6deg',
-        '12': '12deg',
-        '15': '15deg',
-        '30': '30deg',
-        '60': '60deg',
-        '90': '90deg',
-        '180': '180deg',
-      },
-
-      // ===== SKEW PERSONALIZADO =====
-      skew: {
-        '1': '1deg',
-        '2': '2deg',
-        '3': '3deg',
-        '6': '6deg',
-        '12': '12deg',
-      },
-
-      // ===== TRANSLATE PERSONALIZADO =====
-      translate: {
-        '1/7': '14.285714%',
-        '2/7': '28.571429%',
-        '3/7': '42.857143%',
-        '4/7': '57.142857%',
-        '5/7': '71.428571%',
-        '6/7': '85.714286%',
-        '1/8': '12.5%',
-        '2/8': '25%',
-        '3/8': '37.5%',
-        '4/8': '50%',
-        '5/8': '62.5%',
-        '6/8': '75%',
-        '7/8': '87.5%',
-      },
-
-      // ===== BLUR PERSONALIZADO =====
-      blur: {
-        '4xl': '72px',
-        '5xl': '96px',
-      },
-
-      // ===== BRIGHTNESS PERSONALIZADO =====
-      brightness: {
-        '25': '.25',
-        '40': '.4',
-        '50': '.5',
-        '60': '.6',
-        '75': '.75',
-        '90': '.9',
-        '110': '1.1',
-        '125': '1.25',
-        '150': '1.5',
-        '175': '1.75',
-        '200': '2',
-      },
-
-      // ===== CONTRAST PERSONALIZADO =====
-      contrast: {
-        '0': '0',
-        '50': '.5',
-        '75': '.75',
-        '100': '1',
-        '125': '1.25',
-        '150': '1.5',
-        '200': '2',
-      },
-
-      // ===== GRAYSCALE PERSONALIZADO =====
-      grayscale: {
-        '0': '0',
-        '10': '0.1',
-        '20': '0.2',
-        '30': '0.3',
-        '40': '0.4',
-        '50': '0.5',
-        '60': '0.6',
-        '70': '0.7',
-        '80': '0.8',
-        '90': '0.9',
-        '100': '1',
-      },
-
-      // ===== HUE ROTATE PERSONALIZADO =====
-      hueRotate: {
-        '-180': '-180deg',
-        '-90': '-90deg',
-        '-60': '-60deg',
-        '-30': '-30deg',
-        '-15': '-15deg',
-        '0': '0deg',
-        '15': '15deg',
-        '30': '30deg',
-        '60': '60deg',
-        '90': '90deg',
-        '180': '180deg',
-      },
-
-      // ===== INVERT PERSONALIZADO =====
-      invert: {
-        '0': '0',
-        '10': '0.1',
-        '20': '0.2',
-        '30': '0.3',
-        '40': '0.4',
-        '50': '0.5',
-        '60': '0.6',
-        '70': '0.7',
-        '80': '0.8',
-        '90': '0.9',
-        '100': '1',
-      },
-
-      // ===== SATURATE PERSONALIZADO =====
-      saturate: {
-        '0': '0',
-        '50': '.5',
-        '100': '1',
-        '150': '1.5',
-        '200': '2',
-      },
-
-      // ===== SEPIA PERSONALIZADO =====
-      sepia: {
-        '0': '0',
-        '10': '0.1',
-        '20': '0.2',
-        '30': '0.3',
-        '40': '0.4',
-        '50': '0.5',
-        '60': '0.6',
-        '70': '0.7',
-        '80': '0.8',
-        '90': '0.9',
-        '100': '1',
-      },
-
-      // ===== DROP SHADOW PERSONALIZADO =====
-      dropShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07)',
-        'medium': '0 4px 25px -5px rgba(0, 0, 0, 0.1)',
-        'strong': '0 10px 40px -10px rgba(0, 0, 0, 0.15)',
-        'glow': '0 0 20px rgba(249, 115, 22, 0.3)',
-        'glow-lg': '0 0 40px rgba(249, 115, 22, 0.4)',
-      },
     },
   },
   plugins: [
     require('@tailwindcss/forms'),
     require('@tailwindcss/typography'),
-    // Plugin para utilidades responsive personalizadas
+    // Plugin para utilidades tema oscuro
     function({ addUtilities, theme }) {
       const newUtilities = {
-        '.text-responsive': {
+        // Utilidades de texto responsive tema oscuro
+        '.text-responsive-dark': {
           fontSize: 'clamp(0.875rem, 1vw, 1rem)',
           lineHeight: '1.5',
+          color: '#FFFFFF',
         },
-        '.text-responsive-lg': {
+        '.text-responsive-lg-dark': {
           fontSize: 'clamp(1rem, 1.5vw, 1.125rem)',
           lineHeight: '1.6',
+          color: '#FFFFFF',
         },
-        '.text-responsive-xl': {
+        '.text-responsive-xl-dark': {
           fontSize: 'clamp(1.125rem, 2vw, 1.25rem)',
           lineHeight: '1.5',
+          color: '#FFFFFF',
         },
-        '.text-responsive-2xl': {
+        '.text-responsive-2xl-dark': {
           fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)',
           lineHeight: '1.4',
+          color: '#FFFFFF',
         },
-        '.text-responsive-3xl': {
-          fontSize: 'clamp(1.5rem, 3vw, 1.875rem)',
-          lineHeight: '1.3',
+        '.text-secondary-dark': {
+          color: '#B0B0B0',
         },
-        '.text-responsive-4xl': {
-          fontSize: 'clamp(1.875rem, 4vw, 2.25rem)',
-          lineHeight: '1.2',
+        
+        // Utilidades de fondo tema oscuro
+        '.bg-dark-primary': {
+          backgroundColor: '#000000',
         },
-        '.text-responsive-5xl': {
-          fontSize: 'clamp(2.25rem, 5vw, 3rem)',
-          lineHeight: '1.1',
+        '.bg-dark-secondary': {
+          backgroundColor: '#121212',
         },
-        '.p-responsive': {
+        '.bg-dark-tertiary': {
+          backgroundColor: '#1E1E1E',
+        },
+        
+        // Utilidades de bordes tema oscuro
+        '.border-dark': {
+          borderColor: '#2C2C2C',
+        },
+        '.border-dark-light': {
+          borderColor: '#404040',
+        },
+        
+        // Utilidades de padding y margin responsive
+        '.p-responsive-dark': {
           padding: 'clamp(0.5rem, 2vw, 1rem)',
         },
-        '.p-responsive-lg': {
+        '.p-responsive-lg-dark': {
           padding: 'clamp(1rem, 3vw, 1.5rem)',
         },
-        '.p-responsive-xl': {
+        '.p-responsive-xl-dark': {
           padding: 'clamp(1.5rem, 4vw, 2rem)',
         },
-        '.m-responsive': {
+        '.m-responsive-dark': {
           margin: 'clamp(0.5rem, 2vw, 1rem)',
         },
-        '.m-responsive-lg': {
+        '.m-responsive-lg-dark': {
           margin: 'clamp(1rem, 3vw, 1.5rem)',
         },
-        '.m-responsive-xl': {
+        '.m-responsive-xl-dark': {
           margin: 'clamp(1.5rem, 4vw, 2rem)',
         },
-        '.gap-responsive': {
+        
+        // Utilidades de gap responsive
+        '.gap-responsive-dark': {
           gap: 'clamp(0.5rem, 2vw, 1rem)',
         },
-        '.gap-responsive-lg': {
+        '.gap-responsive-lg-dark': {
           gap: 'clamp(1rem, 3vw, 1.5rem)',
         },
-        '.gap-responsive-xl': {
+        '.gap-responsive-xl-dark': {
           gap: 'clamp(1.5rem, 4vw, 2rem)',
         },
-        '.rounded-responsive': {
+        
+        // Utilidades de border radius responsive
+        '.rounded-responsive-dark': {
           borderRadius: 'clamp(0.25rem, 1vw, 0.5rem)',
         },
-        '.rounded-responsive-lg': {
+        '.rounded-responsive-lg-dark': {
           borderRadius: 'clamp(0.5rem, 1.5vw, 1rem)',
         },
-        '.rounded-responsive-xl': {
+        '.rounded-responsive-xl-dark': {
           borderRadius: 'clamp(1rem, 2vw, 1.5rem)',
         },
-        '.shadow-responsive': {
-          boxShadow: '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+        
+        // Utilidades de sombras tema oscuro
+        '.shadow-responsive-dark': {
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.5)',
         },
-        '.shadow-responsive-lg': {
-          boxShadow: '0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        '.shadow-responsive-lg-dark': {
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.3)',
         },
-        '.shadow-responsive-xl': {
-          boxShadow: '0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 2px 10px -2px rgba(0, 0, 0, 0.05)',
+        '.shadow-responsive-xl-dark': {
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -4px rgba(0, 0, 0, 0.4)',
         },
-        '.backdrop-blur-responsive': {
+        
+        // Utilidades de backdrop blur responsive
+        '.backdrop-blur-responsive-dark': {
           backdropFilter: 'blur(clamp(4px, 1vw, 8px))',
         },
-        '.backdrop-blur-responsive-lg': {
+        '.backdrop-blur-responsive-lg-dark': {
           backdropFilter: 'blur(clamp(8px, 2vw, 16px))',
         },
-        '.backdrop-blur-responsive-xl': {
+        '.backdrop-blur-responsive-xl-dark': {
           backdropFilter: 'blur(clamp(16px, 3vw, 24px))',
+        },
+        
+        // Utilidades específicas de motorepuestos
+        '.moto-card-dark': {
+          backgroundColor: '#121212',
+          borderColor: '#2C2C2C',
+          borderWidth: '1px',
+          borderRadius: '0.75rem',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.3)',
+        },
+        '.moto-input-dark': {
+          backgroundColor: '#121212',
+          borderColor: '#2C2C2C',
+          color: '#FFFFFF',
+        },
+        '.moto-input-dark:focus': {
+          borderColor: '#2979FF',
+          boxShadow: '0 0 0 3px rgba(41, 121, 255, 0.1)',
+        },
+        '.moto-button-primary': {
+          backgroundColor: '#2979FF',
+          color: '#FFFFFF',
+          borderColor: '#2979FF',
+        },
+        '.moto-button-primary:hover': {
+          backgroundColor: '#1e6bff',
+          boxShadow: '0 0 20px rgba(41, 121, 255, 0.3)',
+        },
+        '.moto-text-gradient': {
+          background: 'linear-gradient(135deg, #2979FF 0%, #7C4DFF 100%)',
+          '-webkit-background-clip': 'text',
+          '-webkit-text-fill-color': 'transparent',
+          'background-clip': 'text',
         },
       }
       addUtilities(newUtilities)
     },
   ],
-} 
+}

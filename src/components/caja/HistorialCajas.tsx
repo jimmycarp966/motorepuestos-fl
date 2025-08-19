@@ -38,15 +38,15 @@ export const HistorialCajas: React.FC = () => {
   const getSaldoColor = (saldo: number) => {
     if (saldo > 0) return 'text-green-600'
     if (saldo < 0) return 'text-red-600'
-    return 'text-gray-600'
+    return 'text-dark-text-secondary'
   }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Historial de Cajas</h2>
-          <p className="text-gray-600">Resumen de todas las cajas cerradas</p>
+          <h2 className="text-2xl font-bold text-dark-text-primary">Historial de Cajas</h2>
+          <p className="text-dark-text-secondary">Resumen de todas las cajas cerradas</p>
         </div>
         <Button onClick={() => fetchHistorialCajas()} disabled={cajaHistorial.loading}>
           <Receipt className="w-4 h-4 mr-2" />
@@ -57,13 +57,13 @@ export const HistorialCajas: React.FC = () => {
       {cajaHistorial.loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Cargando historial...</p>
+          <p className="mt-2 text-dark-text-secondary">Cargando historial...</p>
         </div>
       ) : cajaHistorial.cajasDiarias.length === 0 ? (
         <div className="text-center py-12">
-          <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No hay historial de cajas</h3>
-          <p className="text-gray-600">Las cajas cerradas aparecerán aquí</p>
+          <Calendar className="w-16 h-16 text-dark-border mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-dark-text-primary mb-2">No hay historial de cajas</h3>
+          <p className="text-dark-text-secondary">Las cajas cerradas aparecerán aquí</p>
         </div>
       ) : (
         <div className="grid gap-4">
@@ -131,7 +131,7 @@ export const HistorialCajas: React.FC = () => {
                       <span className="font-semibold">Ventas</span>
                     </div>
                     <p className="text-lg font-bold">{caja.ventas_count}</p>
-                    <p className="text-sm text-gray-600">{formatCurrency(caja.total_ventas)}</p>
+                    <p className="text-sm text-dark-text-secondary">{formatCurrency(caja.total_ventas)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -143,7 +143,7 @@ export const HistorialCajas: React.FC = () => {
       {/* Modal de detalle */}
       {fechaSeleccionada && detalleDia && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-dark-bg-secondary rounded-lg shadow-dark-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold">Detalle del {DateUtils.formatDate(fechaSeleccionada, 'dd/MM/yyyy')}</h3>
@@ -160,16 +160,16 @@ export const HistorialCajas: React.FC = () => {
                 <CardContent>
                   <div className="space-y-2">
                     {detalleDia.movimientos.map((mov: any) => (
-                      <div key={mov.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                      <div key={mov.id} className="flex justify-between items-center p-2 bg-dark-bg-tertiary rounded">
                         <div>
                           <span className={`font-semibold ${mov.tipo === 'ingreso' ? 'text-green-600' : 'text-red-600'}`}>
                             {mov.tipo === 'ingreso' ? '+' : '-'} {formatCurrency(mov.monto)}
                           </span>
-                          <p className="text-sm text-gray-600">{mov.concepto}</p>
+                          <p className="text-sm text-dark-text-secondary">{mov.concepto}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-sm">{mov.empleado?.nombre}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-dark-text-secondary">
                             {new Date(mov.fecha).toLocaleTimeString()}
                           </p>
                         </div>
@@ -187,10 +187,10 @@ export const HistorialCajas: React.FC = () => {
                 <CardContent>
                   <div className="space-y-2">
                     {detalleDia.ventas.map((venta: any) => (
-                      <div key={venta.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                      <div key={venta.id} className="flex justify-between items-center p-2 bg-dark-bg-tertiary rounded">
                         <div>
                           <span className="font-semibold">Venta #{venta.id}</span>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-dark-text-secondary">
                             {venta.cliente?.nombre || 'Sin cliente'} - {venta.metodo_pago}
                           </p>
                         </div>
@@ -213,19 +213,19 @@ export const HistorialCajas: React.FC = () => {
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="text-center">
-                        <p className="text-sm text-gray-600">Efectivo Real</p>
+                        <p className="text-sm text-dark-text-secondary">Efectivo Real</p>
                         <p className="font-bold">{formatCurrency(detalleDia.arqueo.efectivo_real)}</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-sm text-gray-600">Tarjeta Real</p>
+                        <p className="text-sm text-dark-text-secondary">Tarjeta Real</p>
                         <p className="font-bold">{formatCurrency(detalleDia.arqueo.tarjeta_real)}</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-sm text-gray-600">Transferencia Real</p>
+                        <p className="text-sm text-dark-text-secondary">Transferencia Real</p>
                         <p className="font-bold">{formatCurrency(detalleDia.arqueo.transferencia_real)}</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-sm text-gray-600">Diferencia</p>
+                        <p className="text-sm text-dark-text-secondary">Diferencia</p>
                         <p className={`font-bold ${detalleDia.arqueo.total_diferencia === 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {formatCurrency(detalleDia.arqueo.total_diferencia)}
                         </p>

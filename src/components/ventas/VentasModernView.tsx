@@ -23,7 +23,8 @@ import {
   Wrench,
   Fuel,
   Settings,
-  Car
+  Car,
+  X
 } from 'lucide-react'
 import { useSearchFilter } from '../../hooks/useSearchFilter'
 
@@ -225,7 +226,7 @@ export const VentasModernView: React.FC = () => {
       {/* Panel Principal - Productos */}
       <div className="flex-1 flex flex-col">
         {/* Header de búsqueda y filtros */}
-        <div className="bg-white shadow-sm border-b border-slate-200 p-6">
+        <div className="bg-dark-bg-secondary shadow-dark-sm border-b border-dark-border p-6">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold" style={{ color: '#0ea5e9' }}>
               🏪 Punto de Venta - Motorepuestos
@@ -317,13 +318,13 @@ export const VentasModernView: React.FC = () => {
                 return (
                   <div
                     key={producto.id}
-                    className="ventas-product-card bg-white rounded-xl border border-slate-200 hover:border-moto-blue p-5"
+                    className="ventas-product-card bg-dark-bg-secondary rounded-xl border border-dark-border hover:border-primary-500 p-5"
                   >
                     {/* Header del producto */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center space-x-2">
                         {getCategoryIcon(producto.categoria)}
-                        <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full font-medium">
+                        <span className="text-xs bg-dark-bg-tertiary text-dark-text-secondary px-2 py-1 rounded-full font-medium">
                           {producto.categoria}
                         </span>
                       </div>
@@ -404,13 +405,13 @@ export const VentasModernView: React.FC = () => {
                 return (
                   <div
                     key={producto.id}
-                    className="bg-white rounded-lg border border-slate-200 hover:border-moto-blue hover:shadow-md transition-all duration-200 p-4"
+                    className="bg-dark-bg-secondary rounded-lg border border-dark-border hover:border-primary-500 hover:shadow-dark-md transition-all duration-200 p-4"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4 flex-1">
                         <div className="flex items-center space-x-2">
                           {getCategoryIcon(producto.categoria)}
-                          <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">
+                          <span className="text-xs bg-dark-bg-tertiary text-dark-text-secondary px-2 py-1 rounded-full">
                             {producto.categoria}
                           </span>
                         </div>
@@ -463,7 +464,7 @@ export const VentasModernView: React.FC = () => {
       </div>
 
       {/* Panel Lateral - Carrito */}
-      <div className="w-96 bg-white border-l border-slate-200 flex flex-col">
+      <div className="w-96 bg-dark-bg-secondary border-l border-dark-border flex flex-col">
         {/* Header del carrito */}
         <div className="p-6 border-b border-slate-200">
           <div className="flex items-center justify-between mb-4">
@@ -610,7 +611,7 @@ export const VentasModernView: React.FC = () => {
 
         {/* Total y botón finalizar */}
         {cartItems.length > 0 && (
-          <div className="p-6 border-t border-slate-200 bg-slate-50">
+          <div className="p-6 border-t border-dark-border bg-dark-bg-tertiary">
             <div className="space-y-3 mb-6">
               <div className="flex justify-between text-lg">
                 <span className="font-medium text-slate-700">Subtotal:</span>
@@ -667,7 +668,7 @@ export const VentasModernView: React.FC = () => {
       {/* Modal de selección de cliente */}
       {showClientSearch && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+          <div className="bg-dark-bg-secondary rounded-xl shadow-dark-xl w-full max-w-md">
             <div className="p-6 border-b border-slate-200">
               <h3 className="text-lg font-semibold text-slate-800 mb-4">Seleccionar Cliente</h3>
               <Input

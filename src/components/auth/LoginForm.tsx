@@ -37,19 +37,20 @@ export const LoginForm: React.FC = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: 'linear-gradient(135deg, #000000 0%, #121212 50%, #1E1E1E 100%)',
       padding: '1rem',
       fontFamily: 'Inter, system-ui, sans-serif'
     }}>
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: '#121212',
         borderRadius: '1.5rem',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(41, 121, 255, 0.15)',
         padding: 'clamp(1.5rem, 4vw, 3rem)',
         width: '100%',
         maxWidth: 'min(450px, calc(100vw - 2rem))',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        border: '1px solid #2C2C2C'
       }}>
         {/* Decoración de fondo */}
         <div style={{
@@ -59,8 +60,8 @@ export const LoginForm: React.FC = () => {
           width: '100px',
           height: '100px',
           borderRadius: '50%',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          opacity: 0.1
+          background: 'linear-gradient(135deg, #2979FF 0%, #7C4DFF 100%)',
+          opacity: 0.2
         }} />
         <div style={{
           position: 'absolute',
@@ -69,8 +70,8 @@ export const LoginForm: React.FC = () => {
           width: '60px',
           height: '60px',
           borderRadius: '50%',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          opacity: 0.1
+          background: 'linear-gradient(135deg, #2979FF 0%, #7C4DFF 100%)',
+          opacity: 0.2
         }} />
 
         {/* Header */}
@@ -96,15 +97,16 @@ export const LoginForm: React.FC = () => {
           <h1 style={{
             fontSize: 'clamp(1.5rem, 5vw, 2rem)',
             fontWeight: '700',
-            color: '#1e293b',
-            marginBottom: '0.5rem'
+            color: '#FFFFFF',
+            marginBottom: '0.5rem',
+            textShadow: '0 0 20px rgba(41, 121, 255, 0.3)'
           }}>
-            Sirius
+            Motorepuestos F.L.
           </h1>
           
           <p style={{
             fontSize: 'clamp(0.875rem, 3vw, 1rem)',
-            color: '#64748b',
+            color: '#B0B0B0',
             margin: 0
           }}>
             Sistema de Gestión Inteligente
@@ -148,7 +150,7 @@ export const LoginForm: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-dark-text-secondary hover:text-dark-text-primary transition-colors p-1"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -157,7 +159,11 @@ export const LoginForm: React.FC = () => {
 
           {/* Error */}
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-moto text-red-600 text-sm flex items-center gap-2">
+            <div className="p-3 border rounded-moto text-sm flex items-center gap-2" style={{
+              backgroundColor: 'rgba(244, 51, 54, 0.1)',
+              borderColor: '#F44336',
+              color: '#F44336'
+            }}>
               <span>⚠️</span>
               {error}
             </div>
@@ -170,8 +176,7 @@ export const LoginForm: React.FC = () => {
             style={{
               width: '100%',
               padding: '1rem',
-              backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #2979FF 0%, #7C4DFF 100%)',
               color: 'white',
               border: 'none',
               borderRadius: '0.75rem',
@@ -183,18 +188,19 @@ export const LoginForm: React.FC = () => {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.5rem',
-              opacity: loading || isLoading ? 0.7 : 1
+              opacity: loading || isLoading ? 0.7 : 1,
+              boxShadow: '0 0 20px rgba(41, 121, 255, 0.3)'
             }}
             onMouseEnter={(e) => {
               if (!loading && !isLoading) {
                 e.currentTarget.style.transform = 'translateY(-2px)'
-                e.currentTarget.style.boxShadow = '0 10px 25px rgba(102, 126, 234, 0.3)'
+                e.currentTarget.style.boxShadow = '0 10px 25px rgba(41, 121, 255, 0.6)'
               }
             }}
             onMouseLeave={(e) => {
               if (!loading && !isLoading) {
                 e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = 'none'
+                e.currentTarget.style.boxShadow = '0 0 20px rgba(41, 121, 255, 0.3)'
               }
             }}
           >
@@ -213,16 +219,16 @@ export const LoginForm: React.FC = () => {
             textAlign: 'center',
             marginTop: '1rem',
             padding: '1rem',
-            backgroundColor: '#f8fafc',
+            backgroundColor: '#1E1E1E',
             borderRadius: '0.75rem',
-            border: '1px solid #e2e8f0'
+            border: '1px solid #2C2C2C'
           }}>
             <p style={{
               fontSize: '0.875rem',
-              color: '#64748b',
+              color: '#B0B0B0',
               margin: 0
             }}>
-              💡 <strong>Consejo:</strong> Usa tu correo electrónico y contraseña para acceder al sistema
+              💡 <strong style={{ color: '#FFFFFF' }}>Consejo:</strong> Usa tu correo electrónico y contraseña para acceder al sistema
             </p>
           </div>
         </form>
@@ -232,14 +238,15 @@ export const LoginForm: React.FC = () => {
           textAlign: 'center',
           marginTop: '2rem',
           paddingTop: '1.5rem',
-          borderTop: '1px solid #e5e7eb'
+          borderTop: '1px solid #2C2C2C'
         }}>
           <p style={{
             fontSize: '0.75rem',
-            color: '#9ca3af',
-            margin: 0
+            color: '#B0B0B0',
+            margin: 0,
+            opacity: 0.7
           }}>
-            © 2024 Sirius - Sistema de Gestión Inteligente - Todos los derechos reservados
+            © 2024 Motorepuestos F.L. - Sistema de Gestión Inteligente - Todos los derechos reservados
           </p>
         </div>
 

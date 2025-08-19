@@ -119,7 +119,7 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-2xl bg-dark-bg-secondary rounded-2xl shadow-dark-xl border border-dark-border overflow-hidden max-h-[90vh] overflow-y-auto">
         {/* Header con gradiente */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 sticky top-0">
           <div className="flex justify-between items-center">
@@ -147,14 +147,14 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Campo Nombre */}
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
+                <label className="block text-sm font-semibold text-dark-text-primary">
                   📝 Nombre Completo
                 </label>
                 <Input
                   {...register('nombre')}
                   placeholder="Ingresa el nombre completo"
-                  className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
-                    errors.nombre ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                  className={`w-full px-4 py-3 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 ${
+                    errors.nombre ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                   }`}
                 />
                 {errors.nombre && (
@@ -167,15 +167,15 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
               
               {/* Campo Email */}
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
+                <label className="block text-sm font-semibold text-dark-text-primary">
                   📧 Correo Electrónico
                 </label>
                 <Input
                   {...register('email')}
                   type="email"
                   placeholder="ejemplo@motorepuestos.com"
-                  className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
-                    errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                  className={`w-full px-4 py-3 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 ${
+                    errors.email ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                   }`}
                   style={{ backgroundColor: 'white', color: '#374151' }}
                 />
@@ -190,7 +190,7 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
 
             {/* Contraseña */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
+              <label className="block text-sm font-semibold text-dark-text-primary">
                 🔐 Contraseña {empleado && '(dejar vacío para no cambiar)'}
               </label>
               <div className="relative">
@@ -198,15 +198,15 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
                   {...register('password')}
                   type={showPassword ? 'text' : 'password'}
                   placeholder={empleado ? 'Nueva contraseña (opcional)' : 'Ingresa la contraseña'}
-                  className={`w-full px-4 py-3 pr-12 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
-                    errors.password ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                  className={`w-full px-4 py-3 pr-12 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 ${
+                    errors.password ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                   }`}
                   style={{ backgroundColor: 'white', color: '#374151' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-dark-text-secondary hover:text-dark-text-primary"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -223,12 +223,12 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Campo Rol */}
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
+                <label className="block text-sm font-semibold text-dark-text-primary">
                   🎯 Rol en el Sistema
                 </label>
                 <select
                   {...register('rol')}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-300 transition-all duration-200"
+                  className="w-full px-4 py-3 border-2 border-dark-border rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200"
                   style={{ backgroundColor: 'white', color: '#374151' }}
                 >
                   <option value="">Selecciona un rol</option>
@@ -249,15 +249,15 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
 
               {/* Campo Salario */}
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
+                <label className="block text-sm font-semibold text-dark-text-primary">
                   💰 Salario Mensual
                 </label>
                 <Input
                   {...register('salario', { valueAsNumber: true })}
                   type="number"
                   placeholder="0.00"
-                  className={`w-full px-4 py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 ${
-                    errors.salario ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                  className={`w-full px-4 py-3 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 ${
+                    errors.salario ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                   }`}
                   style={{ backgroundColor: 'white', color: '#374151' }}
                 />
@@ -273,7 +273,7 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
                          {/* Permisos de Módulos */}
              <div className="space-y-4">
                <div className="flex justify-between items-center">
-                 <label className="block text-sm font-semibold text-gray-700">
+                 <label className="block text-sm font-semibold text-dark-text-primary">
                    🔐 Módulos Accesibles (Selección Libre)
                  </label>
                  <button
@@ -287,7 +287,7 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
                    Limpiar selección
                  </button>
                </div>
-               <p className="text-sm text-gray-600 mb-3">
+               <p className="text-sm text-dark-text-secondary mb-3">
                  Selecciona libremente qué módulos puede acceder el empleado, independientemente del rol.
                </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -299,21 +299,21 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
                       key={modulo.id}
                       className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
                         isSelected
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300 bg-white'
+                          ? 'border-primary-500 bg-primary-50'
+                          : 'border-dark-border hover:border-dark-border-light bg-dark-bg-secondary'
                       }`}
                       onClick={() => toggleModulo(modulo.id)}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                            isSelected ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                            isSelected ? 'border-primary-500 bg-primary-500' : 'border-dark-border'
                           }`}>
                             {isSelected && <Check className="w-3 h-3 text-white" />}
                           </div>
                           <div>
-                            <h4 className="font-medium text-gray-900">{modulo.nombre}</h4>
-                            <p className="text-sm text-gray-500">{modulo.descripcion}</p>
+                            <h4 className="font-medium text-dark-text-primary">{modulo.nombre}</h4>
+                            <p className="text-sm text-dark-text-secondary">{modulo.descripcion}</p>
                           </div>
                         </div>
                       </div>
@@ -335,7 +335,7 @@ export const EmpleadoForm: React.FC<EmpleadoFormProps> = ({ empleado, onClose })
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="flex-1 py-3 px-6 border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium"
+                className="flex-1 py-3 px-6 border-2 border-dark-border text-dark-text-primary hover:bg-dark-bg-tertiary hover:border-dark-border-light transition-all duration-200 font-medium"
               >
                 ❌ Cancelar
               </Button>

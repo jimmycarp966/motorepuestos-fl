@@ -5,18 +5,18 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 // Variantes para MotorCard
 const motorCardVariants = cva(
-  "transition-all duration-300 hover:shadow-lg relative overflow-hidden group",
+  "transition-all duration-300 hover:shadow-dark-lg relative overflow-hidden group",
   {
     variants: {
       variant: {
-        default: "border border-gray-200 bg-white hover:shadow-md",
-        featured: "border-2 border-moto-orange/20 bg-gradient-moto-card hover:shadow-xl hover:scale-[1.02]",
-        danger: "border-red-200 bg-red-50 hover:bg-red-100",
-        success: "border-green-200 bg-green-50 hover:bg-green-100", 
-        warning: "border-yellow-200 bg-yellow-50 hover:bg-yellow-100",
-        info: "border-blue-200 bg-blue-50 hover:bg-blue-100",
-        steel: "border-moto-steel/20 bg-gradient-moto-steel text-white",
-        glass: "border border-white/20 bg-white/10 backdrop-blur-md",
+        default: "border border-dark-border bg-dark-bg-secondary hover:shadow-dark-md hover:border-dark-border-light",
+        featured: "border-2 border-primary-500/30 bg-gradient-to-br from-primary-500/10 to-secondary-500/10 hover:shadow-glow-blue hover:scale-[1.02]",
+        danger: "border-danger-500/30 bg-danger-500/10 hover:bg-danger-500/20",
+        success: "border-success-500/30 bg-success-500/10 hover:bg-success-500/20", 
+        warning: "border-warning-500/30 bg-warning-500/10 hover:bg-warning-500/20",
+        info: "border-primary-500/30 bg-primary-500/10 hover:bg-primary-500/20",
+        steel: "border-secondary-500/30 bg-gradient-to-br from-secondary-500/20 to-primary-500/20 text-dark-text-primary",
+        glass: "border border-white/20 bg-white/5 backdrop-blur-md",
       },
       size: {
         sm: "p-3",
@@ -56,7 +56,7 @@ export const MotorCard = React.forwardRef<HTMLDivElement, MotorCardProps>(
         ref={ref}
         className={cn(
           motorCardVariants({ variant, size, rounded }),
-          glow && "shadow-lg hover:shadow-xl",
+          glow && "shadow-glow-blue hover:shadow-glow-blue-lg",
           animate && "hover:translate-y-[-2px]",
           className
         )}
@@ -64,7 +64,7 @@ export const MotorCard = React.forwardRef<HTMLDivElement, MotorCardProps>(
       >
         {/* Overlay de hover para variants especiales */}
         {(variant === 'featured' || variant === 'steel') && (
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 to-secondary-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         )}
         
         {/* Contenido */}

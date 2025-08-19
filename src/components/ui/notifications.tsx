@@ -11,10 +11,10 @@ const notificationIcons = {
 }
 
 const notificationStyles = {
-  success: 'bg-green-50 border-green-200 text-green-800',
-  error: 'bg-red-50 border-red-200 text-red-800',
-  warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-  info: 'bg-blue-50 border-blue-200 text-blue-800',
+  success: 'bg-success-500/20 border-success-500 text-success-500',
+  error: 'bg-danger-500/20 border-danger-500 text-danger-500',
+  warning: 'bg-warning-500/20 border-warning-500 text-warning-500',
+  info: 'bg-primary-500/20 border-primary-500 text-primary-500',
 }
 
 export const NotificationsContainer: React.FC = () => {
@@ -42,7 +42,7 @@ export const NotificationsContainer: React.FC = () => {
             </div>
             <button
               onClick={() => removeNotification(notification.id)}
-              className="ml-3 text-gray-400 hover:text-gray-600 transition-colors"
+              className="ml-3 text-dark-text-secondary hover:text-dark-text-primary transition-colors"
             >
               <X className="w-4 h-4" />
             </button>

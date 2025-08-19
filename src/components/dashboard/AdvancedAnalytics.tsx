@@ -24,12 +24,12 @@ const KPICard: React.FC<KPICardProps> = ({ title, value, change, changeLabel, ic
     <Card className="p-6 bg-gradient-to-br from-white to-gray-50 hover:shadow-lg transition-all duration-300">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+          <p className="text-sm font-medium text-dark-text-secondary">{title}</p>
+          <p className="text-3xl font-bold text-dark-text-primary mt-2">{value}</p>
           <div className={`flex items-center mt-2 text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
             <TrendIcon className="w-4 h-4 mr-1" />
             <span className="font-medium">{Math.abs(change)}%</span>
-            <span className="text-gray-500 ml-1">{changeLabel}</span>
+            <span className="text-dark-text-secondary ml-1">{changeLabel}</span>
           </div>
         </div>
         <div className={`p-3 rounded-xl bg-gradient-to-br`} style={{ backgroundColor: `${color}20`, color }}>
@@ -178,7 +178,7 @@ export const AdvancedAnalytics: React.FC = () => {
         {/* Tendencia de Ventas */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Tendencia de Ventas (7 días)</h3>
+            <h3 className="text-lg font-semibold text-dark-text-primary">Tendencia de Ventas (7 días)</h3>
             <BarChart3 className="w-5 h-5 text-blue-500" />
           </div>
           <ResponsiveContainer width="100%" height={250}>
@@ -206,7 +206,7 @@ export const AdvancedAnalytics: React.FC = () => {
         {/* Distribución de Métodos de Pago */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Métodos de Pago</h3>
+            <h3 className="text-lg font-semibold text-dark-text-primary">Métodos de Pago</h3>
             <Target className="w-5 h-5 text-green-500" />
           </div>
           <ResponsiveContainer width="100%" height={250}>
@@ -233,25 +233,25 @@ export const AdvancedAnalytics: React.FC = () => {
       {/* Top Productos */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Productos Más Vendidos</h3>
+          <h3 className="text-lg font-semibold text-dark-text-primary">Productos Más Vendidos</h3>
           <Package className="w-5 h-5 text-purple-500" />
         </div>
         <div className="space-y-4">
           {analytics.topProductos.map((producto, index) => (
-            <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div key={index} className="flex items-center justify-between p-4 bg-dark-bg-tertiary rounded-lg">
               <div className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mr-3`}
                      style={{ backgroundColor: COLORS[index % COLORS.length] }}>
                   {index + 1}
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">{producto.nombre}</p>
-                  <p className="text-sm text-gray-500">{producto.cantidad} unidades vendidas</p>
+                  <p className="font-medium text-dark-text-primary">{producto.nombre}</p>
+                  <p className="text-sm text-dark-text-secondary">{producto.cantidad} unidades vendidas</p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="font-bold text-green-600">${producto.ingresos.toLocaleString()}</p>
-                <p className="text-sm text-gray-500">ingresos</p>
+                <p className="text-sm text-dark-text-secondary">ingresos</p>
               </div>
             </div>
           ))}
@@ -264,21 +264,21 @@ export const AdvancedAnalytics: React.FC = () => {
           <div className="text-3xl font-bold text-blue-600 mb-2">
             ${analytics.promedioVenta.toLocaleString()}
           </div>
-          <p className="text-gray-600">Venta Promedio</p>
+          <p className="text-dark-text-secondary">Venta Promedio</p>
         </Card>
         
         <Card className="p-6 text-center">
           <div className="text-3xl font-bold text-green-600 mb-2">
             {productos.filter(p => p.activo).length}
           </div>
-          <p className="text-gray-600">Productos Activos</p>
+          <p className="text-dark-text-secondary">Productos Activos</p>
         </Card>
         
         <Card className="p-6 text-center">
           <div className="text-3xl font-bold text-purple-600 mb-2">
             {clientes.filter(c => c.activo).length}
           </div>
-          <p className="text-gray-600">Clientes Registrados</p>
+          <p className="text-dark-text-secondary">Clientes Registrados</p>
         </Card>
       </div>
     </div>

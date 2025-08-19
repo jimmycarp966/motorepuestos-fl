@@ -255,23 +255,23 @@ export const VentasTableModern: React.FC = () => {
   }
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-dark-bg-primary min-h-screen">
       {/* Header con título */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2" style={{ color: '#0ea5e9' }}>
+        <h1 className="text-3xl font-bold mb-2 text-gradient-moto">
           🏪 Punto de Venta - Motorepuestos
         </h1>
-        <p className="text-slate-600">Sistema optimizado para venta rápida de repuestos automotrices</p>
+        <p className="text-dark-text-secondary">Sistema optimizado para venta rápida de repuestos automotrices</p>
       </div>
 
       {/* Barra de búsqueda sola - Como en la imagen */}
-      <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6 mb-6">
+      <div className="bg-dark-bg-secondary rounded-xl shadow-dark-lg border border-dark-border p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Búsqueda principal */}
           <div className="md:col-span-2">
             <Label>Buscar Productos</Label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-500 w-5 h-5" />
               <Input
                 ref={searchInputRef}
                 value={searchTerm}
@@ -284,18 +284,18 @@ export const VentasTableModern: React.FC = () => {
                 placeholder="Ingrese el código de barras o el nombre del producto"
                 className="pl-10"
                 style={{
-                  borderColor: '#cbd5e1',
+                  borderColor: '#2C2C2C',
                   fontSize: '0.95rem'
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#0ea5e9'
-                  e.target.style.boxShadow = '0 0 0 3px rgba(14, 165, 233, 0.1)'
+                  e.target.style.borderColor = '#2979FF'
+                  e.target.style.boxShadow = '0 0 0 3px rgba(41, 121, 255, 0.1)'
                   if (searchTerm.length > 0) {
                     setShowSuggestions(true)
                   }
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = '#cbd5e1'
+                  e.target.style.borderColor = '#2C2C2C'
                   e.target.style.boxShadow = 'none'
                   // Delay para permitir clicks en sugerencias
                   setTimeout(() => setShowSuggestions(false), 200)
@@ -304,7 +304,7 @@ export const VentasTableModern: React.FC = () => {
               
               {/* Dropdown de sugerencias */}
               {showSuggestions && searchTerm.length > 0 && filteredProductos.length > 0 && (
-                <div className="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto mt-1">
+                <div className="absolute top-full left-0 right-0 bg-dark-bg-tertiary border border-dark-border rounded-lg shadow-dark-lg z-50 max-h-64 overflow-y-auto mt-1">
                   {filteredProductos.slice(0, 8).map((producto, index) => {
                     const precio = tipoPrecio === 'mayorista' ? producto.precio_mayorista : producto.precio_minorista
                     const enCarrito = cartItems.find(item => item.producto.id === producto.id)
@@ -312,27 +312,29 @@ export const VentasTableModern: React.FC = () => {
                     return (
                       <div
                         key={producto.id}
-                        className={`p-3 cursor-pointer border-b border-slate-100 last:border-b-0 hover:bg-slate-50 ${
-                          index === selectedSuggestionIndex ? 'bg-blue-50 border-blue-200' : ''
+                        className={`p-3 cursor-pointer border-b border-dark-border last:border-b-0 hover:bg-dark-bg-secondary transition-colors ${
+                          index === selectedSuggestionIndex ? 'bg-primary-500/20 border-primary-500/30' : ''
                         }`}
                         onClick={() => handleProductSelect(producto)}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
-                            {getCategoryIcon(producto.categoria)}
+                            <div className="text-primary-500">
+                              {getCategoryIcon(producto.categoria)}
+                            </div>
                             <div>
-                              <div className="font-medium text-slate-900">{producto.nombre}</div>
-                              <div className="text-sm text-slate-500">{producto.codigo_sku} • {producto.categoria}</div>
+                              <div className="font-medium text-dark-text-primary">{producto.nombre}</div>
+                              <div className="text-sm text-dark-text-secondary">{producto.codigo_sku} • {producto.categoria}</div>
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="font-semibold" style={{ color: '#0ea5e9' }}>
+                            <div className="font-semibold text-primary-500">
                               S/. {precio.toFixed(2)}
                             </div>
-                            <div className="text-sm text-slate-500">
+                            <div className="text-sm text-dark-text-secondary">
                               Stock: {producto.stock}
                               {enCarrito && (
-                                <span className="ml-2 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
+                                <span className="ml-2 bg-success-500/20 text-success-500 px-2 py-1 rounded-full text-xs border border-success-500/30">
                                   En carrito: {enCarrito.cantidad}
                                 </span>
                               )}
@@ -351,7 +353,7 @@ export const VentasTableModern: React.FC = () => {
           <div>
             <Label>Categoría</Label>
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 z-10" />
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-text-secondary w-4 h-4 z-10" />
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -380,7 +382,7 @@ export const VentasTableModern: React.FC = () => {
               <select
                 value={tipoPrecio}
                 onChange={(e) => setTipoPrecio(e.target.value as 'minorista' | 'mayorista')}
-                className="px-3 py-1 rounded-md border border-slate-300 text-sm"
+                className="px-3 py-1 rounded-md border border-dark-border text-sm"
               >
                 <option value="minorista">Minorista</option>
                 <option value="mayorista">Mayorista</option>
@@ -413,23 +415,23 @@ export const VentasTableModern: React.FC = () => {
             </div>
           </div>
           
-          <div className="text-sm text-slate-600">
+          <div className="text-sm text-dark-text-secondary">
             {filteredProductos?.length || 0} productos • {cartItems.length} en carrito
           </div>
         </div>
       </div>
 
       {/* Card principal único - Como en la imagen */}
-      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+      <div className="bg-dark-bg-secondary rounded-xl shadow-dark-lg border border-dark-border overflow-hidden">
         {/* Header del card */}
-        <div className="border-b border-slate-200 p-4" style={{ backgroundColor: '#f8fafc' }}>
+        <div className="border-b border-dark-border p-4" style={{ backgroundColor: '#f8fafc' }}>
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-800 flex items-center">
+            <h2 className="text-lg font-semibold text-dark-text-primary flex items-center">
               <Package className="w-5 h-5 mr-2" style={{ color: '#0ea5e9' }} />
               Productos Disponibles
             </h2>
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-slate-600">Total Venta:</span>
+              <span className="text-sm text-dark-text-secondary">Total Venta:</span>
               <span className="text-xl font-bold" style={{ color: '#0ea5e9' }}>
                 S/. {calculateTotal().toFixed(2)}
               </span>
@@ -440,7 +442,7 @@ export const VentasTableModern: React.FC = () => {
         {/* Todo el espacio para el carrito - amplio como una tabla */}
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-slate-800 flex items-center">
+            <h3 className="text-xl font-semibold text-dark-text-primary flex items-center">
               <ShoppingCart className="w-6 h-6 mr-3" style={{ color: '#0ea5e9' }} />
               Carrito de Compras ({cartItems.length} productos)
             </h3>
@@ -458,31 +460,31 @@ export const VentasTableModern: React.FC = () => {
 
           {cartItems.length === 0 ? (
             <div className="text-center py-16">
-              <ShoppingCart className="w-20 h-20 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-xl font-medium text-slate-600 mb-2">Carrito vacío</h3>
-              <p className="text-slate-500">Usa el buscador de arriba para agregar productos</p>
-              <p className="text-slate-400 text-sm mt-2">Escribe el código de barras o nombre del producto</p>
+              <ShoppingCart className="w-20 h-20 text-dark-border mx-auto mb-4" />
+              <h3 className="text-xl font-medium text-dark-text-secondary mb-2">Carrito vacío</h3>
+              <p className="text-dark-text-secondary">Usa el buscador de arriba para agregar productos</p>
+              <p className="text-dark-text-secondary text-sm mt-2">Escribe el código de barras o nombre del producto</p>
             </div>
           ) : (
             <>
               {/* Tabla del carrito - estilo amplio */}
-              <div className="overflow-hidden rounded-lg border border-slate-200">
+              <div className="overflow-hidden rounded-lg border border-dark-border">
                 <table className="w-full">
                   <thead style={{ backgroundColor: '#f8fafc' }}>
                     <tr>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Código</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Producto</th>
-                      <th className="px-6 py-4 text-center text-sm font-semibold text-slate-700">Cantidad</th>
-                      <th className="px-6 py-4 text-right text-sm font-semibold text-slate-700">Precio Unit.</th>
-                      <th className="px-6 py-4 text-right text-sm font-semibold text-slate-700">Total</th>
-                      <th className="px-6 py-4 text-center text-sm font-semibold text-slate-700">Opciones</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-dark-text-secondary">Código</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-dark-text-secondary">Producto</th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold text-dark-text-secondary">Cantidad</th>
+                      <th className="px-6 py-4 text-right text-sm font-semibold text-dark-text-secondary">Precio Unit.</th>
+                      <th className="px-6 py-4 text-right text-sm font-semibold text-dark-text-secondary">Total</th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold text-dark-text-secondary">Opciones</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 bg-white">
+                  <tbody className="divide-y divide-dark-border bg-dark-bg-secondary">
                     {cartItems.map((item, index) => (
-                      <tr key={`${item.producto.id}-${index}`} className="hover:bg-slate-50 transition-colors">
+                      <tr key={`${item.producto.id}-${index}`} className="hover:bg-dark-bg-tertiary transition-colors">
                         <td className="px-6 py-4">
-                          <span className="font-mono text-sm text-slate-600">
+                          <span className="font-mono text-sm text-dark-text-secondary">
                             {item.producto.codigo_sku}
                           </span>
                         </td>
@@ -490,10 +492,10 @@ export const VentasTableModern: React.FC = () => {
                           <div className="flex items-center space-x-3">
                             {getCategoryIcon(item.producto.categoria)}
                             <div>
-                              <div className="font-medium text-slate-900">
+                              <div className="font-medium text-dark-text-primary">
                                 {item.producto.nombre}
                               </div>
-                              <div className="text-sm text-slate-500">
+                              <div className="text-sm text-dark-text-secondary">
                                 {item.producto.categoria}
                               </div>
                             </div>
@@ -510,7 +512,7 @@ export const VentasTableModern: React.FC = () => {
                               <Minus className="w-4 h-4" />
                             </Button>
                             
-                            <span className="text-lg font-semibold text-slate-800 w-12 text-center">
+                            <span className="text-lg font-semibold text-dark-text-primary w-12 text-center">
                               {item.cantidad}
                             </span>
                             
@@ -530,7 +532,7 @@ export const VentasTableModern: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <span className="text-lg font-bold text-slate-900">
+                          <span className="text-lg font-bold text-dark-text-primary">
                             S/. {item.subtotal.toFixed(2)}
                           </span>
                         </td>
@@ -551,14 +553,14 @@ export const VentasTableModern: React.FC = () => {
               </div>
 
               {/* Método de pago dentro del carrito */}
-              <div className="mt-6 bg-slate-50 rounded-lg p-4">
+              <div className="mt-6 bg-dark-bg-secondary rounded-xl shadow-dark-lg border border-dark-border p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">Método de Pago</Label>
                     <select
                       value={metodoPago}
                       onChange={(e) => setMetodoPago(e.target.value as any)}
-                      className="w-full mt-1 px-3 py-2 border border-slate-300 rounded-lg"
+                      className="w-full mt-1 px-3 py-2 border border-dark-border rounded-lg"
                     >
                       <option value="efectivo">💵 Efectivo</option>
                       <option value="tarjeta">💳 Tarjeta</option>
@@ -568,7 +570,7 @@ export const VentasTableModern: React.FC = () => {
                   </div>
                   <div className="flex items-end">
                     <div className="text-right w-full">
-                      <div className="text-sm text-slate-600">Total de la Venta</div>
+                      <div className="text-sm text-dark-text-secondary">Total de la Venta</div>
                       <div className="text-2xl font-bold" style={{ color: '#0ea5e9' }}>
                         S/. {calculateTotal().toFixed(2)}
                       </div>
@@ -583,17 +585,17 @@ export const VentasTableModern: React.FC = () => {
 
       {/* Botón finalizar venta - Abajo del card principal */}
       {cartItems.length > 0 && (
-        <div className="mt-6 bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+        <div className="mt-6 bg-dark-bg-secondary rounded-xl shadow-dark-lg border border-dark-border p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               <div className="text-center">
-                <div className="text-sm text-slate-600">Total Items</div>
-                <div className="text-2xl font-bold text-slate-800">
+                <div className="text-sm text-dark-text-secondary">Total Items</div>
+                <div className="text-2xl font-bold text-dark-text-primary">
                   {cartItems.reduce((sum, item) => sum + item.cantidad, 0)}
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-sm text-slate-600">Total Venta</div>
+                <div className="text-sm text-dark-text-secondary">Total Venta</div>
                 <div className="text-3xl font-bold" style={{ color: '#0ea5e9' }}>
                   S/. {calculateTotal().toFixed(2)}
                 </div>
@@ -642,9 +644,9 @@ export const VentasTableModern: React.FC = () => {
       {/* Modal de selección de cliente */}
       {showClientSearch && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
-            <div className="p-6 border-b border-slate-200">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">Seleccionar Cliente</h3>
+          <div className="bg-dark-bg-secondary rounded-xl shadow-dark-xl w-full max-w-md">
+            <div className="p-6 border-b border-dark-border">
+              <h3 className="text-lg font-semibold text-dark-text-primary mb-4">Seleccionar Cliente</h3>
               <Input
                 value={clientSearchTerm}
                 onChange={(e) => setClientSearchTerm(e.target.value)}
@@ -685,7 +687,7 @@ export const VentasTableModern: React.FC = () => {
               </div>
             </div>
             
-            <div className="p-6 border-t border-slate-200">
+            <div className="p-6 border-t border-dark-border">
               <Button
                 onClick={() => setShowClientSearch(false)}
                 variant="outline"

@@ -154,8 +154,8 @@ function TableBase<T>({
     return (
       <Card className={`p-8 ${className}`}>
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
-          <span className="text-gray-600">Cargando...</span>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mr-3"></div>
+          <span className="text-dark-text-secondary">Cargando...</span>
         </div>
       </Card>
     )
@@ -165,9 +165,9 @@ function TableBase<T>({
     return (
       <Card className={`p-8 ${className}`}>
         <div className="text-center">
-          <div className="text-red-500 mb-4">
-            <div className="text-lg font-medium">Error al cargar datos</div>
-            <p className="text-sm text-gray-600 mt-2">{error}</p>
+          <div className="text-danger-500 mb-4">
+            <div className="text-lg font-medium text-dark-text-primary">Error al cargar datos</div>
+            <p className="text-sm text-dark-text-secondary mt-2">{error}</p>
           </div>
           {onRefresh && (
             <Button onClick={onRefresh} variant="outline">
@@ -185,8 +185,8 @@ function TableBase<T>({
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          {title && <h1 className="text-2xl font-bold text-gray-900">{title}</h1>}
-          {subtitle && <p className="text-gray-600">{subtitle}</p>}
+          {title && <h1 className="text-2xl font-bold text-dark-text-primary">{title}</h1>}
+          {subtitle && <p className="text-dark-text-secondary">{subtitle}</p>}
         </div>
         
         <div className="flex gap-2">
@@ -205,7 +205,7 @@ function TableBase<T>({
           {showCreateButton && onCreate && (
             <Button
               onClick={onCreate}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              variant="default"
             >
               <Plus className="w-4 h-4 mr-2" />
               {createLabel}
@@ -218,7 +218,7 @@ function TableBase<T>({
       {searchable && (
         <Card className="p-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-500 w-4 h-4" />
             <Input
               placeholder={searchPlaceholder}
               value={searchTerm}
@@ -231,9 +231,9 @@ function TableBase<T>({
 
       {/* Información de selección */}
       {selectable && selectedItems.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="bg-primary-500/20 border border-primary-500/30 rounded-lg p-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-blue-800">
+            <span className="text-sm text-primary-500">
               {selectedItems.length} elemento(s) seleccionado(s)
             </span>
             <Button
@@ -251,8 +251,8 @@ function TableBase<T>({
       <Card className="overflow-hidden">
         {items.length === 0 ? (
           <div className="p-8 text-center">
-            <div className="text-gray-500 mb-4">
-              <div className="text-lg font-medium">Sin resultados</div>
+            <div className="text-dark-text-secondary mb-4">
+              <div className="text-lg font-medium text-dark-text-primary">Sin resultados</div>
               <p className="text-sm mt-2">{emptyMessage}</p>
             </div>
             {onCreate && (
@@ -267,7 +267,7 @@ function TableBase<T>({
             {/* Vista de escritorio - Tabla */}
             <div className="hidden lg:block overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-dark-bg-tertiary">
                   <tr>
                     {selectable && (
                       <th className="w-12 px-4 py-3 text-left">
@@ -276,13 +276,13 @@ function TableBase<T>({
                           className="flex items-center justify-center w-full"
                         >
                           {selectedItems.length === items.length ? (
-                            <CheckSquare className="w-4 h-4 text-blue-600" />
+                            <CheckSquare className="w-4 h-4 text-primary-500" />
                           ) : selectedItems.length > 0 ? (
-                            <div className="w-4 h-4 bg-blue-600 rounded border-2 border-blue-600 relative">
-                              <div className="w-2 h-0.5 bg-white absolute top-1.5 left-1"></div>
+                            <div className="w-4 h-4 bg-primary-500 rounded border-2 border-primary-500 relative">
+                              <div className="w-2 h-0.5 bg-dark-text-primary absolute top-1.5 left-1"></div>
                             </div>
                           ) : (
-                            <Square className="w-4 h-4 text-gray-400" />
+                            <Square className="w-4 h-4 text-dark-text-secondary" />
                           )}
                         </button>
                       </th>
@@ -291,7 +291,7 @@ function TableBase<T>({
                     {columns.map((column, index) => (
                       <th
                         key={index}
-                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider"
                         style={{ width: column.width }}
                       >
                         {column.title}
@@ -299,13 +299,13 @@ function TableBase<T>({
                     ))}
                     
                     {actions.length > 0 && (
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                         Acciones
                       </th>
                     )}
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-dark-bg-secondary divide-y divide-dark-border">
                   {items.map((item, index) => {
                     const itemId = getItemId(item)
                     const isSelected = selectedItems.includes(itemId)
@@ -313,8 +313,8 @@ function TableBase<T>({
                     return (
                       <tr
                         key={itemId}
-                        className={`hover:bg-gray-50 transition-colors ${
-                          isSelected ? 'bg-blue-50' : ''
+                        className={`hover:bg-dark-bg-tertiary transition-colors ${
+                          isSelected ? 'bg-primary-500/10' : ''
                         }`}
                       >
                         {selectable && (
@@ -324,16 +324,16 @@ function TableBase<T>({
                               className="flex items-center justify-center w-full"
                             >
                               {isSelected ? (
-                                <CheckSquare className="w-4 h-4 text-blue-600" />
+                                <CheckSquare className="w-4 h-4 text-primary-500" />
                               ) : (
-                                <Square className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                                <Square className="w-4 h-4 text-dark-text-secondary hover:text-dark-text-primary" />
                               )}
                             </button>
                           </td>
                         )}
                         
                         {columns.map((column, colIndex) => (
-                          <td key={colIndex} className="px-4 py-3 text-sm text-gray-900">
+                          <td key={colIndex} className="px-4 py-3 text-sm text-dark-text-primary">
                             {column.render
                               ? column.render(
                                   typeof column.key === 'string' && column.key.includes('.')
@@ -388,8 +388,8 @@ function TableBase<T>({
                   return (
                     <div
                       key={itemId}
-                      className={`bg-white border rounded-lg p-4 shadow-sm ${
-                        isSelected ? 'border-blue-200 bg-blue-50' : 'border-gray-200'
+                      className={`bg-dark-bg-secondary border rounded-lg p-4 shadow-dark-sm ${
+                        isSelected ? 'border-primary-500/30 bg-primary-500/10' : 'border-dark-border'
                       }`}
                     >
                       {/* Selección */}
@@ -400,9 +400,9 @@ function TableBase<T>({
                             className="flex items-center justify-center"
                           >
                             {isSelected ? (
-                              <CheckSquare className="w-5 h-5 text-blue-600" />
+                              <CheckSquare className="w-5 h-5 text-primary-500" />
                             ) : (
-                              <Square className="w-5 h-5 text-gray-400" />
+                              <Square className="w-5 h-5 text-dark-text-secondary" />
                             )}
                           </button>
                         </div>
@@ -412,10 +412,10 @@ function TableBase<T>({
                       <div className="space-y-3">
                         {mobileColumns.map((column, colIndex) => (
                           <div key={colIndex} className="flex justify-between items-start">
-                            <span className="text-sm font-medium text-gray-500 min-w-0 flex-1">
+                            <span className="text-sm font-medium text-dark-text-secondary min-w-0 flex-1">
                               {column.title}:
                             </span>
-                            <div className="text-sm text-gray-900 min-w-0 flex-1 text-right">
+                            <div className="text-sm text-dark-text-primary min-w-0 flex-1 text-right">
                               {column.render
                                 ? column.render(
                                     typeof column.key === 'string' && column.key.includes('.')
@@ -435,7 +435,7 @@ function TableBase<T>({
 
                       {/* Acciones */}
                       {actions.length > 0 && (
-                        <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100">
+                        <div className="flex gap-2 mt-4 pt-3 border-t border-dark-border">
                           {actions
                             .filter(action => !action.hidden?.(item))
                             .map((action, actionIndex) => (
@@ -464,9 +464,9 @@ function TableBase<T>({
 
         {/* Paginación */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
+          <div className="px-4 py-3 border-t border-dark-border bg-dark-bg-tertiary">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-sm text-gray-700">
+              <div className="text-sm text-dark-text-secondary">
                 Mostrando {pagination.start} a {pagination.end} de {pagination.totalItems} resultados
               </div>
               
@@ -481,7 +481,7 @@ function TableBase<T>({
                   <span className="hidden sm:inline">Anterior</span>
                 </Button>
                 
-                <span className="text-sm text-gray-700 px-3">
+                <span className="text-sm text-dark-text-secondary px-3">
                   Página {pagination.currentPage + 1} de {pagination.totalPages}
                 </span>
                 

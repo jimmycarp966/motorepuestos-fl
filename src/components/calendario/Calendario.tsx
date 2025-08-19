@@ -44,7 +44,7 @@ const EventoForm: React.FC<EventoFormProps> = ({ evento, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+      <div className="w-full max-w-lg bg-dark-bg-secondary rounded-2xl shadow-dark-xl border border-dark-border overflow-hidden">
         {/* Header con gradiente */}
         <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
           <div className="flex justify-between items-center">
@@ -70,41 +70,41 @@ const EventoForm: React.FC<EventoFormProps> = ({ evento, onClose }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Campo Título */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
+              <label className="block text-sm font-semibold text-dark-text-primary">
                 📝 Título del Evento *
               </label>
               <Input
                 value={formData.titulo}
                 onChange={(e) => setFormData({ ...formData, titulo: e.target.value })}
                 placeholder="Ej: Reunión con proveedor"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:border-gray-300"
+                className="w-full px-4 py-3 border-2 border-dark-border rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200"
                 required
               />
             </div>
 
             {/* Campo Descripción */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
+              <label className="block text-sm font-semibold text-dark-text-primary">
                 📄 Descripción
               </label>
               <textarea
                 value={formData.descripcion}
                 onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
                 placeholder="Describe el evento..."
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:border-gray-300 resize-none"
+                className="w-full px-4 py-3 border-2 border-dark-border rounded-lg bg-dark-bg-secondary text-dark-text-primary placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light resize-none"
                 rows={3}
               />
             </div>
 
             {/* Campo Tipo */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
+              <label className="block text-sm font-semibold text-dark-text-primary">
                 🏷️ Tipo de Evento *
               </label>
               <select
                 value={formData.tipo}
                 onChange={(e) => setFormData({ ...formData, tipo: e.target.value as any })}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:border-gray-300 transition-all duration-200"
+                className="w-full px-4 py-3 border-2 border-dark-border rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200"
                 required
               >
                 <option value="venta">🛒 Venta</option>
@@ -118,27 +118,27 @@ const EventoForm: React.FC<EventoFormProps> = ({ evento, onClose }) => {
             {/* Campos Fecha y Hora */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
+                <label className="block text-sm font-semibold text-dark-text-primary">
                   🕐 Fecha y Hora de Inicio *
                 </label>
                 <Input
                   type="datetime-local"
                   value={formData.fecha_inicio}
                   onChange={(e) => setFormData({ ...formData, fecha_inicio: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:border-gray-300"
+                  className="w-full px-4 py-3 border-2 border-dark-border rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
+                <label className="block text-sm font-semibold text-dark-text-primary">
                   🕐 Fecha y Hora de Fin *
                 </label>
                 <Input
                   type="datetime-local"
                   value={formData.fecha_fin}
                   onChange={(e) => setFormData({ ...formData, fecha_fin: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:border-gray-300"
+                  className="w-full px-4 py-3 border-2 border-dark-border rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200"
                   required
                 />
               </div>
@@ -150,7 +150,7 @@ const EventoForm: React.FC<EventoFormProps> = ({ evento, onClose }) => {
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="flex-1 py-3 px-6 border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium"
+                className="flex-1 py-3 px-6 border-2 border-dark-border text-dark-text-primary hover:bg-dark-bg-hover hover:border-dark-border-light transition-all duration-200 font-medium"
               >
                 ❌ Cancelar
               </Button>
@@ -211,7 +211,7 @@ export const Calendario: React.FC = () => {
       case 'compra': return 'bg-blue-100 text-blue-800'
       case 'mantenimiento': return 'bg-orange-100 text-orange-800'
       case 'reunion': return 'bg-purple-100 text-purple-800'
-      default: return 'bg-gray-100 text-gray-800'
+      default: return 'bg-dark-bg-tertiary text-dark-text-primary'
     }
   }
 
@@ -230,8 +230,8 @@ export const Calendario: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">📅 Calendario</h1>
-          <p className="text-gray-600">Gestiona eventos y actividades del negocio</p>
+          <h1 className="text-2xl font-bold text-dark-text-primary">📅 Calendario</h1>
+          <p className="text-dark-text-secondary">Gestiona eventos y actividades del negocio</p>
         </div>
         <Button
           onClick={() => {
@@ -246,20 +246,20 @@ export const Calendario: React.FC = () => {
       </div>
 
       {/* Lista de eventos */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-dark-bg-secondary rounded-lg shadow-dark-sm border border-dark-border">
         <div className="p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Eventos Programados</h2>
+          <h2 className="text-lg font-semibold text-dark-text-primary mb-4">Eventos Programados</h2>
           
           {loading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-              <p className="text-gray-600 mt-2">Cargando eventos...</p>
+              <p className="text-dark-text-secondary mt-2">Cargando eventos...</p>
             </div>
           ) : eventos.length === 0 ? (
             <div className="text-center py-12">
-              <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No hay eventos programados</h3>
-              <p className="text-gray-600 mb-4">Crea tu primer evento para comenzar a organizar tu agenda</p>
+              <Calendar className="w-16 h-16 text-dark-border mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-dark-text-primary mb-2">No hay eventos programados</h3>
+              <p className="text-dark-text-secondary mb-4">Crea tu primer evento para comenzar a organizar tu agenda</p>
               <Button
                 onClick={() => {
                   setSelectedEvento(undefined)
@@ -276,23 +276,23 @@ export const Calendario: React.FC = () => {
               {eventos.map((evento) => (
                 <div
                   key={evento.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                  className="border border-dark-border rounded-lg p-4 hover:shadow-dark-md transition-shadow"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-lg">{getTipoIcon(evento.tipo)}</span>
-                        <h3 className="text-lg font-semibold text-gray-900">{evento.titulo}</h3>
+                        <h3 className="text-lg font-semibold text-dark-text-primary">{evento.titulo}</h3>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTipoColor(evento.tipo)}`}>
                           {evento.tipo}
                         </span>
                       </div>
                       
                       {evento.descripcion && (
-                        <p className="text-gray-600 mb-3">{evento.descripcion}</p>
+                        <p className="text-dark-text-secondary mb-3">{evento.descripcion}</p>
                       )}
                       
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-4 text-sm text-dark-text-secondary">
                         <div className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
                           <span>

@@ -9,8 +9,8 @@ import { Label } from './label'
  */
 export const InputShowcase: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
-      <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+    <div className="max-w-4xl mx-auto p-8 bg-gradient-to-br from-dark-bg-primary to-dark-bg-secondary min-h-screen">
+      <div className="bg-dark-bg-secondary rounded-2xl shadow-dark-xl p-8 border border-dark-border">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-slate-800 mb-2">
             🔧 Inputs Mejorados para Motorepuestos
@@ -122,7 +122,7 @@ export const InputShowcase: React.FC = () => {
         </div>
 
         {/* Sección de formulario completo */}
-        <div className="mt-12 p-6 bg-slate-50 rounded-xl border border-slate-200">
+        <div className="mt-12 p-6 bg-dark-bg-tertiary rounded-xl border border-dark-border">
           <h2 className="text-xl font-semibold text-slate-700 mb-6 flex items-center">
             <span className="bg-moto-blue text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">
               🏪

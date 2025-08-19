@@ -121,12 +121,12 @@ export function ArqueoModal() {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-dark-bg-secondary rounded-lg shadow-dark-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Arqueo de Caja</h2>
-              <p className="text-gray-600">Fecha: {arqueoActual.fecha}</p>
+              <h2 className="text-2xl font-bold text-dark-text-primary">Arqueo de Caja</h2>
+              <p className="text-dark-text-secondary">Fecha: {arqueoActual.fecha}</p>
             </div>
             <Button
               variant="ghost"
@@ -159,19 +159,19 @@ export function ArqueoModal() {
               </CardHeader>
               <CardContent className="grid grid-cols-3 gap-4">
                 <div className="text-center">
-                  <Label className="text-sm font-medium text-gray-600">Efectivo</Label>
+                  <Label className="text-sm font-medium text-dark-text-secondary">Efectivo</Label>
                   <p className="text-lg font-semibold text-green-600">
                     {formatCurrency(arqueoActual.efectivo_esperado)}
                   </p>
                 </div>
                 <div className="text-center">
-                  <Label className="text-sm font-medium text-gray-600">Tarjeta</Label>
+                  <Label className="text-sm font-medium text-dark-text-secondary">Tarjeta</Label>
                   <p className="text-lg font-semibold text-blue-600">
                     {formatCurrency(arqueoActual.tarjeta_esperado)}
                   </p>
                 </div>
                 <div className="text-center">
-                  <Label className="text-sm font-medium text-gray-600">Transferencia</Label>
+                  <Label className="text-sm font-medium text-dark-text-secondary">Transferencia</Label>
                   <p className="text-lg font-semibold text-purple-600">
                     {formatCurrency(arqueoActual.transferencia_esperado)}
                   </p>
@@ -265,28 +265,28 @@ export function ArqueoModal() {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
-                    <Label className="text-sm font-medium text-gray-600">Efectivo</Label>
+                    <Label className="text-sm font-medium text-dark-text-secondary">Efectivo</Label>
                     <Badge className={`mt-1 ${getDiferenciaColor(diferencias.efectivo)}`}>
                       {getDiferenciaIcon(diferencias.efectivo)}
                       <span className="ml-1">{formatCurrency(diferencias.efectivo)}</span>
                     </Badge>
                   </div>
                   <div className="text-center">
-                    <Label className="text-sm font-medium text-gray-600">Tarjeta</Label>
+                    <Label className="text-sm font-medium text-dark-text-secondary">Tarjeta</Label>
                     <Badge className={`mt-1 ${getDiferenciaColor(diferencias.tarjeta)}`}>
                       {getDiferenciaIcon(diferencias.tarjeta)}
                       <span className="ml-1">{formatCurrency(diferencias.tarjeta)}</span>
                     </Badge>
                   </div>
                   <div className="text-center">
-                    <Label className="text-sm font-medium text-gray-600">Transferencia</Label>
+                    <Label className="text-sm font-medium text-dark-text-secondary">Transferencia</Label>
                     <Badge className={`mt-1 ${getDiferenciaColor(diferencias.transferencia)}`}>
                       {getDiferenciaIcon(diferencias.transferencia)}
                       <span className="ml-1">{formatCurrency(diferencias.transferencia)}</span>
                     </Badge>
                   </div>
                   <div className="text-center">
-                    <Label className="text-sm font-medium text-gray-600">Total</Label>
+                    <Label className="text-sm font-medium text-dark-text-secondary">Total</Label>
                     <Badge className={`mt-1 ${getDiferenciaColor(diferencias.total)}`}>
                       {getDiferenciaIcon(diferencias.total)}
                       <span className="ml-1">{formatCurrency(diferencias.total)}</span>

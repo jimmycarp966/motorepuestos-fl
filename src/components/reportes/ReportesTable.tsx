@@ -111,8 +111,8 @@ const ReportesTable: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reportes</h1>
-          <p className="text-gray-600">Genera y exporta reportes detallados del negocio</p>
+          <h1 className="text-2xl font-bold text-dark-text-primary">Reportes</h1>
+          <p className="text-dark-text-secondary">Genera y exporta reportes detallados del negocio</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -139,38 +139,38 @@ const ReportesTable: React.FC = () => {
 
       {/* Filtros */}
       {showFiltros && (
-        <div className="bg-white p-6 rounded-lg shadow border">
+        <div className="bg-dark-bg-secondary p-6 rounded-lg shadow-dark-md border border-dark-border">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-dark-text-primary mb-1">
                 Fecha Inicio
               </label>
               <input
                 type="date"
                 value={filtros.fechaInicio}
                 onChange={(e) => setFiltros({ fechaInicio: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-dark-text-primary mb-1">
                 Fecha Fin
               </label>
               <input
                 type="date"
                 value={filtros.fechaFin}
                 onChange={(e) => setFiltros({ fechaFin: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-dark-text-primary mb-1">
                 Empleado
               </label>
               <select
                 value={filtros.empleadoId || ''}
                 onChange={(e) => setFiltros({ empleadoId: e.target.value || undefined })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">Todos los empleados</option>
                 {empleados.empleados.map((empleado) => (
@@ -181,13 +181,13 @@ const ReportesTable: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-dark-text-primary mb-1">
                 Cliente
               </label>
               <select
                 value={filtros.clienteId || ''}
                 onChange={(e) => setFiltros({ clienteId: e.target.value || undefined })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">Todos los clientes</option>
                 {clientes.clientes.map((cliente) => (
@@ -198,13 +198,13 @@ const ReportesTable: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-dark-text-primary mb-1">
                 Método de Pago
               </label>
               <select
                 value={filtros.metodoPago || ''}
                 onChange={(e) => setFiltros({ metodoPago: e.target.value || undefined })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">Todos los métodos</option>
                 <option value="efectivo">Efectivo</option>
@@ -214,13 +214,13 @@ const ReportesTable: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-dark-text-primary mb-1">
                 Tipo de Precio
               </label>
               <select
                 value={filtros.tipoPrecio || ''}
                 onChange={(e) => setFiltros({ tipoPrecio: e.target.value || undefined })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">Todos los tipos</option>
                 <option value="minorista">Minorista</option>
@@ -232,14 +232,14 @@ const ReportesTable: React.FC = () => {
       )}
 
       {/* Selector de Tipo de Reporte */}
-      <div className="bg-white p-4 rounded-lg shadow border">
+      <div className="bg-dark-bg-secondary p-4 rounded-lg shadow-dark-md border border-dark-border">
         <div className="flex gap-2">
           <button
             onClick={() => setTipoReporte('ventas')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
               tipoReporte === 'ventas'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-dark-bg-tertiary text-dark-text-primary hover:bg-dark-bg-secondary'
             }`}
           >
             <TrendingUp className="w-4 h-4" />
@@ -250,7 +250,7 @@ const ReportesTable: React.FC = () => {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
               tipoReporte === 'productos'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-dark-bg-tertiary text-dark-text-primary hover:bg-dark-bg-secondary'
             }`}
           >
             <Package className="w-4 h-4" />
@@ -261,7 +261,7 @@ const ReportesTable: React.FC = () => {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
               tipoReporte === 'caja'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-dark-bg-tertiary text-dark-text-primary hover:bg-dark-bg-secondary'
             }`}
           >
             <DollarSign className="w-4 h-4" />
@@ -273,10 +273,10 @@ const ReportesTable: React.FC = () => {
       {/* Estadísticas */}
       {tipoReporte === 'ventas' && reporteVentas.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow border">
+          <div className="bg-dark-bg-secondary p-4 rounded-lg shadow-dark-md border border-dark-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Ventas</p>
+                <p className="text-sm text-dark-text-secondary">Total Ventas</p>
                 <p className="text-2xl font-bold text-green-600">
                   ${getTotalVentas().toLocaleString()}
                 </p>
@@ -284,10 +284,10 @@ const ReportesTable: React.FC = () => {
               <TrendingUp className="w-8 h-8 text-green-600" />
             </div>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow border">
+          <div className="bg-dark-bg-secondary p-4 rounded-lg shadow-dark-md border border-dark-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Cantidad de Ventas</p>
+                <p className="text-sm text-dark-text-secondary">Cantidad de Ventas</p>
                 <p className="text-2xl font-bold text-blue-600">
                   {reporteVentas.length}
                 </p>
@@ -295,10 +295,10 @@ const ReportesTable: React.FC = () => {
               <FileText className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow border">
+          <div className="bg-dark-bg-secondary p-4 rounded-lg shadow-dark-md border border-dark-border">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Promedio por Venta</p>
+                <p className="text-sm text-dark-text-secondary">Promedio por Venta</p>
                 <p className="text-2xl font-bold text-purple-600">
                   ${(getTotalVentas() / reporteVentas.length).toFixed(2)}
                 </p>
@@ -311,21 +311,21 @@ const ReportesTable: React.FC = () => {
 
       {/* Métodos de Pago (solo para reporte de ventas) */}
       {tipoReporte === 'ventas' && reporteVentas.length > 0 && (
-        <div className="bg-white p-6 rounded-lg shadow border">
+        <div className="bg-dark-bg-secondary p-6 rounded-lg shadow-dark-md border border-dark-border">
           <h3 className="text-lg font-semibold mb-4">Ventas por Método de Pago</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {getMetodosPagoStats().map((stat) => (
-              <div key={stat.metodo} className="bg-gray-50 p-4 rounded-lg">
+              <div key={stat.metodo} className="bg-dark-bg-tertiary p-4 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-700 capitalize">
+                  <span className="text-sm font-medium text-dark-text-primary capitalize">
                     {stat.metodo}
                   </span>
-                  <span className="text-xs text-gray-500">{stat.porcentaje}%</span>
+                  <span className="text-xs text-dark-text-secondary">{stat.porcentaje}%</span>
                 </div>
                 <p className="text-lg font-bold text-green-600">
                   ${stat.total.toLocaleString()}
                 </p>
-                <p className="text-sm text-gray-600">{stat.count} ventas</p>
+                <p className="text-sm text-dark-text-secondary">{stat.count} ventas</p>
               </div>
             ))}
           </div>
@@ -333,8 +333,8 @@ const ReportesTable: React.FC = () => {
       )}
 
       {/* Tabla de Datos */}
-      <div className="bg-white rounded-lg shadow border">
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+      <div className="bg-dark-bg-secondary rounded-lg shadow-dark-md border border-dark-border">
+        <div className="p-4 border-b border-dark-border flex justify-between items-center">
           <h3 className="text-lg font-semibold">
             {tipoReporte === 'ventas' && 'Reporte de Ventas'}
             {tipoReporte === 'productos' && 'Reporte de Productos'}
@@ -368,53 +368,53 @@ const ReportesTable: React.FC = () => {
         {loading ? (
           <div className="p-8 text-center">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto text-blue-600" />
-            <p className="mt-2 text-gray-600">Generando reporte...</p>
+            <p className="mt-2 text-dark-text-secondary">Generando reporte...</p>
           </div>
         ) : getReporteData().length === 0 ? (
           <div className="p-8 text-center">
-            <FileText className="w-12 h-12 mx-auto text-gray-400" />
-            <p className="mt-2 text-gray-600">No hay datos para mostrar</p>
-            <p className="text-sm text-gray-500">Genera un reporte para ver los datos</p>
+            <FileText className="w-12 h-12 mx-auto text-dark-border" />
+            <p className="mt-2 text-dark-text-secondary">No hay datos para mostrar</p>
+            <p className="text-sm text-dark-text-secondary">Genera un reporte para ver los datos</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             {tipoReporte === 'ventas' && (
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-dark-bg-tertiary">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Fecha
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       ID
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Empleado
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Cliente
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Método Pago
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Total
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-dark-bg-secondary divide-y divide-dark-border">
                   {reporteVentas.map((venta) => (
-                    <tr key={venta.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <tr key={venta.id} className="hover:bg-dark-bg-tertiary">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         {DateUtils.formatDate(venta.fecha)}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         {venta.id.slice(0, 8)}...
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         {venta.empleado.nombre}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         {venta.cliente?.nombre || 'Sin cliente'}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
@@ -438,41 +438,41 @@ const ReportesTable: React.FC = () => {
 
             {tipoReporte === 'productos' && (
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-dark-bg-tertiary">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Producto
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Código
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Categoría
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Stock
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Ventas
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Cantidad Vendida
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Ingresos
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-dark-bg-secondary divide-y divide-dark-border">
                   {reporteProductos.map((producto) => (
-                    <tr key={producto.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={producto.id} className="hover:bg-dark-bg-tertiary">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-dark-text-primary">
                         {producto.nombre}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         {producto.codigo}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         {producto.categoria}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
@@ -484,10 +484,10 @@ const ReportesTable: React.FC = () => {
                           {producto.stock}
                         </span>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         {producto.totalVentas}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         {producto.cantidadVendida}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-green-600">
@@ -501,41 +501,41 @@ const ReportesTable: React.FC = () => {
 
             {tipoReporte === 'caja' && (
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-dark-bg-tertiary">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Fecha
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Empleado
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Apertura
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Ingresos
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Egresos
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Ventas
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Saldo Final
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-dark-bg-secondary divide-y divide-dark-border">
                   {reporteCaja.map((caja, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <tr key={index} className="hover:bg-dark-bg-tertiary">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         {DateUtils.formatDate(caja.fecha)}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         {caja.empleado}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         ${caja.apertura.toLocaleString()}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-green-600">
@@ -547,7 +547,7 @@ const ReportesTable: React.FC = () => {
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-blue-600">
                         ${caja.ventas.toLocaleString()}
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-dark-text-primary">
                         ${caja.saldoFinal.toLocaleString()}
                       </td>
                     </tr>

@@ -1,4 +1,4 @@
-import { StateCreator } from 'zustand'
+import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
 import { getAFIPService } from '../../lib/afipBrowserService'
 

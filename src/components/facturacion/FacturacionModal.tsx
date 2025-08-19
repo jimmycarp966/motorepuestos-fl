@@ -254,11 +254,11 @@ export const FacturacionModal: React.FC<FacturacionModalProps> = ({
 
           {/* Cliente */}
           {cliente && (
-            <div className="p-4 bg-gray-50 rounded-md">
+            <div className="p-4 bg-dark-bg-tertiary rounded-md">
               <Label>Cliente</Label>
               <div className="mt-2">
                 <p className="font-medium">{cliente.nombre}</p>
-                {cliente.email && <p className="text-sm text-gray-600">{cliente.email}</p>}
+                {cliente.email && <p className="text-sm text-dark-text-secondary">{cliente.email}</p>}
               </div>
             </div>
           )}
@@ -268,10 +268,10 @@ export const FacturacionModal: React.FC<FacturacionModalProps> = ({
             <Label>Items de la Venta</Label>
             <div className="mt-2 space-y-2 max-h-40 overflow-y-auto">
               {items.map((item, index) => (
-                <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                <div key={index} className="flex justify-between items-center p-2 bg-dark-bg-tertiary rounded">
                   <div>
                     <p className="font-medium">{item.producto.nombre}</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-dark-text-secondary">
                       {item.cantidad} x ${item.precio_unitario.toFixed(2)}
                     </p>
                   </div>

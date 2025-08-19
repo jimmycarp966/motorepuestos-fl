@@ -187,18 +187,18 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ on
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-7xl h-[90vh] flex flex-col">
+      <div className="bg-dark-bg-secondary rounded-lg shadow-dark-xl w-full max-w-7xl h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Nueva Venta</h2>
-            <p className="text-gray-600">Selecciona productos y completa la venta</p>
+            <h2 className="text-2xl font-bold text-dark-text-primary">Nueva Venta</h2>
+            <p className="text-dark-text-secondary">Selecciona productos y completa la venta</p>
           </div>
           <Button
             onClick={onClose}
             variant="ghost"
             size="sm"
-            className="text-gray-500 hover:text-gray-700"
+            className="text-dark-text-secondary hover:text-dark-text-primary"
           >
             <X className="w-5 h-5" />
           </Button>
@@ -206,19 +206,19 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ on
 
         <div className="flex-1 flex overflow-hidden">
           {/* Panel izquierdo - Productos */}
-          <div className="w-2/3 border-r border-gray-200 flex flex-col">
+          <div className="w-2/3 border-r border-dark-border flex flex-col">
             {/* Buscador */}
-            <div className="p-4 border-b border-gray-200">
+            <div className="p-4 border-b border-dark-border">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
+                  <Search className="h-5 w-5 text-dark-text-secondary" />
                 </div>
                 <input
                   type="text"
                   placeholder="Buscar productos por nombre, código, categoría..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border-2 border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -234,25 +234,25 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ on
                     <Card key={producto.id} className="p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 truncate">{producto.nombre}</h3>
-                          <p className="text-sm text-gray-500 font-mono">{producto.codigo_sku}</p>
+                          <h3 className="font-semibold text-dark-text-primary truncate">{producto.nombre}</h3>
+                          <p className="text-sm text-dark-text-secondary font-mono">{producto.codigo_sku}</p>
                           <p className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full inline-block mt-1">
                             {producto.categoria}
                           </p>
                         </div>
-                        <Package className="h-8 w-8 text-gray-400 flex-shrink-0 ml-2" />
+                        <Package className="h-8 w-8 text-dark-text-secondary flex-shrink-0 ml-2" />
                       </div>
                       
                       <div className="space-y-2">
                                                  <div className="flex justify-between text-sm">
-                           <span className="text-gray-600">Precio {tipoPrecio}:</span>
+                           <span className="text-dark-text-secondary">Precio {tipoPrecio}:</span>
                            <span className="font-semibold text-green-600">
                              ${(tipoPrecio === 'mayorista' ? producto.precio_mayorista : producto.precio_minorista).toFixed(2)}
                            </span>
                          </div>
                         
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Stock:</span>
+                          <span className="text-dark-text-secondary">Stock:</span>
                           <span className={`font-semibold ${
                             stockDisponible > 10 ? 'text-green-600' : 
                             stockDisponible > 0 ? 'text-yellow-600' : 'text-red-600'
@@ -276,7 +276,7 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ on
                         disabled={stockDisponible <= 0}
                         className={`w-full mt-3 ${
                           stockDisponible <= 0 
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            ? 'bg-dark-bg-tertiary text-dark-text-secondary cursor-not-allowed'
                             : 'bg-orange-600 hover:bg-orange-700 text-white'
                         }`}
                       >
@@ -290,8 +290,8 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ on
               
               {filteredProductos?.length === 0 && (
                 <div className="text-center py-12">
-                  <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No se encontraron productos</p>
+                  <Package className="h-12 w-12 text-dark-text-secondary mx-auto mb-4" />
+                  <p className="text-dark-text-secondary">No se encontraron productos</p>
                 </div>
               )}
             </div>
@@ -300,18 +300,18 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ on
           {/* Panel derecho - Carrito */}
           <div className="w-1/3 flex flex-col">
             {/* Información de cliente y empleado */}
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="font-semibold text-gray-900 mb-3">Información de la Venta</h3>
+            <div className="p-4 border-b border-dark-border">
+              <h3 className="font-semibold text-dark-text-primary mb-3">Información de la Venta</h3>
               
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-dark-text-primary mb-1">
                     Cliente (opcional)
                   </label>
                   <select
                     value={selectedCliente}
                     onChange={(e) => setSelectedCliente(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
                     <option value="">Sin cliente</option>
                     {clientes.map((cliente) => (
@@ -323,13 +323,13 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ on
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-dark-text-primary mb-1">
                     Tipo de Precio
                   </label>
                   <select
                     value={tipoPrecio}
                     onChange={(e) => setTipoPrecio(e.target.value as 'minorista' | 'mayorista')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
                     <option value="minorista">Precio Minorista</option>
                     <option value="mayorista">Precio Mayorista</option>
@@ -340,8 +340,8 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ on
 
             {/* Carrito */}
             <div className="flex-1 flex flex-col">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="font-semibold text-gray-900 flex items-center">
+              <div className="p-4 border-b border-dark-border">
+                <h3 className="font-semibold text-dark-text-primary flex items-center">
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   Carrito ({cart.length} productos)
                 </h3>
@@ -350,9 +350,9 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ on
               <div className="flex-1 overflow-y-auto p-4">
                 {cart.length === 0 ? (
                   <div className="text-center py-8">
-                    <ShoppingCart className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">El carrito está vacío</p>
-                    <p className="text-sm text-gray-400">Agrega productos desde la lista</p>
+                    <ShoppingCart className="h-12 w-12 text-dark-border mx-auto mb-4" />
+                    <p className="text-dark-text-secondary">El carrito está vacío</p>
+                    <p className="text-sm text-dark-text-secondary">Agrega productos desde la lista</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -360,10 +360,10 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ on
                       <Card key={item.producto.id} className="p-3">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h4 className="font-medium text-gray-900 text-sm truncate">
+                            <h4 className="font-medium text-dark-text-primary text-sm truncate">
                               {item.producto.nombre}
                             </h4>
-                            <p className="text-xs text-gray-500 font-mono">
+                            <p className="text-xs text-dark-text-secondary font-mono">
                               {item.producto.codigo_sku}
                             </p>
                             <p className="text-sm text-green-600 font-semibold">
@@ -407,7 +407,7 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ on
                             </Button>
                           </div>
                           
-                          <span className="text-sm font-bold text-gray-900">
+                          <span className="text-sm font-bold text-dark-text-primary">
                             ${(item.precio * item.cantidad).toFixed(2)}
                           </span>
                         </div>
@@ -418,10 +418,10 @@ export const ProductSelectionModal: React.FC<ProductSelectionModalProps> = ({ on
               </div>
 
               {/* Resumen y botones */}
-              <div className="p-4 border-t border-gray-200 bg-gray-50">
+              <div className="p-4 border-t border-dark-border bg-dark-bg-tertiary">
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal:</span>
+                    <span className="text-dark-text-secondary">Subtotal:</span>
                     <span className="font-medium">${calculateSubtotal().toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold">

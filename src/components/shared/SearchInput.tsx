@@ -24,19 +24,19 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   return (
     <div className="relative">
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <Search className="h-5 w-5 text-gray-400" />
+        <Search className="h-5 w-5 text-dark-text-secondary" />
       </div>
       <Input
         type="text"
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`pl-10 pr-10 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-${focusColor}-500 focus:border-transparent ${className}`}
+        className={`pl-10 pr-10 py-3 border-2 border-dark-border rounded-lg focus:ring-2 focus:ring-${focusColor}-500 focus:border-transparent ${className}`}
       />
       {value && (
         <button
           onClick={clearSearch}
-          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute inset-y-0 right-0 pr-3 flex items-center text-dark-text-secondary hover:text-dark-text-primary transition-colors"
         >
           <X className="h-5 w-5" />
         </button>

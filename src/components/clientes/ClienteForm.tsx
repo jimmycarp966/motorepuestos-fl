@@ -89,7 +89,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+      <div className="w-full max-w-lg bg-dark-bg-secondary rounded-2xl shadow-dark-xl border border-dark-border overflow-hidden">
         {/* Header con gradiente */}
         <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-4">
           <div className="flex justify-between items-center">
@@ -115,7 +115,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Campo Nombre */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
+              <label className="block text-sm font-semibold text-dark-text-primary">
                 👤 Nombre Completo *
               </label>
               <Input
@@ -129,7 +129,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
 
             {/* Campo Email */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
+              <label className="block text-sm font-semibold text-dark-text-primary">
                 📧 Correo Electrónico
               </label>
               <Input
@@ -144,7 +144,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
 
             {/* Campo Teléfono */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
+              <label className="block text-sm font-semibold text-dark-text-primary">
                 📞 Teléfono
               </label>
               <Input
@@ -156,7 +156,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
 
             {/* Campo Dirección */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
+              <label className="block text-sm font-semibold text-dark-text-primary">
                 🏠 Dirección
               </label>
               <textarea
@@ -169,11 +169,11 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
 
             {/* Campo Límite de Crédito */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
+              <label className="block text-sm font-semibold text-dark-text-primary">
                 💳 Límite de Crédito
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10">$</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-text-secondary z-10">$</span>
                 <Input
                   type="number"
                   step="0.01"
@@ -193,7 +193,7 @@ export const ClienteForm: React.FC<ClienteFormProps> = ({ cliente, onClose }) =>
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="flex-1 py-3 px-6 border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium"
+                className="flex-1 py-3 px-6 border-2 border-dark-border text-dark-text-primary hover:bg-dark-bg-tertiary hover:border-dark-border-light transition-all duration-200 font-medium"
               >
                 ❌ Cancelar
               </Button>

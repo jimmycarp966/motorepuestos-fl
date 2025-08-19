@@ -9,7 +9,7 @@ export const Skeleton: React.FC<{
   pulse?: boolean
 }> = ({ className, pulse = true }) => (
   <div className={cn(
-    "bg-gray-200 rounded",
+    "bg-dark-bg-tertiary rounded",
     pulse && "animate-pulse",
     className
   )} />
@@ -36,7 +36,7 @@ export const TableSkeleton: React.FC<{
 }> = ({ rows = 5, columns = 4 }) => (
   <div className="space-y-3">
     {/* Header */}
-    <div className="grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+    <div className="grid grid-cols-4 gap-4 p-4 bg-dark-bg-tertiary rounded-lg border border-dark-border">
       {Array.from({ length: columns }).map((_, i) => (
         <Skeleton key={i} className="h-4" />
       ))}
@@ -44,7 +44,7 @@ export const TableSkeleton: React.FC<{
     
     {/* Rows */}
     {Array.from({ length: rows }).map((_, rowIndex) => (
-      <div key={rowIndex} className="grid grid-cols-4 gap-4 p-4 border rounded-lg">
+      <div key={rowIndex} className="grid grid-cols-4 gap-4 p-4 border border-dark-border rounded-lg bg-dark-bg-secondary">
         {Array.from({ length: columns }).map((_, colIndex) => (
           <Skeleton key={colIndex} className="h-4" />
         ))}
@@ -86,14 +86,14 @@ export const ContextualLoader: React.FC<{
   const sizeClasses = sizes[size]
   
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-moto-steel">
+    <div className="flex flex-col items-center justify-center p-8 text-dark-text-primary">
       <div className="relative mb-4">
-        <Icon className={cn(sizeClasses.spinner, "animate-spin")} />
+        <Icon className={cn(sizeClasses.spinner, "animate-spin text-primary-500")} />
         {type !== 'general' && (
-          <div className="absolute inset-0 rounded-full border-2 border-moto-blue/20 animate-ping" />
+          <div className="absolute inset-0 rounded-full border-2 border-primary-500/20 animate-ping" />
         )}
       </div>
-      <p className={cn(sizeClasses.text, "font-medium")}>
+      <p className={cn(sizeClasses.text, "font-medium text-dark-text-secondary")}>
         {displayMessage}
       </p>
     </div>
@@ -138,15 +138,15 @@ export const EmptyState: React.FC<{
   
   return (
     <div className="flex flex-col items-center justify-center p-12 text-center">
-      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-        <Icon className="w-8 h-8 text-gray-400" />
+      <div className="w-16 h-16 rounded-full bg-dark-bg-tertiary flex items-center justify-center mb-4 border border-dark-border">
+        <Icon className="w-8 h-8 text-dark-text-secondary" />
       </div>
       
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <h3 className="text-lg font-semibold text-dark-text-primary mb-2">
         {displayTitle}
       </h3>
       
-      <p className="text-gray-500 mb-6 max-w-sm">
+      <p className="text-dark-text-secondary mb-6 max-w-sm">
         {displayDescription}
       </p>
       
@@ -169,10 +169,10 @@ export const LoadingOverlay: React.FC<{
     {children}
     
     {isLoading && (
-      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
+      <div className="absolute inset-0 bg-dark-bg-primary/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
         <div className="flex flex-col items-center">
-          <Loader2 className="w-8 h-8 animate-spin text-moto-blue mb-3" />
-          <p className="text-sm font-medium text-gray-700">{message}</p>
+          <Loader2 className="w-8 h-8 animate-spin text-primary-500 mb-3" />
+          <p className="text-sm font-medium text-dark-text-primary">{message}</p>
         </div>
       </div>
     )}
@@ -196,17 +196,17 @@ export const ProgressBar: React.FC<{
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-2">
-        <span className="text-sm font-medium text-gray-700">
+        <span className="text-sm font-medium text-dark-text-secondary">
           {message}
         </span>
         {showPercentage && (
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-dark-text-secondary">
             {clampedProgress.toFixed(0)}%
           </span>
         )}
       </div>
       
-      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+      <div className="w-full bg-dark-bg-tertiary rounded-full h-2 overflow-hidden border border-dark-border">
         <div 
           className="h-2 rounded-full transition-all duration-300 ease-out relative"
           style={{ 

@@ -83,28 +83,28 @@ export const VentasShowcase: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-8 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
-      <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+    <div className="max-w-7xl mx-auto p-8 bg-gradient-to-br from-dark-bg-primary to-dark-bg-secondary min-h-screen">
+      <div className="bg-dark-bg-secondary rounded-2xl shadow-dark-xl p-8 border border-dark-border">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-slate-800 mb-4">
+          <h1 className="text-4xl font-bold text-dark-text-primary mb-4">
             🏪 Sistema de Ventas Mejorado
           </h1>
-          <p className="text-xl text-slate-600 mb-2">
+          <p className="text-xl text-dark-text-secondary mb-2">
             Diseño amplio y moderno para tiendas de motorepuestos
           </p>
           <div className="flex items-center justify-center space-x-6 mt-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600">100%</div>
-              <div className="text-sm text-slate-600">Completado</div>
+              <div className="text-sm text-dark-text-secondary">Completado</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-moto-blue">6</div>
-              <div className="text-sm text-slate-600">Mejoras Principales</div>
+              <div className="text-sm text-dark-text-secondary">Mejoras Principales</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-moto-orange">25+</div>
-              <div className="text-sm text-slate-600">Características Nuevas</div>
+              <div className="text-sm text-dark-text-secondary">Características Nuevas</div>
             </div>
           </div>
         </div>
@@ -112,14 +112,14 @@ export const VentasShowcase: React.FC = () => {
         {/* Mejoras Implementadas */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {mejoras.map((mejora, index) => (
-            <div key={index} className="border border-slate-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+            <div key={index} className="border border-dark-border rounded-xl p-6 hover:shadow-dark-md transition-shadow">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="flex items-center space-x-3 mb-2">
                     {getEstadoIcon(mejora.estado)}
-                    <h3 className="text-lg font-semibold text-slate-800">{mejora.titulo}</h3>
+                    <h3 className="text-lg font-semibold text-dark-text-primary">{mejora.titulo}</h3>
                   </div>
-                  <p className="text-slate-600 text-sm">{mejora.descripcion}</p>
+                  <p className="text-dark-text-secondary text-sm">{mejora.descripcion}</p>
                 </div>
               </div>
               
@@ -127,7 +127,7 @@ export const VentasShowcase: React.FC = () => {
                 {mejora.caracteristicas.map((caracteristica, charIndex) => (
                   <div key={charIndex} className="flex items-center space-x-2 text-sm">
                     <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    <span className="text-slate-700">{caracteristica}</span>
+                    <span className="text-dark-text-primary">{caracteristica}</span>
                   </div>
                 ))}
               </div>
@@ -137,16 +137,16 @@ export const VentasShowcase: React.FC = () => {
 
         {/* Comparación Antes vs Después */}
         <div className="bg-gradient-to-r from-moto-blue/10 to-moto-orange/10 rounded-xl p-8 mb-8">
-          <h2 className="text-2xl font-bold text-slate-800 mb-6 text-center">📊 Antes vs Después</h2>
+          <h2 className="text-2xl font-bold text-dark-text-primary mb-6 text-center">📊 Antes vs Después</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Antes */}
-            <div className="bg-white rounded-lg p-6 border border-slate-200">
+            <div className="bg-dark-bg-secondary rounded-lg p-6 border border-dark-border">
               <h3 className="text-lg font-semibold text-red-600 mb-4 flex items-center">
                 <X className="w-5 h-5 mr-2" />
                 Antes (Sistema Anterior)
               </h3>
-              <div className="space-y-3 text-sm text-slate-600">
+              <div className="space-y-3 text-sm text-dark-text-secondary">
                 <div>• Modal pequeño con espacio limitado</div>
                 <div>• Cards de productos pequeños</div>
                 <div>• Información condensada y difícil de leer</div>
@@ -159,12 +159,12 @@ export const VentasShowcase: React.FC = () => {
             </div>
 
             {/* Después */}
-            <div className="bg-white rounded-lg p-6 border border-slate-200">
+            <div className="bg-dark-bg-secondary rounded-lg p-6 border border-dark-border">
               <h3 className="text-lg font-semibold text-green-600 mb-4 flex items-center">
                 <CheckCircle className="w-5 h-5 mr-2" />
                 Después (Sistema Mejorado)
               </h3>
-              <div className="space-y-3 text-sm text-slate-600">
+              <div className="space-y-3 text-sm text-dark-text-secondary">
                 <div>• Pantalla completa con layout optimizado</div>
                 <div>• Cards grandes con información clara</div>
                 <div>• Texto legible y bien espaciado</div>
@@ -180,42 +180,42 @@ export const VentasShowcase: React.FC = () => {
 
         {/* Características Técnicas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="text-center p-6 bg-slate-50 rounded-xl">
+          <div className="text-center p-6 bg-dark-bg-tertiary rounded-xl">
             <Eye className="w-12 h-12 text-moto-blue mx-auto mb-4" />
-            <h3 className="font-semibold text-slate-800 mb-2">Visibilidad Mejorada</h3>
-            <p className="text-sm text-slate-600">
+            <h3 className="font-semibold text-dark-text-primary mb-2">Visibilidad Mejorada</h3>
+            <p className="text-sm text-dark-text-secondary">
               Layout amplio que aprovecha toda la pantalla para mostrar productos con claridad
             </p>
           </div>
           
-          <div className="text-center p-6 bg-slate-50 rounded-xl">
+          <div className="text-center p-6 bg-dark-bg-tertiary rounded-xl">
             <Zap className="w-12 h-12 text-moto-orange mx-auto mb-4" />
-            <h3 className="font-semibold text-slate-800 mb-2">Flujo Rápido</h3>
-            <p className="text-sm text-slate-600">
+            <h3 className="font-semibold text-dark-text-primary mb-2">Flujo Rápido</h3>
+            <p className="text-sm text-dark-text-secondary">
               Optimizado para ventas rápidas con búsqueda instantánea y atajos de teclado
             </p>
           </div>
           
-          <div className="text-center p-6 bg-slate-50 rounded-xl">
+          <div className="text-center p-6 bg-dark-bg-tertiary rounded-xl">
             <Star className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-            <h3 className="font-semibold text-slate-800 mb-2">UX Profesional</h3>
-            <p className="text-sm text-slate-600">
+            <h3 className="font-semibold text-dark-text-primary mb-2">UX Profesional</h3>
+            <p className="text-sm text-dark-text-secondary">
               Diseño específico para motorepuestos con iconografía y colores apropiados
             </p>
           </div>
         </div>
 
         {/* Instrucciones de Uso */}
-        <div className="bg-white border border-slate-200 rounded-xl p-6">
-          <h3 className="text-xl font-semibold text-slate-800 mb-4 flex items-center">
+        <div className="bg-dark-bg-secondary border border-dark-border rounded-xl p-6">
+          <h3 className="text-xl font-semibold text-dark-text-primary mb-4 flex items-center">
             <Receipt className="w-6 h-6 mr-2 text-moto-blue" />
             Cómo Usar el Nuevo Sistema de Ventas
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h4 className="font-medium text-slate-700 mb-3">🔍 Búsqueda y Selección:</h4>
-              <ol className="space-y-2 text-sm text-slate-600">
+              <h4 className="font-medium text-dark-text-primary mb-3">🔍 Búsqueda y Selección:</h4>
+              <ol className="space-y-2 text-sm text-dark-text-secondary">
                 <li>1. Usa la barra de búsqueda para encontrar productos</li>
                 <li>2. Filtra por categoría (Lubricantes, Repuestos, etc.)</li>
                 <li>3. Cambia entre vista grid y lista según prefieras</li>
@@ -224,8 +224,8 @@ export const VentasShowcase: React.FC = () => {
             </div>
             
             <div>
-              <h4 className="font-medium text-slate-700 mb-3">💳 Finalización:</h4>
-              <ol className="space-y-2 text-sm text-slate-600">
+              <h4 className="font-medium text-dark-text-primary mb-3">💳 Finalización:</h4>
+              <ol className="space-y-2 text-sm text-dark-text-secondary">
                 <li>1. Revisa los productos en el carrito lateral</li>
                 <li>2. Ajusta cantidades con los botones + y -</li>
                 <li>3. Selecciona cliente (opcional) y método de pago</li>
@@ -236,11 +236,11 @@ export const VentasShowcase: React.FC = () => {
           
           <div className="mt-6 p-4 bg-moto-blue/10 rounded-lg">
             <h4 className="font-medium text-moto-blue mb-2">⌨️ Atajos de Teclado:</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-slate-700">
-              <div><kbd className="bg-slate-200 px-2 py-1 rounded">F10</kbd> - Enfocar búsqueda</div>
-              <div><kbd className="bg-slate-200 px-2 py-1 rounded">F11</kbd> - Finalizar venta</div>
-              <div><kbd className="bg-slate-200 px-2 py-1 rounded">Enter</kbd> - Agregar producto destacado</div>
-              <div><kbd className="bg-slate-200 px-2 py-1 rounded">Esc</kbd> - Limpiar búsqueda</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-dark-text-secondary">
+              <div><kbd className="bg-dark-bg-tertiary px-2 py-1 rounded border border-dark-border text-dark-text-secondary">F10</kbd> - Enfocar búsqueda</div>
+              <div><kbd className="bg-dark-bg-tertiary px-2 py-1 rounded border border-dark-border text-dark-text-secondary">F11</kbd> - Finalizar venta</div>
+              <div><kbd className="bg-dark-bg-tertiary px-2 py-1 rounded border border-dark-border text-dark-text-secondary">Enter</kbd> - Agregar producto destacado</div>
+              <div><kbd className="bg-dark-bg-tertiary px-2 py-1 rounded border border-dark-border text-dark-text-secondary">Esc</kbd> - Limpiar búsqueda</div>
             </div>
           </div>
         </div>

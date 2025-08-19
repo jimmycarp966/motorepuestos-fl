@@ -98,7 +98,7 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
-      <div className="w-full max-w-2xl bg-white rounded-lg sm:rounded-2xl shadow-2xl border border-gray-100 overflow-hidden my-2 sm:my-0 max-h-[calc(100vh-16px)] sm:max-h-[calc(100vh-32px)] flex flex-col">
+      <div className="w-full max-w-2xl bg-dark-bg-secondary rounded-lg sm:rounded-2xl shadow-dark-xl border border-dark-border overflow-hidden my-2 sm:my-0 max-h-[calc(100vh-16px)] sm:max-h-[calc(100vh-32px)] flex flex-col">
         {/* Header con gradiente */}
         <div className="bg-gradient-to-r from-green-600 to-blue-600 px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
           <div className="flex justify-between items-center">
@@ -124,14 +124,14 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
             {/* Campo Nombre */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
+              <label className="block text-sm font-semibold text-dark-text-primary">
                 📝 Nombre del Producto *
               </label>
               <Input
                 {...register('nombre')}
                 placeholder="Ej: Filtro de aceite premium"
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 text-sm sm:text-base ${
-                  errors.nombre ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 text-sm sm:text-base ${
+                  errors.nombre ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                 }`}
               />
               {errors.nombre && (
@@ -144,14 +144,14 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
 
                          {/* Campo Código SKU */}
              <div className="space-y-2">
-               <label className="block text-sm font-semibold text-gray-700">
+               <label className="block text-sm font-semibold text-dark-text-primary">
                  🏷️ Código SKU *
                </label>
                <Input
                  {...register('codigo_sku')}
                  placeholder="Ej: PROD-001"
-                 className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 text-sm sm:text-base ${
-                   errors.codigo_sku ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                 className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 text-sm sm:text-base ${
+                   errors.codigo_sku ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                  }`}
                />
                {errors.codigo_sku && (
@@ -164,13 +164,13 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
 
              {/* Campo Descripción */}
              <div className="space-y-2">
-               <label className="block text-sm font-semibold text-gray-700">
+               <label className="block text-sm font-semibold text-dark-text-primary">
                  📄 Descripción
                </label>
                <textarea
                  {...register('descripcion')}
                  placeholder="Describe las características del producto..."
-                 className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 resize-none text-sm sm:text-base"
+                 className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-dark-border rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light resize-none text-sm sm:text-base"
                  rows={3}
                />
              </div>
@@ -178,18 +178,18 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
                          {/* Campos Precios y Costo */}
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                <div className="space-y-2">
-                 <label className="block text-sm font-semibold text-gray-700">
+                 <label className="block text-sm font-semibold text-dark-text-primary">
                    💰 Precio Minorista *
                  </label>
                  <div className="relative">
-                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-text-secondary">$</span>
                    <Input
                      type="number"
                      step="0.01"
                      {...register('precio_minorista', { valueAsNumber: true })}
                      placeholder="0.00"
-                     className={`w-full pl-6 sm:pl-8 pr-3 sm:pr-4 py-2 sm:py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 text-sm sm:text-base ${
-                       errors.precio_minorista ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                     className={`w-full pl-6 sm:pl-8 pr-3 sm:pr-4 py-2 sm:py-3 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 text-sm sm:text-base ${
+                       errors.precio_minorista ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                      }`}
                    />
                  </div>
@@ -202,18 +202,18 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
                </div>
 
                <div className="space-y-2">
-                 <label className="block text-sm font-semibold text-gray-700">
+                 <label className="block text-sm font-semibold text-dark-text-primary">
                    🏢 Precio Mayorista *
                  </label>
                  <div className="relative">
-                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-text-secondary">$</span>
                    <Input
                      type="number"
                      step="0.01"
                      {...register('precio_mayorista', { valueAsNumber: true })}
                      placeholder="0.00"
-                     className={`w-full pl-6 sm:pl-8 pr-3 sm:pr-4 py-2 sm:py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 text-sm sm:text-base ${
-                       errors.precio_mayorista ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                     className={`w-full pl-6 sm:pl-8 pr-3 sm:pr-4 py-2 sm:py-3 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 text-sm sm:text-base ${
+                       errors.precio_mayorista ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                      }`}
                    />
                  </div>
@@ -226,18 +226,18 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
                </div>
 
                <div className="space-y-2">
-                 <label className="block text-sm font-semibold text-gray-700">
+                 <label className="block text-sm font-semibold text-dark-text-primary">
                    💸 Costo *
                  </label>
                  <div className="relative">
-                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-text-secondary">$</span>
                    <Input
                      type="number"
                      step="0.01"
                      {...register('costo', { valueAsNumber: true })}
                      placeholder="0.00"
-                     className={`w-full pl-6 sm:pl-8 pr-3 sm:pr-4 py-2 sm:py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 text-sm sm:text-base ${
-                       errors.costo ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                     className={`w-full pl-6 sm:pl-8 pr-3 sm:pr-4 py-2 sm:py-3 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 text-sm sm:text-base ${
+                       errors.costo ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                      }`}
                    />
                  </div>
@@ -252,15 +252,15 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
 
              {/* Campo Stock Mínimo */}
              <div className="space-y-2">
-               <label className="block text-sm font-semibold text-gray-700">
+               <label className="block text-sm font-semibold text-dark-text-primary">
                  ⚠️ Stock Mínimo *
                </label>
                <Input
                  type="number"
                  {...register('stock_minimo', { valueAsNumber: true })}
                  placeholder="0"
-                 className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 text-sm sm:text-base ${
-                   errors.stock_minimo ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                 className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 text-sm sm:text-base ${
+                   errors.stock_minimo ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                  }`}
                />
                {errors.stock_minimo && (
@@ -273,15 +273,15 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
 
              {/* Campo Stock */}
              <div className="space-y-2">
-               <label className="block text-sm font-semibold text-gray-700">
+               <label className="block text-sm font-semibold text-dark-text-primary">
                  📊 Stock Inicial *
                </label>
                <Input
                  type="number"
                  {...register('stock', { valueAsNumber: true })}
                  placeholder="0"
-                 className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 text-sm sm:text-base ${
-                   errors.stock ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                 className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 text-sm sm:text-base ${
+                   errors.stock ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                  }`}
                />
                {errors.stock && (
@@ -295,13 +295,13 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
             {/* Campos Categoría y Unidad de Medida */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
+                <label className="block text-sm font-semibold text-dark-text-primary">
                   🏷️ Categoría *
                 </label>
                 <select
                   {...register('categoria')}
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 text-sm sm:text-base ${
-                    errors.categoria ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 text-sm sm:text-base ${
+                    errors.categoria ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                   }`}
                 >
                   <option value="">Selecciona una categoría</option>
@@ -323,13 +323,13 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
+                <label className="block text-sm font-semibold text-dark-text-primary">
                   📏 Unidad de Medida *
                 </label>
                 <select
                   {...register('unidad_medida')}
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-gray-300 transition-all duration-200 text-sm sm:text-base ${
-                    errors.unidad_medida ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg bg-dark-bg-secondary text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent hover:border-dark-border-light transition-all duration-200 text-sm sm:text-base ${
+                    errors.unidad_medida ? 'border-danger-300 bg-danger-50' : 'border-dark-border'
                   }`}
                 >
                   <option value="">Selecciona unidad</option>
@@ -355,7 +355,7 @@ export const ProductoForm: React.FC<ProductoFormProps> = ({ producto, onClose })
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="w-full sm:flex-1 py-3 px-4 sm:px-6 border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium text-sm sm:text-base"
+                className="w-full sm:flex-1 py-3 px-4 sm:px-6 border-2 border-dark-border text-dark-text-primary hover:bg-dark-bg-tertiary hover:border-dark-border-light transition-all duration-200 font-medium text-sm sm:text-base"
               >
                 <span className="hidden sm:inline">❌</span> Cancelar
               </Button>

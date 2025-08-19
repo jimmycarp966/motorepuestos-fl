@@ -10,10 +10,10 @@ const trendVariants = cva(
   {
     variants: {
       trend: {
-        up: "bg-green-100 text-green-700",
-        down: "bg-red-100 text-red-700", 
-        neutral: "bg-gray-100 text-gray-600",
-        positive: "bg-blue-100 text-blue-700"
+        up: "bg-success-500/20 text-success-500 border border-success-500/30",
+        down: "bg-danger-500/20 text-danger-500 border border-danger-500/30", 
+        neutral: "bg-dark-bg-tertiary text-dark-text-secondary border border-dark-border",
+        positive: "bg-primary-500/20 text-primary-500 border border-primary-500/30"
       }
     },
     defaultVariants: {
@@ -74,7 +74,7 @@ const TrendIndicator: React.FC<{ trend: TrendData }> = ({ trend }) => {
     <div className={cn(trendVariants({ trend: trendType }))}>
       <TrendIcon className="w-3 h-3" />
       <span>{formatValue()}</span>
-      <span className="text-gray-500 ml-1">{trend.label}</span>
+      <span className="text-dark-text-secondary ml-1">{trend.label}</span>
     </div>
   )
 }
@@ -89,11 +89,11 @@ const ProgressBar: React.FC<{ current: number; target: number; color: string }> 
   
   return (
     <div className="mt-3">
-      <div className="flex justify-between text-xs text-gray-500 mb-1">
+      <div className="flex justify-between text-xs text-dark-text-secondary mb-1">
         <span>Progreso</span>
         <span>{percentage.toFixed(0)}% de meta</span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2">
+      <div className="w-full bg-dark-bg-tertiary rounded-full h-2 border border-dark-border">
         <div 
           className="h-2 rounded-full transition-all duration-500 relative overflow-hidden"
           style={{ 
@@ -156,7 +156,7 @@ export const KPICard: React.FC<KPICardProps> = ({
         {/* Contenido principal */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-moto-steel truncate">
+            <p className="text-sm font-medium text-dark-text-secondary truncate">
               {title}
             </p>
             {trend && <TrendIndicator trend={trend} />}
@@ -165,9 +165,9 @@ export const KPICard: React.FC<KPICardProps> = ({
           {/* Valor principal */}
           <div className="mb-2">
             {loading ? (
-              <div className="h-8 bg-gray-200 rounded animate-pulse" />
+              <div className="h-8 bg-dark-bg-tertiary rounded animate-pulse" />
             ) : (
-              <p className="text-3xl font-bold text-gray-900 leading-tight">
+              <p className="text-3xl font-bold text-dark-text-primary leading-tight">
                 {typeof value === 'number' ? value.toLocaleString() : value}
               </p>
             )}
@@ -175,7 +175,7 @@ export const KPICard: React.FC<KPICardProps> = ({
           
           {/* Subtítulo */}
           {subtitle && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-dark-text-secondary">
               {subtitle}
             </p>
           )}
@@ -207,7 +207,7 @@ export const KPICard: React.FC<KPICardProps> = ({
       {/* Indicador de clic si es clickable */}
       {isClickable && (
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-          <ArrowUpRight className="w-4 h-4 text-gray-400" />
+          <ArrowUpRight className="w-4 h-4 text-dark-text-secondary" />
         </div>
       )}
     </MotorCard>

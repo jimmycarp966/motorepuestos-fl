@@ -14,26 +14,26 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const getVariantStyles = () => {
       switch (variant) {
         case 'error':
-          return "border-red-500 bg-red-50 focus-visible:ring-red-500 focus-visible:border-red-500 hover:border-red-600"
+          return "border-danger-500 bg-danger-500/10 focus-visible:ring-danger-500 focus-visible:border-danger-500 hover:border-danger-400"
         case 'success':
-          return "border-green-500 bg-green-50 focus-visible:ring-green-500 focus-visible:border-green-500 hover:border-green-600"
+          return "border-success-500 bg-success-500/10 focus-visible:ring-success-500 focus-visible:border-success-500 hover:border-success-400"
         case 'warning':
-          return "border-yellow-500 bg-yellow-50 focus-visible:ring-yellow-500 focus-visible:border-yellow-500 hover:border-yellow-600"
+          return "border-warning-500 bg-warning-500/10 focus-visible:ring-warning-500 focus-visible:border-warning-500 hover:border-warning-400"
         default:
-          return "border-slate-300 bg-white focus-visible:ring-moto-blue focus-visible:border-moto-blue hover:border-slate-400"
+          return "border-dark-border bg-dark-bg-secondary focus-visible:ring-primary-500 focus-visible:border-primary-500 hover:border-dark-border-light"
       }
     }
 
     const getIconColor = () => {
       switch (variant) {
         case 'error':
-          return "text-red-500"
+          return "text-danger-500"
         case 'success':
-          return "text-green-500"
+          return "text-success-500"
         case 'warning':
-          return "text-yellow-500"
+          return "text-warning-500"
         default:
-          return "text-moto-blue"
+          return "text-primary-500"
       }
     }
 
@@ -42,7 +42,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         <div className="relative">
           <textarea
             className={cn(
-              "flex min-h-[100px] w-full rounded-moto border-2 px-4 py-3 text-base text-slate-800 placeholder-slate-500 shadow-sm transition-all duration-200 resize-vertical focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60 disabled:bg-slate-50",
+              "flex min-h-[100px] w-full rounded-moto border-2 px-4 py-3 text-base text-dark-text-primary placeholder-dark-text-secondary shadow-dark-sm transition-all duration-200 resize-vertical focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60 disabled:bg-dark-bg-primary",
               getVariantStyles(),
               className
             )}
@@ -72,10 +72,10 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         {helperText && (
           <p className={cn(
             "text-sm mt-2 flex items-center gap-1.5",
-            variant === 'error' && "text-red-600",
-            variant === 'success' && "text-green-600", 
-            variant === 'warning' && "text-yellow-600",
-            variant === 'default' && "text-slate-500"
+            variant === 'error' && "text-danger-500",
+            variant === 'success' && "text-success-500", 
+            variant === 'warning' && "text-warning-500",
+            variant === 'default' && "text-dark-text-secondary"
           )}>
             {helperText}
           </p>

@@ -10,7 +10,7 @@ const actionButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-white border-gray-300 text-gray-700 hover:bg-gray-50",
+        default: "bg-dark-bg-secondary border-dark-border text-dark-text-primary hover:bg-dark-bg-tertiary",
         primary: "bg-moto-blue text-white hover:bg-moto-darkBlue",
         secondary: "bg-moto-steel text-white hover:bg-moto-iron", 
         danger: "bg-red-500 text-white hover:bg-red-600",

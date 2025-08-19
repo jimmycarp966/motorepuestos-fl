@@ -171,10 +171,10 @@ export const Dashboard: React.FC = () => {
   // Mostrar loading si es necesario con nuevo componente
   if (isLoading) {
     return (
-      <div className="p-8 font-sans">
+      <div className="p-8 font-sans bg-dark-bg-primary">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Dashboard</h1>
-          <p className="text-gray-600">Resumen general del sistema de gestión</p>
+          <h1 className="text-2xl font-bold text-dark-text-primary mb-2">Dashboard</h1>
+          <p className="text-dark-text-secondary">Resumen general del sistema de gestión</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -199,13 +199,13 @@ export const Dashboard: React.FC = () => {
   // Mostrar errores si existen
   if (hasErrors && retryCount >= 3) {
     return (
-      <div style={{ padding: '2rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <div style={{ padding: '2rem', fontFamily: 'Inter, system-ui, sans-serif', backgroundColor: '#000000' }}>
         <div style={{ textAlign: 'center', paddingTop: '4rem', maxWidth: '500px', margin: '0 auto' }}>
-          <AlertCircle size={48} style={{ color: '#ef4444', margin: '0 auto 1rem' }} />
-          <h3 style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '1.5rem' }}>
+          <AlertCircle size={48} style={{ color: '#F44336', margin: '0 auto 1rem' }} />
+          <h3 style={{ color: '#F44336', marginBottom: '1rem', fontSize: '1.5rem' }}>
             Error en el Dashboard
           </h3>
-          <p style={{ color: '#64748b', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+          <p style={{ color: '#B0B0B0', marginBottom: '1.5rem', lineHeight: '1.6' }}>
             No se pudieron cargar los datos después de varios intentos. Esto puede deberse a problemas de conexión o del servidor.
           </p>
           
@@ -214,17 +214,18 @@ export const Dashboard: React.FC = () => {
               onClick={handleRetryManual}
               style={{
                 padding: '0.75rem 1.5rem',
-                backgroundColor: '#3b82f6',
+                backgroundColor: '#2979FF',
                 color: 'white',
                 border: 'none',
                 borderRadius: '0.5rem',
                 cursor: 'pointer',
                 fontSize: '0.875rem',
                 fontWeight: '500',
-                transition: 'background-color 0.2s'
+                transition: 'background-color 0.2s',
+                boxShadow: '0 0 20px rgba(41, 121, 255, 0.3)'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3b82f6'}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e6bff'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2979FF'}
             >
               🔄 Reintentar Ahora
             </button>
@@ -233,23 +234,23 @@ export const Dashboard: React.FC = () => {
               onClick={() => window.location.reload()}
               style={{
                 padding: '0.75rem 1.5rem',
-                backgroundColor: '#6b7280',
-                color: 'white',
-                border: 'none',
+                backgroundColor: '#121212',
+                color: '#FFFFFF',
+                border: '1px solid #2C2C2C',
                 borderRadius: '0.5rem',
                 cursor: 'pointer',
                 fontSize: '0.875rem',
                 fontWeight: '500',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4b5563'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6b7280'}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1E1E1E'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#121212'}
             >
               🔃 Refrescar Página
             </button>
           </div>
 
-          <p style={{ color: '#9ca3af', fontSize: '0.75rem', marginTop: '1.5rem' }}>
+          <p style={{ color: '#B0B0B0', fontSize: '0.75rem', marginTop: '1.5rem', opacity: 0.7 }}>
             Si el problema persiste, contacte al administrador del sistema.
           </p>
         </div>
@@ -263,8 +264,8 @@ export const Dashboard: React.FC = () => {
       value: `$${kpis.totalVentasHoy.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
       subtitle: `${kpis.cantidadVentasHoy} ventas`,
       icon: TrendingUp,
-      color: '#667eea',
-      bgColor: '#f0f4ff',
+      color: '#2979FF',
+      bgColor: 'rgba(41, 121, 255, 0.1)',
       trend: kpis.totalVentasHoy > 0 ? 'up' : 'neutral',
       trendValue: kpis.totalVentasHoy > 0 ? '+12%' : '0%'
     },
@@ -273,8 +274,8 @@ export const Dashboard: React.FC = () => {
       value: `$${kpis.saldoCaja.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
       subtitle: 'Balance actual',
       icon: DollarSign,
-      color: '#10b981',
-      bgColor: '#f0fdf4',
+      color: '#4CAF50',
+      bgColor: 'rgba(76, 175, 80, 0.1)',
       trend: kpis.saldoCaja > 0 ? 'up' : 'down',
       trendValue: kpis.saldoCaja > 0 ? '+5%' : '-2%'
     },
@@ -283,8 +284,8 @@ export const Dashboard: React.FC = () => {
       value: kpis.productosActivos.toString(),
       subtitle: `${kpis.productosStockBajo} con stock bajo`,
       icon: Package,
-      color: '#f59e0b',
-      bgColor: '#fffbeb',
+      color: '#FF9800',
+      bgColor: 'rgba(255, 152, 0, 0.1)',
       trend: kpis.productosStockBajo > 0 ? 'down' : 'up',
       trendValue: kpis.productosStockBajo > 0 ? `⚠️ ${kpis.productosStockBajo}` : '✅'
     },
@@ -293,8 +294,8 @@ export const Dashboard: React.FC = () => {
       value: kpis.clientesActivos.toString(),
       subtitle: 'Activos',
       icon: Users,
-      color: '#8b5cf6',
-      bgColor: '#faf5ff',
+      color: '#7C4DFF',
+      bgColor: 'rgba(124, 77, 255, 0.1)',
       trend: 'up',
       trendValue: '+8%'
     }
@@ -303,7 +304,9 @@ export const Dashboard: React.FC = () => {
   return (
     <div style={{ 
       padding: 'clamp(0.75rem, 3vw, 1rem)', 
-      fontFamily: 'Inter, system-ui, sans-serif' 
+      fontFamily: 'Inter, system-ui, sans-serif',
+      backgroundColor: '#000000',
+      minHeight: '100vh'
     }}>
 
       {/* Header del Dashboard */}
@@ -313,14 +316,14 @@ export const Dashboard: React.FC = () => {
             <h1 style={{ 
               fontSize: 'clamp(1.25rem, 4vw, 2rem)', 
               fontWeight: '700', 
-              color: '#1e293b',
+              color: '#FFFFFF',
               marginBottom: '0.5rem'
             }}>
               Dashboard
             </h1>
             <p style={{ 
               fontSize: 'clamp(0.75rem, 2vw, 1rem)', 
-              color: '#64748b',
+              color: '#B0B0B0',
               margin: 0
             }}>
               Resumen general del sistema de gestión
@@ -333,8 +336,8 @@ export const Dashboard: React.FC = () => {
             alignItems: 'center',
             gap: '0.5rem',
             padding: '0.5rem 0.75rem',
-            backgroundColor: calendarSync.syncInProgress ? '#fef3c7' : '#f0fdf4',
-            border: `1px solid ${calendarSync.syncInProgress ? '#f59e0b' : '#10b981'}`,
+            backgroundColor: calendarSync.syncInProgress ? 'rgba(255, 152, 0, 0.2)' : 'rgba(76, 175, 80, 0.2)',
+            border: `1px solid ${calendarSync.syncInProgress ? '#FF9800' : '#4CAF50'}`,
             borderRadius: '0.5rem',
             fontSize: '0.75rem'
           }}>
@@ -342,10 +345,10 @@ export const Dashboard: React.FC = () => {
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: calendarSync.syncInProgress ? '#f59e0b' : '#10b981',
+              backgroundColor: calendarSync.syncInProgress ? '#FF9800' : '#4CAF50',
               animation: calendarSync.syncInProgress ? 'pulse 2s infinite' : 'none'
             }} />
-            <span style={{ color: calendarSync.syncInProgress ? '#92400e' : '#065f46' }}>
+            <span style={{ color: calendarSync.syncInProgress ? '#FF9800' : '#4CAF50' }}>
               {calendarSync.syncInProgress ? 'Sincronizando...' : `Día: ${calendarSync.currentDate}`}
             </span>
           </div>
@@ -363,13 +366,14 @@ export const Dashboard: React.FC = () => {
           const Icon = card.icon
           return (
             <div key={index} style={{
-              backgroundColor: 'white',
+              backgroundColor: '#121212',
               borderRadius: '1rem',
               padding: '1rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              border: '1px solid #e2e8f0',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.3)',
+              border: '1px solid #2C2C2C',
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              transition: 'all 0.2s ease'
             }}>
               {/* Icono de fondo */}
               <div style={{
@@ -383,7 +387,7 @@ export const Dashboard: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                opacity: 0.1
+                opacity: 0.3
               }}>
                 <Icon size={30} style={{ color: card.color }} />
               </div>
@@ -392,7 +396,7 @@ export const Dashboard: React.FC = () => {
                 <div style={{ flex: 1 }}>
                   <div style={{ 
                     fontSize: '0.875rem', 
-                    color: '#64748b',
+                    color: '#B0B0B0',
                     fontWeight: '500',
                     marginBottom: '0.5rem'
                   }}>
@@ -401,14 +405,14 @@ export const Dashboard: React.FC = () => {
                   <div style={{ 
                     fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
                     fontWeight: '700', 
-                    color: '#1e293b',
+                    color: '#FFFFFF',
                     marginBottom: '0.25rem'
                   }}>
                     {card.value}
                   </div>
                   <div style={{ 
                     fontSize: '0.875rem', 
-                    color: '#64748b'
+                    color: '#B0B0B0'
                   }}>
                     {card.subtitle}
                   </div>
@@ -421,12 +425,14 @@ export const Dashboard: React.FC = () => {
                   gap: '0.25rem',
                   padding: '0.25rem 0.5rem',
                   borderRadius: '0.375rem',
-                  backgroundColor: card.trend === 'up' ? '#f0fdf4' : 
-                                   card.trend === 'down' ? '#fef2f2' : '#f8fafc',
-                  color: card.trend === 'up' ? '#10b981' : 
-                         card.trend === 'down' ? '#ef4444' : '#64748b',
+                  backgroundColor: card.trend === 'up' ? 'rgba(76, 175, 80, 0.2)' : 
+                                   card.trend === 'down' ? 'rgba(244, 51, 54, 0.2)' : '#1E1E1E',
+                  color: card.trend === 'up' ? '#4CAF50' : 
+                         card.trend === 'down' ? '#F44336' : '#B0B0B0',
                   fontSize: '0.75rem',
-                  fontWeight: '600'
+                  fontWeight: '600',
+                  border: `1px solid ${card.trend === 'up' ? '#4CAF50' : 
+                                      card.trend === 'down' ? '#F44336' : '#2C2C2C'}`
                 }}>
                   {card.trend === 'up' ? <ArrowUpRight size={12} /> : 
                    card.trend === 'down' ? <ArrowDownRight size={12} /> : null}
@@ -452,11 +458,11 @@ export const Dashboard: React.FC = () => {
       }}>
         {/* Ventas Recientes */}
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: '#121212',
           borderRadius: '1rem',
           padding: '1rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          border: '1px solid #e2e8f0'
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.3)',
+          border: '1px solid #2C2C2C'
         }}>
           <div style={{ 
             display: 'flex', 
@@ -467,12 +473,12 @@ export const Dashboard: React.FC = () => {
             <h3 style={{ 
               fontSize: '1.125rem', 
               fontWeight: '600', 
-              color: '#1e293b',
+              color: '#FFFFFF',
               margin: 0
             }}>
               Ventas Recientes
             </h3>
-            <ShoppingCart size={20} style={{ color: '#64748b' }} />
+            <ShoppingCart size={20} style={{ color: '#2979FF' }} />
           </div>
 
           {ventasRecientes.length > 0 ? (
@@ -483,22 +489,23 @@ export const Dashboard: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '0.75rem',
-                  backgroundColor: '#f8fafc',
+                  backgroundColor: '#1E1E1E',
                   borderRadius: '0.75rem',
-                  border: '1px solid #e2e8f0'
+                  border: '1px solid #2C2C2C',
+                  transition: 'all 0.2s ease'
                 }}>
                   <div>
                     <div style={{ 
                       fontSize: '0.875rem', 
                       fontWeight: '600', 
-                      color: '#1e293b',
+                      color: '#FFFFFF',
                       marginBottom: '0.25rem'
                     }}>
                       Venta #{venta.id}
                     </div>
                     <div style={{ 
                       fontSize: '0.75rem', 
-                      color: '#64748b',
+                      color: '#B0B0B0',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.5rem'
@@ -510,7 +517,7 @@ export const Dashboard: React.FC = () => {
                   <div style={{ 
                     fontSize: '1rem', 
                     fontWeight: '700', 
-                    color: '#10b981'
+                    color: '#4CAF50'
                   }}>
                     ${venta.total?.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                   </div>
@@ -521,9 +528,9 @@ export const Dashboard: React.FC = () => {
             <div style={{
               textAlign: 'center',
               padding: '2rem',
-              color: '#64748b'
+              color: '#B0B0B0'
             }}>
-              <ShoppingCart size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
+              <ShoppingCart size={48} style={{ marginBottom: '1rem', opacity: 0.5, color: '#B0B0B0' }} />
               <p>No hay ventas recientes</p>
             </div>
           )}
@@ -531,11 +538,11 @@ export const Dashboard: React.FC = () => {
 
         {/* Movimientos de Caja */}
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: '#121212',
           borderRadius: '1rem',
           padding: '1rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          border: '1px solid #e2e8f0'
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.3)',
+          border: '1px solid #2C2C2C'
         }}>
           <div style={{ 
             display: 'flex', 
@@ -546,12 +553,12 @@ export const Dashboard: React.FC = () => {
             <h3 style={{ 
               fontSize: '1.125rem', 
               fontWeight: '600', 
-              color: '#1e293b',
+              color: '#FFFFFF',
               margin: 0
             }}>
               Movimientos de Caja
             </h3>
-            <DollarSign size={20} style={{ color: '#64748b' }} />
+            <DollarSign size={20} style={{ color: '#FF9800' }} />
           </div>
 
           {movimientosRecientes.length > 0 ? (
@@ -562,22 +569,23 @@ export const Dashboard: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '0.75rem',
-                  backgroundColor: '#f8fafc',
+                  backgroundColor: '#1E1E1E',
                   borderRadius: '0.75rem',
-                  border: '1px solid #e2e8f0'
+                  border: '1px solid #2C2C2C',
+                  transition: 'all 0.2s ease'
                 }}>
                   <div>
                     <div style={{ 
                       fontSize: '0.875rem', 
                       fontWeight: '600', 
-                      color: '#1e293b',
+                      color: '#FFFFFF',
                       marginBottom: '0.25rem'
                     }}>
                       {movimiento.tipo}
                     </div>
                     <div style={{ 
                       fontSize: '0.75rem', 
-                      color: '#64748b',
+                      color: '#B0B0B0',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.5rem'
@@ -589,7 +597,7 @@ export const Dashboard: React.FC = () => {
                   <div style={{ 
                     fontSize: '1rem', 
                     fontWeight: '700', 
-                    color: movimiento.tipo === 'ingreso' ? '#10b981' : '#ef4444'
+                    color: movimiento.tipo === 'ingreso' ? '#4CAF50' : '#F44336'
                   }}>
                     {movimiento.tipo === 'ingreso' ? '+' : '-'}${Math.abs(movimiento.monto || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                   </div>
@@ -600,9 +608,9 @@ export const Dashboard: React.FC = () => {
             <div style={{
               textAlign: 'center',
               padding: '2rem',
-              color: '#64748b'
+              color: '#B0B0B0'
             }}>
-              <DollarSign size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
+              <DollarSign size={48} style={{ marginBottom: '1rem', opacity: 0.5, color: '#B0B0B0' }} />
               <p>No hay movimientos recientes</p>
             </div>
           )}
@@ -612,11 +620,11 @@ export const Dashboard: React.FC = () => {
       {/* Estadísticas adicionales */}
       <div style={{
         marginTop: '1.5rem',
-        backgroundColor: 'white',
+        backgroundColor: '#121212',
         borderRadius: '1rem',
         padding: '1rem',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        border: '1px solid #e2e8f0'
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.3)',
+        border: '1px solid #2C2C2C'
       }}>
         <div style={{ 
           display: 'flex', 
@@ -627,12 +635,12 @@ export const Dashboard: React.FC = () => {
           <h3 style={{ 
             fontSize: '1.125rem', 
             fontWeight: '600', 
-            color: '#1e293b',
+            color: '#FFFFFF',
             margin: 0
           }}>
             Resumen del Período
           </h3>
-          <BarChart3 size={20} style={{ color: '#64748b' }} />
+          <BarChart3 size={20} style={{ color: '#2979FF' }} />
         </div>
 
         <div style={{
@@ -643,21 +651,22 @@ export const Dashboard: React.FC = () => {
           <div style={{
             textAlign: 'center',
             padding: '1rem',
-            backgroundColor: '#f8fafc',
+            backgroundColor: '#1E1E1E',
             borderRadius: '0.75rem',
-            border: '1px solid #e2e8f0'
+            border: '1px solid #2C2C2C',
+            transition: 'all 0.2s ease'
           }}>
             <div style={{ 
               fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
               fontWeight: '700', 
-              color: '#667eea',
+              color: '#2979FF',
               marginBottom: '0.5rem'
             }}>
               {kpis.cantidadVentasHoy}
             </div>
             <div style={{ 
               fontSize: '0.875rem', 
-              color: '#64748b',
+              color: '#B0B0B0',
               fontWeight: '500'
             }}>
               Total Ventas Hoy
@@ -667,21 +676,22 @@ export const Dashboard: React.FC = () => {
           <div style={{
             textAlign: 'center',
             padding: '1rem',
-            backgroundColor: '#f8fafc',
+            backgroundColor: '#1E1E1E',
             borderRadius: '0.75rem',
-            border: '1px solid #e2e8f0'
+            border: '1px solid #2C2C2C',
+            transition: 'all 0.2s ease'
           }}>
             <div style={{ 
               fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
               fontWeight: '700', 
-              color: '#10b981',
+              color: '#4CAF50',
               marginBottom: '0.5rem'
             }}>
               ${kpis.ventasSemanaPasada.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
             </div>
             <div style={{ 
               fontSize: '0.875rem', 
-              color: '#64748b',
+              color: '#B0B0B0',
               fontWeight: '500'
             }}>
               Ventas Última Semana
@@ -691,21 +701,22 @@ export const Dashboard: React.FC = () => {
           <div style={{
             textAlign: 'center',
             padding: '1rem',
-            backgroundColor: '#f8fafc',
+            backgroundColor: '#1E1E1E',
             borderRadius: '0.75rem',
-            border: '1px solid #e2e8f0'
+            border: '1px solid #2C2C2C',
+            transition: 'all 0.2s ease'
           }}>
             <div style={{ 
               fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
               fontWeight: '700', 
-              color: '#f59e0b',
+              color: '#FF9800',
               marginBottom: '0.5rem'
             }}>
               {kpis.productosActivos}
             </div>
             <div style={{ 
               fontSize: '0.875rem', 
-              color: '#64748b',
+              color: '#B0B0B0',
               fontWeight: '500'
             }}>
               Productos Activos
@@ -715,21 +726,22 @@ export const Dashboard: React.FC = () => {
           <div style={{
             textAlign: 'center',
             padding: '1rem',
-            backgroundColor: '#f8fafc',
+            backgroundColor: '#1E1E1E',
             borderRadius: '0.75rem',
-            border: '1px solid #e2e8f0'
+            border: '1px solid #2C2C2C',
+            transition: 'all 0.2s ease'
           }}>
             <div style={{ 
               fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
               fontWeight: '700', 
-              color: '#8b5cf6',
+              color: '#7C4DFF',
               marginBottom: '0.5rem'
             }}>
               {kpis.clientesActivos}
             </div>
             <div style={{ 
               fontSize: '0.875rem', 
-              color: '#64748b',
+              color: '#B0B0B0',
               fontWeight: '500'
             }}>
               Clientes Activos

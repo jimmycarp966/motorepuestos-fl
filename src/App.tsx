@@ -158,30 +158,31 @@ function App() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
+        background: 'linear-gradient(135deg, #000000 0%, #121212 50%, #1E1E1E 100%)',
+        color: '#FFFFFF',
         fontFamily: 'Inter, system-ui, sans-serif'
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{
             width: '60px',
             height: '60px',
-            border: '4px solid rgba(255,255,255,0.3)',
-            borderTop: '4px solid #ffffff',
+            border: '4px solid #2C2C2C',
+            borderTop: '4px solid #2979FF',
             borderRadius: '50%',
             animation: 'spin 1s linear infinite',
-            margin: '0 auto 20px'
+            margin: '0 auto 20px',
+            boxShadow: '0 0 20px rgba(41, 121, 255, 0.3)'
           }}></div>
-          <h2 style={{ marginBottom: '10px', fontSize: '1.5rem', fontWeight: '600' }}>
-            Cargando aplicación...
+          <h2 style={{ marginBottom: '10px', fontSize: '1.5rem', fontWeight: '600', color: '#FFFFFF' }}>
+            Cargando Motorepuestos...
           </h2>
-          <p style={{ opacity: 0.8, fontSize: '1rem' }}>
+          <p style={{ opacity: 0.8, fontSize: '1rem', color: '#B0B0B0' }}>
             Inicializando sistema de gestión
           </p>
           {process.env.NODE_ENV === 'development' && (
-            <div style={{ marginTop: '1rem', fontSize: '12px', opacity: 0.8 }}>
+            <div style={{ marginTop: '1rem', fontSize: '12px', opacity: 0.8, color: '#B0B0B0' }}>
               <p>Debug: Auth checked: {debugInfo.authChecked ? '✅' : '⏳'}</p>
-              {debugInfo.authError && <p>Error: {debugInfo.authError}</p>}
+              {debugInfo.authError && <p style={{ color: '#F44336' }}>Error: {debugInfo.authError}</p>}
             </div>
           )}
         </div>
@@ -202,7 +203,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="min-h-screen bg-dark-bg-primary font-sans">
       <NotificationsContainer />
       
       {/* Sidebar */}
@@ -210,10 +211,13 @@ function App() {
       
       {/* Contenido principal */}
       <main className="flex flex-col lg:ml-[280px] min-h-screen">
-        {/* Header moderno */}
-        <header className="bg-white border-b border-gray-200 px-4 lg:px-8 py-4 flex items-center justify-between shadow-sm">
+        {/* Header moderno tema oscuro */}
+        <header className="bg-dark-bg-secondary border-b border-dark-border px-4 lg:px-8 py-4 flex items-center justify-between shadow-dark-sm">
           <div className="flex items-center gap-4">
-            <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">
+            <h1 className="text-xl lg:text-2xl font-semibold text-dark-text-primary">
+              Punto de Venta – Motorepuestos
+            </h1>
+            <div className="text-sm text-dark-text-secondary font-medium">
               {currentModule === 'dashboard' ? 'Dashboard' :
                currentModule === 'empleados' ? 'Empleados' :
                currentModule === 'productos' ? 'Productos' :
@@ -221,19 +225,19 @@ function App() {
                currentModule === 'ventas' ? 'Ventas' :
                currentModule === 'caja' ? 'Caja' :
                currentModule === 'reportes' ? 'Reportes' : 'Dashboard'}
-            </h1>
+            </div>
           </div>
           
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-dark-text-secondary">
                 Bienvenido
               </div>
-              <div className="text-base font-medium text-gray-900">
+              <div className="text-base font-medium text-dark-text-primary">
                 {user.nombre}
               </div>
             </div>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white font-semibold text-lg shadow-glow-blue">
               {user.nombre.charAt(0).toUpperCase()}
             </div>
           </div>
@@ -241,7 +245,7 @@ function App() {
 
         {/* Contenido del módulo */}
         <div className="flex-1 p-4 lg:p-8 overflow-auto">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-dark-bg-secondary rounded-xl shadow-dark-md border border-dark-border overflow-hidden">
             {renderModule()}
           </div>
         </div>

@@ -161,11 +161,11 @@ export const CajaTable: React.FC = () => {
   // Obtener color para método de pago
   const getMetodoPagoColor = (metodo: string) => {
     switch (metodo) {
-      case 'efectivo': return 'text-green-600 bg-green-100'
-      case 'tarjeta': return 'text-blue-600 bg-blue-100'
-      case 'transferencia': return 'text-purple-600 bg-purple-100'
-      case 'cuenta_corriente': return 'text-orange-600 bg-orange-100'
-      default: return 'text-gray-600 bg-gray-100'
+      case 'efectivo': return 'text-success-500 bg-success-500/20 border border-success-500/30'
+      case 'tarjeta': return 'text-primary-500 bg-primary-500/20 border border-primary-500/30'
+      case 'transferencia': return 'text-secondary-500 bg-secondary-500/20 border border-secondary-500/30'
+      case 'cuenta_corriente': return 'text-warning-500 bg-warning-500/20 border border-warning-500/30'
+      default: return 'text-dark-text-secondary bg-dark-bg-tertiary border border-dark-border'
     }
   }
 
@@ -174,8 +174,8 @@ export const CajaTable: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Caja</h1>
-          <p className="text-gray-600">Gestión de efectivo y movimientos</p>
+          <h1 className="text-2xl font-bold text-dark-text-primary">Caja</h1>
+          <p className="text-dark-text-secondary">Gestión de efectivo y movimientos</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -195,7 +195,7 @@ export const CajaTable: React.FC = () => {
               disabled={arqueoCompletadoHoy}
               className={`${
                 arqueoCompletadoHoy 
-                  ? 'text-gray-400 border-gray-200 cursor-not-allowed' 
+                  ? 'text-dark-text-secondary border-dark-border cursor-not-allowed' 
                   : 'text-red-600 border-red-200 hover:bg-red-50'
               }`}
             >
@@ -225,8 +225,8 @@ export const CajaTable: React.FC = () => {
               </div>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Saldo Actual</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-dark-text-secondary">Saldo Actual</p>
+              <p className="text-2xl font-bold text-dark-text-primary">
                 ${saldo.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
               </p>
             </div>
@@ -241,7 +241,7 @@ export const CajaTable: React.FC = () => {
               </div>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Ingresos Hoy</p>
+              <p className="text-sm font-medium text-dark-text-secondary">Ingresos Hoy</p>
               <p className="text-2xl font-bold text-green-600">
                 ${ingresosHoy.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
               </p>
@@ -257,7 +257,7 @@ export const CajaTable: React.FC = () => {
               </div>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Egresos Hoy</p>
+              <p className="text-sm font-medium text-dark-text-secondary">Egresos Hoy</p>
               <p className="text-2xl font-bold text-red-600">
                 ${egresosHoy.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
               </p>
@@ -273,7 +273,7 @@ export const CajaTable: React.FC = () => {
               </div>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Ventas Hoy</p>
+              <p className="text-sm font-medium text-dark-text-secondary">Ventas Hoy</p>
               <p className="text-2xl font-bold text-blue-600">
                 ${totalVentasHoy.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
               </p>
@@ -287,17 +287,17 @@ export const CajaTable: React.FC = () => {
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-xl font-bold text-gray-900 flex items-center">
+              <h3 className="text-xl font-bold text-dark-text-primary flex items-center">
                 <BarChart3 className="w-5 h-5 mr-2 text-blue-600" />
                 Ventas por Modalidad de Pago
               </h3>
-              <p className="text-sm text-gray-600 mt-1">Desglose detallado de ventas del día</p>
+              <p className="text-sm text-dark-text-secondary mt-1">Desglose detallado de ventas del día</p>
             </div>
             <div className="text-right">
               <div className="text-2xl font-bold text-blue-600">
                 ${totalVentasHoy.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
               </div>
-              <div className="text-sm text-gray-500">{ventasHoy.length} ventas totales</div>
+              <div className="text-sm text-dark-text-secondary">{ventasHoy.length} ventas totales</div>
             </div>
           </div>
           
@@ -306,17 +306,17 @@ export const CajaTable: React.FC = () => {
             {Object.entries(ventasPorMetodo).map(([metodo, total]) => {
               const porcentaje = totalVentasHoy > 0 ? ((total / totalVentasHoy) * 100).toFixed(1) : '0'
               return (
-                <div key={metodo} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div key={metodo} className="bg-dark-bg-secondary border border-dark-border rounded-lg p-4 hover:shadow-dark-md transition-shadow">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center">
                       <div className={`p-2 rounded-full ${getMetodoPagoColor(metodo)}`}>
                         {getMetodoPagoIcon(metodo)}
                       </div>
                       <div className="ml-3">
-                        <p className="text-sm font-semibold text-gray-900 capitalize">
+                        <p className="text-sm font-semibold text-dark-text-primary capitalize">
                           {metodo.replace('_', ' ')}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-dark-text-secondary">
                           {porcentaje}% del total
                         </p>
                       </div>
@@ -326,7 +326,7 @@ export const CajaTable: React.FC = () => {
                     <p className="text-xl font-bold text-green-600">
                       ${total.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-dark-text-secondary">
                       {ventasHoy.filter(v => (v.metodo_pago || 'efectivo') === metodo).length} ventas
                     </p>
                   </div>
@@ -337,7 +337,7 @@ export const CajaTable: React.FC = () => {
 
           {/* Gráfico de barras simple */}
           <div className="mt-6">
-            <h4 className="text-sm font-medium text-gray-700 mb-3">Distribución Visual</h4>
+            <h4 className="text-sm font-medium text-dark-text-primary mb-3">Distribución Visual</h4>
             <div className="flex items-end space-x-2 h-8">
               {Object.entries(ventasPorMetodo).map(([metodo, total]) => {
                 const porcentaje = totalVentasHoy > 0 ? (total / totalVentasHoy) * 100 : 0
@@ -353,7 +353,7 @@ export const CajaTable: React.FC = () => {
                                         metodo === 'cuenta_corriente' ? '#f59e0b' : '#6b7280'
                       }}
                     ></div>
-                    <div className="text-xs text-gray-500 mt-1 capitalize">
+                    <div className="text-xs text-dark-text-secondary mt-1 capitalize">
                       {metodo.replace('_', ' ')}
                     </div>
                   </div>
@@ -369,7 +369,7 @@ export const CajaTable: React.FC = () => {
         <Card className="p-6">
           <div className="flex items-center mb-4">
             <BarChart3 className="w-5 h-5 mr-2 text-purple-600" />
-            <h3 className="text-lg font-semibold text-gray-900">Estadísticas Adicionales</h3>
+            <h3 className="text-lg font-semibold text-dark-text-primary">Estadísticas Adicionales</h3>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -412,14 +412,14 @@ export const CajaTable: React.FC = () => {
           </div>
 
           {/* Resumen de métodos de pago */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h4 className="text-sm font-medium text-gray-700 mb-3">Resumen por Método de Pago</h4>
+          <div className="mt-6 p-4 bg-dark-bg-tertiary rounded-lg">
+            <h4 className="text-sm font-medium text-dark-text-primary mb-3">Resumen por Método de Pago</h4>
             <div className="space-y-2">
               {Object.entries(ventasPorMetodo).map(([metodo, total]) => {
                 const cantidad = ventasHoy.filter(v => (v.metodo_pago || 'efectivo') === metodo).length
                 const porcentaje = totalVentasHoy > 0 ? ((total / totalVentasHoy) * 100).toFixed(1) : '0'
                 return (
-                  <div key={metodo} className="flex items-center justify-between p-2 bg-white rounded border">
+                  <div key={metodo} className="flex items-center justify-between p-2 bg-dark-bg-secondary rounded border border-dark-border">
                     <div className="flex items-center">
                       <div className={`p-1 rounded ${getMetodoPagoColor(metodo)}`}>
                         {getMetodoPagoIcon(metodo)}
@@ -429,10 +429,10 @@ export const CajaTable: React.FC = () => {
                       </span>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-semibold text-gray-900">
+                      <div className="text-sm font-semibold text-dark-text-primary">
                         ${total.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-dark-text-secondary">
                         {cantidad} ventas ({porcentaje}%)
                       </div>
                     </div>
@@ -485,9 +485,9 @@ export const CajaTable: React.FC = () => {
       {!cajaAbierta && (
         <Card className="p-6">
           <div className="text-center">
-            <Lock className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Caja Cerrada</h3>
-            <p className="text-gray-500 mb-4">
+            <Lock className="w-16 h-16 mx-auto mb-4 text-dark-border" />
+            <h3 className="text-lg font-medium text-dark-text-primary mb-2">Caja Cerrada</h3>
+            <p className="text-dark-text-secondary mb-4">
               Para realizar movimientos, primero debes abrir la caja
             </p>
             <Button
@@ -503,34 +503,34 @@ export const CajaTable: React.FC = () => {
 
       {/* Tabla de movimientos */}
       <Card className="overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4 border-b border-dark-border">
           <h3 className="text-lg font-medium">Movimientos Recientes</h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-dark-border">
+            <thead className="bg-dark-bg-tertiary">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                   Fecha
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                   Tipo
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                   Concepto
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                   Monto
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                   Empleado
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-dark-bg-secondary divide-y divide-dark-border">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-4 text-center text-dark-text-secondary">
                     <div className="flex items-center justify-center">
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                       Cargando movimientos...
@@ -539,16 +539,16 @@ export const CajaTable: React.FC = () => {
                 </tr>
               ) : movimientos.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-4 text-center text-dark-text-secondary">
                     No hay movimientos registrados
                   </td>
                 </tr>
               ) : (
                 movimientos.map((movimiento) => (
-                  <tr key={movimiento.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <tr key={movimiento.id} className="hover:bg-dark-bg-tertiary">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                       <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+                        <Calendar className="w-4 h-4 mr-2 text-dark-text-secondary" />
                         {new Date(movimiento.fecha).toLocaleDateString('es-ES', {
                           day: '2-digit',
                           month: '2-digit',
@@ -572,7 +572,7 @@ export const CajaTable: React.FC = () => {
                         {movimiento.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-dark-text-primary">
                       {movimiento.concepto}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -580,9 +580,9 @@ export const CajaTable: React.FC = () => {
                         {movimiento.tipo === 'ingreso' ? '+' : '-'}${movimiento.monto.toFixed(2)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-secondary">
                       <div className="flex items-center">
-                        <User className="w-4 h-4 mr-2 text-gray-400" />
+                        <User className="w-4 h-4 mr-2 text-dark-text-secondary" />
                         {movimiento.empleado?.nombre || 'N/A'}
                       </div>
                     </td>
@@ -597,33 +597,33 @@ export const CajaTable: React.FC = () => {
       {/* Tabla de ventas recientes */}
       {ventasHoy.length > 0 && (
         <Card className="overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
+          <div className="px-6 py-4 border-b border-dark-border">
             <h3 className="text-lg font-medium">Ventas Recientes (Hoy)</h3>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-dark-border">
+              <thead className="bg-dark-bg-tertiary">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                     Hora
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                     Método de Pago
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                     Total
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                     Empleado
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-dark-bg-secondary divide-y divide-dark-border">
                 {ventasHoy.slice(0, 10).map((venta) => (
-                  <tr key={venta.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <tr key={venta.id} className="hover:bg-dark-bg-tertiary">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                       <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+                        <Calendar className="w-4 h-4 mr-2 text-dark-text-secondary" />
                         {new Date(venta.fecha).toLocaleTimeString('es-ES', {
                           hour: '2-digit',
                           minute: '2-digit'
@@ -641,9 +641,9 @@ export const CajaTable: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
                       ${(venta.total || 0).toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-secondary">
                       <div className="flex items-center">
-                        <User className="w-4 h-4 mr-2 text-gray-400" />
+                        <User className="w-4 h-4 mr-2 text-dark-text-secondary" />
                         {venta.empleado?.nombre || 'N/A'}
                       </div>
                     </td>
@@ -693,10 +693,10 @@ export const CajaTable: React.FC = () => {
       {/* Historial de Cajas */}
       {showHistorial && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-7xl max-h-[90vh] overflow-hidden bg-white rounded-lg">
+          <div className="w-full max-w-7xl max-h-[90vh] overflow-hidden bg-dark-bg-secondary rounded-lg">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Historial de Cajas Diarias</h2>
+                <h2 className="text-xl font-bold text-dark-text-primary">Historial de Cajas Diarias</h2>
                 <Button
                   onClick={handleCerrarHistorial}
                   variant="ghost"
