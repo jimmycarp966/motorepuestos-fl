@@ -14,7 +14,7 @@ const initialState: CajaState = {
   error: null,
 }
 
-export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | 'fetchMovimientos' | 'registrarIngreso' | 'registrarEgreso' | 'abrirCaja' | 'cerrarCaja' | 'realizarArqueo' | 'fetchCajasDiarias' | 'fetchArqueos'>> = (set, get) => ({
+export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | 'fetchMovimientos' | 'registrarIngreso' | 'registrarEgreso' | 'abrirCaja' | 'cerrarCaja' | 'realizarArqueo' | 'fetchCajasDiarias' | 'fetchArqueos' | 'editarMovimiento' | 'eliminarMovimiento'>> = (set, get) => ({
   caja: initialState,
 
   fetchMovimientos: async () => {
@@ -256,6 +256,75 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
           error: error.message 
         } 
       }))
+    }
+  },
+
+  editarMovimiento: async (movimientoId: string, datosActualizados: Partial<MovimientoCaja>) => {
+    const currentUser = get().auth.user
+    if (!currentUser) throw new Error('Usuario no autenticado')
+    
+    // Verificar que el usuario sea administrador
+    if (currentUser.rol !== 'Administrador') {
+      throw new Error('Solo los administradores pueden editar movimientos')
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('movimientos_caja')
+        .update({
+          ...datosActualizados,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', movimientoId)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      // Actualizar estado local
+      set((state) => ({
+        caja: {
+          ...state.caja,
+          movimientos: state.caja.movimientos.map(mov => 
+            mov.id === movimientoId ? { ...mov, ...data } : mov
+          )
+        }
+      }))
+
+      return data
+    } catch (error: any) {
+      throw new Error(`Error al editar movimiento: ${error.message}`)
+    }
+  },
+
+  eliminarMovimiento: async (movimientoId: string) => {
+    const currentUser = get().auth.user
+    if (!currentUser) throw new Error('Usuario no autenticado')
+    
+    // Verificar que el usuario sea administrador
+    if (currentUser.rol !== 'Administrador') {
+      throw new Error('Solo los administradores pueden eliminar movimientos')
+    }
+
+    try {
+      const { error } = await supabase
+        .from('movimientos_caja')
+        .delete()
+        .eq('id', movimientoId)
+
+      if (error) throw error
+
+      // Actualizar estado local
+      set((state) => ({
+        caja: {
+          ...state.caja,
+          movimientos: state.caja.movimientos.filter(mov => mov.id !== movimientoId)
+        }
+      }))
+
+      return true
+    } catch (error: any) {
+      throw new Error(`Error al eliminar movimiento: ${error.message}`)
     }
   }
 })

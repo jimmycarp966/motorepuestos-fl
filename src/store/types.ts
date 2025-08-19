@@ -515,6 +515,8 @@ export interface CajaSlice {
   realizarArqueo: (data: any) => Promise<void>
   fetchCajasDiarias: () => Promise<void>
   fetchArqueos: () => Promise<void>
+  editarMovimiento: (movimientoId: string, datosActualizados: Partial<MovimientoCaja>) => Promise<MovimientoCaja>
+  eliminarMovimiento: (movimientoId: string) => Promise<boolean>
 }
 
 export interface UISlice {

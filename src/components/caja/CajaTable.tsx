@@ -3,6 +3,7 @@ import { useAppStore } from '../../store'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
 import { DateUtils } from '../../lib/dateUtils'
+import { usePermissionGuard } from '../../hooks/usePermissionGuard'
 import { 
   Plus, 
   DollarSign, 
@@ -20,13 +21,19 @@ import {
   Receipt,
   History,
   X,
-  Calculator
+  Calculator,
+  Edit,
+  Trash2,
+  Eye
 } from 'lucide-react'
 import { MovimientoForm } from './MovimientoForm'
 import { AbrirCajaForm } from './AbrirCajaForm'
 import { GastosForm } from './GastosForm'
 import { HistorialCajas } from './HistorialCajas'
 import { ArqueoModal } from './ArqueoModal'
+import { EditarMovimientoModal } from './EditarMovimientoModal'
+import { obtenerDetallesMovimiento, formatearDetallesMovimiento, obtenerIconoMovimiento } from '../../lib/movimientoDetails'
+import type { MovimientoCaja, MovimientoDetalle } from '../../store/types'
 
 export const CajaTable: React.FC = () => {
   const movimientos = useAppStore((state) => state.caja.movimientos)
@@ -39,6 +46,8 @@ export const CajaTable: React.FC = () => {
   const fetchVentas = useAppStore((state) => state.fetchVentas)
   const iniciarArqueo = useAppStore((state) => state.iniciarArqueo)
   const verificarArqueoCompletado = useAppStore((state) => state.verificarArqueoCompletado)
+  const editarMovimiento = useAppStore((state) => state.editarMovimiento)
+  const eliminarMovimiento = useAppStore((state) => state.eliminarMovimiento)
   const addNotification = useAppStore((state) => state.addNotification)
   
   const [showIngresoForm, setShowIngresoForm] = useState(false)
@@ -46,6 +55,13 @@ export const CajaTable: React.FC = () => {
   const [showGastosForm, setShowGastosForm] = useState(false)
   const [showHistorial, setShowHistorial] = useState(false)
   const [tipoMovimiento, setTipoMovimiento] = useState<'ingreso' | 'egreso'>('ingreso')
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedMovimiento, setSelectedMovimiento] = useState<MovimientoCaja | null>(null)
+  const [movimientosDetallados, setMovimientosDetallados] = useState<MovimientoDetalle[]>([])
+  const [loadingDetails, setLoadingDetails] = useState(false)
+
+  // Hook de permisos
+  const { isAdmin } = usePermissionGuard()
 
   // Cargar datos al montar
   useEffect(() => {
@@ -97,6 +113,82 @@ export const CajaTable: React.FC = () => {
 
   const handleVerHistorial = () => {
     setShowHistorial(true)
+  }
+
+  // Función para cargar detalles de movimientos
+  const cargarDetallesMovimientos = async () => {
+    setLoadingDetails(true)
+    try {
+      const detalles = await Promise.all(
+        movimientos.map(mov => obtenerDetallesMovimiento(mov))
+      )
+      setMovimientosDetallados(detalles)
+    } catch (error) {
+      console.error('Error al cargar detalles:', error)
+    } finally {
+      setLoadingDetails(false)
+    }
+  }
+
+  // Cargar detalles cuando cambian los movimientos
+  useEffect(() => {
+    if (movimientos.length > 0) {
+      cargarDetallesMovimientos()
+    }
+  }, [movimientos])
+
+  // Función para editar movimiento
+  const handleEditarMovimiento = async (datos: Partial<MovimientoCaja>) => {
+    if (!selectedMovimiento) return
+    
+    try {
+      await editarMovimiento(selectedMovimiento.id, datos)
+      addNotification({
+        id: Date.now().toString(),
+        type: 'success',
+        title: 'Movimiento actualizado',
+        message: 'El movimiento se ha actualizado correctamente'
+      })
+      setShowEditModal(false)
+      setSelectedMovimiento(null)
+    } catch (error: any) {
+      addNotification({
+        id: Date.now().toString(),
+        type: 'error',
+        title: 'Error al actualizar',
+        message: error.message || 'No se pudo actualizar el movimiento'
+      })
+    }
+  }
+
+  // Función para eliminar movimiento
+  const handleEliminarMovimiento = async (movimientoId: string) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar este movimiento? Esta acción no se puede deshacer.')) {
+      return
+    }
+
+    try {
+      await eliminarMovimiento(movimientoId)
+      addNotification({
+        id: Date.now().toString(),
+        type: 'success',
+        title: 'Movimiento eliminado',
+        message: 'El movimiento se ha eliminado correctamente'
+      })
+    } catch (error: any) {
+      addNotification({
+        id: Date.now().toString(),
+        type: 'error',
+        title: 'Error al eliminar',
+        message: error.message || 'No se pudo eliminar el movimiento'
+      })
+    }
+  }
+
+  // Función para abrir modal de edición
+  const abrirModalEdicion = (movimiento: MovimientoCaja) => {
+    setSelectedMovimiento(movimiento)
+    setShowEditModal(true)
   }
 
   const handleCerrarHistorial = () => {
@@ -354,11 +446,22 @@ export const CajaTable: React.FC = () => {
                       }}
                     ></div>
                     <div className="text-xs text-dark-text-secondary mt-1 capitalize">
-                      {metodo.replace('_', ' ')}
-                    </div>
-                  </div>
-                )
-              })}
+                      {metodo.replace('_', ' '        )}
+      </div>
+
+      {/* Modal de edición de movimiento */}
+      <EditarMovimientoModal
+        movimiento={selectedMovimiento}
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false)
+          setSelectedMovimiento(null)
+        }}
+        onSave={handleEditarMovimiento}
+      />
+    </div>
+  )
+})}
             </div>
           </div>
         </Card>
@@ -517,7 +620,7 @@ export const CajaTable: React.FC = () => {
                   Tipo
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
-                  Concepto
+                  Detalles
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                   Monto
@@ -525,6 +628,11 @@ export const CajaTable: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                   Empleado
                 </th>
+                {isAdmin && (
+                  <th className="px-6 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
+                    Acciones
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="bg-dark-bg-secondary divide-y divide-dark-border">
@@ -544,50 +652,90 @@ export const CajaTable: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                movimientos.map((movimiento) => (
-                  <tr key={movimiento.id} className="hover:bg-dark-bg-tertiary">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-primary">
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-2 text-dark-text-secondary" />
-                        {new Date(movimiento.fecha).toLocaleDateString('es-ES', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        movimiento.tipo === 'ingreso' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {movimiento.tipo === 'ingreso' ? (
-                          <TrendingUp className="w-3 h-3 mr-1" />
-                        ) : (
-                          <TrendingDown className="w-3 h-3 mr-1" />
-                        )}
-                        {movimiento.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-dark-text-primary">
-                      {movimiento.concepto}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <span className={movimiento.tipo === 'ingreso' ? 'text-green-600' : 'text-red-600'}>
-                        {movimiento.tipo === 'ingreso' ? '+' : '-'}${movimiento.monto.toFixed(2)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-secondary">
-                      <div className="flex items-center">
-                        <User className="w-4 h-4 mr-2 text-dark-text-secondary" />
-                        {movimiento.empleado?.nombre || 'N/A'}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                movimientos.map((movimiento, index) => {
+                  const detalles = movimientosDetallados[index]
+                  const detallesFormateados = detalles ? formatearDetallesMovimiento(detalles) : movimiento.concepto
+                  const icono = detalles ? obtenerIconoMovimiento(detalles) : '💰'
+                  
+                  return (
+                    <tr key={movimiento.id} className="hover:bg-dark-bg-tertiary">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-primary">
+                        <div className="flex items-center">
+                          <Calendar className="w-4 h-4 mr-2 text-dark-text-secondary" />
+                          {new Date(movimiento.fecha).toLocaleDateString('es-ES', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          movimiento.tipo === 'ingreso' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {movimiento.tipo === 'ingreso' ? (
+                            <TrendingUp className="w-3 h-3 mr-1" />
+                          ) : (
+                            <TrendingDown className="w-3 h-3 mr-1" />
+                          )}
+                          {movimiento.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-dark-text-primary">
+                        <div className="flex items-center">
+                          <span className="mr-2 text-lg">{icono}</span>
+                          <div>
+                            <div className="font-medium">{detallesFormateados}</div>
+                            {detalles?.detalles?.tipo === 'venta' && detalles.detalles.items && detalles.detalles.items.length > 3 && (
+                              <div className="text-xs text-dark-text-secondary mt-1">
+                                {detalles.detalles.items.length} productos vendidos
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <span className={movimiento.tipo === 'ingreso' ? 'text-green-600' : 'text-red-600'}>
+                          {movimiento.tipo === 'ingreso' ? '+' : '-'}${movimiento.monto.toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-secondary">
+                        <div className="flex items-center">
+                          <User className="w-4 h-4 mr-2 text-dark-text-secondary" />
+                          {movimiento.empleado?.nombre || 'N/A'}
+                        </div>
+                      </td>
+                      {isAdmin && (
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-secondary">
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              onClick={() => abrirModalEdicion(movimiento)}
+                              variant="ghost"
+                              size="sm"
+                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                              title="Editar movimiento"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              onClick={() => handleEliminarMovimiento(movimiento.id)}
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              title="Eliminar movimiento"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>
@@ -715,6 +863,17 @@ export const CajaTable: React.FC = () => {
 
       {/* Modal de Arqueo */}
       <ArqueoModal />
+
+      {/* Modal de edición de movimiento */}
+      <EditarMovimientoModal
+        movimiento={selectedMovimiento}
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false)
+          setSelectedMovimiento(null)
+        }}
+        onSave={handleEditarMovimiento}
+      />
     </div>
   )
 }
