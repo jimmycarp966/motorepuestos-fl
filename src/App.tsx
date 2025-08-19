@@ -14,6 +14,7 @@ import { CajaTable } from './components/caja/CajaTable'
 import ReportesTable from './components/reportes/ReportesTable'
 import { NotificationsContainer } from './components/ui/notifications'
 import { ConnectionError } from './components/ui/ConnectionError'
+import { AccessDenied } from './components/ui/AccessDenied'
 
 
 import { Footer } from './components/ui/Footer'
@@ -130,6 +131,11 @@ function App() {
 
   // Renderizar módulo correspondiente
   const renderModule = () => {
+    // Verificar si el usuario tiene permisos para el módulo actual
+    if (!permissions.canAccess(currentModule as any)) {
+      return <AccessDenied module={currentModule} />
+    }
+
     switch (currentModule) {
       case 'dashboard':
         return <Dashboard />

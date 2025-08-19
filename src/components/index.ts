@@ -39,6 +39,7 @@ export { Card } from './ui/card'
 export { Input } from './ui/input'
 export { Textarea } from './ui/textarea'
 export { NotificationsContainer } from './ui/notifications'
+export { AccessDenied } from './ui/AccessDenied'
 
 // Nuevos componentes UI mejorados
 export { MotorCard } from './ui/motor-card'
