@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Leer el archivo produc.txt
-const filePath = path.join(__dirname, '../produc.txt');
+const filePath = path.join(__dirname, '../assets/data/produc.txt');
 const content = fs.readFileSync(filePath, 'utf8');
 
 // Procesar las líneas
@@ -44,23 +44,30 @@ const productos = lines.slice(1).map(line => {
 
 // Generar el SQL completo
 let sql = `-- Script para limpiar todas las tablas y cargar productos desde produc.txt
--- Este script elimina todos los datos excepto empleados y carga los productos
+-- Basado en las tablas que realmente existen en la base de datos:
+-- - arqueos_caja
+-- - audit_log
+-- - cajas_diarias
+-- - clientes
+-- - empleados (NO SE ELIMINAN)
+-- - error_log
+-- - movimientos_caja
+-- - notificaciones
+-- - notificaciones_sistema
+-- - productos
+-- - venta_items
+-- - ventas
 
--- ===== LIMPIAR TABLAS =====
+-- ===== LIMPIAR TABLAS EXISTENTES =====
 
--- 1. Limpiar ventas (si existe la tabla detalles_venta)
-DO $$
-BEGIN
-    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'detalles_venta') THEN
-        DELETE FROM detalles_venta;
-    END IF;
-END $$;
-
+-- 1. Limpiar ventas y sus items
+DELETE FROM venta_items;
 DELETE FROM ventas;
 
 -- 2. Limpiar caja y movimientos
 DELETE FROM movimientos_caja;
-DELETE FROM cajas;
+DELETE FROM cajas_diarias;
+DELETE FROM arqueos_caja;
 
 -- 3. Limpiar clientes
 DELETE FROM clientes;
@@ -68,32 +75,13 @@ DELETE FROM clientes;
 -- 4. Limpiar productos
 DELETE FROM productos;
 
--- 5. Limpiar arqueos (si existe)
-DO $$
-BEGIN
-    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'arqueos') THEN
-        DELETE FROM arqueos;
-    END IF;
-END $$;
+-- 5. Limpiar notificaciones
+DELETE FROM notificaciones;
+DELETE FROM notificaciones_sistema;
 
--- 6. Limpiar facturación AFIP (si existe)
-DO $$
-BEGIN
-    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'facturas_afip') THEN
-        DELETE FROM facturas_afip;
-    END IF;
-END $$;
-
--- 7. Limpiar cuenta corriente (si existe)
-DO $$
-BEGIN
-    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'movimientos_cuenta_corriente') THEN
-        DELETE FROM movimientos_cuenta_corriente;
-    END IF;
-    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'cuentas_corrientes') THEN
-        DELETE FROM cuentas_corrientes;
-    END IF;
-END $$;
+-- 6. Limpiar logs
+DELETE FROM audit_log;
+DELETE FROM error_log;
 
 -- ===== RESETEAR SECUENCIAS =====
 
@@ -106,29 +94,44 @@ BEGIN
     IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'ventas_id_seq') THEN
         ALTER SEQUENCE ventas_id_seq RESTART WITH 1;
     END IF;
-    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'detalles_venta_id_seq') THEN
-        ALTER SEQUENCE detalles_venta_id_seq RESTART WITH 1;
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'venta_items_id_seq') THEN
+        ALTER SEQUENCE venta_items_id_seq RESTART WITH 1;
     END IF;
     IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'clientes_id_seq') THEN
         ALTER SEQUENCE clientes_id_seq RESTART WITH 1;
     END IF;
-    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'cajas_id_seq') THEN
-        ALTER SEQUENCE cajas_id_seq RESTART WITH 1;
-    END IF;
     IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'movimientos_caja_id_seq') THEN
         ALTER SEQUENCE movimientos_caja_id_seq RESTART WITH 1;
+    END IF;
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'cajas_diarias_id_seq') THEN
+        ALTER SEQUENCE cajas_diarias_id_seq RESTART WITH 1;
+    END IF;
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'arqueos_caja_id_seq') THEN
+        ALTER SEQUENCE arqueos_caja_id_seq RESTART WITH 1;
+    END IF;
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'notificaciones_id_seq') THEN
+        ALTER SEQUENCE notificaciones_id_seq RESTART WITH 1;
+    END IF;
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'notificaciones_sistema_id_seq') THEN
+        ALTER SEQUENCE notificaciones_sistema_id_seq RESTART WITH 1;
+    END IF;
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'audit_log_id_seq') THEN
+        ALTER SEQUENCE audit_log_id_seq RESTART WITH 1;
+    END IF;
+    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'error_log_id_seq') THEN
+        ALTER SEQUENCE error_log_id_seq RESTART WITH 1;
     END IF;
 END $$;
 
 -- ===== CARGAR PRODUCTOS DESDE PRODUC.TXT =====
 
-INSERT INTO productos (sku, nombre, descripcion, precio_costo, precio_venta, precio_mayoreo, stock_actual, stock_minimo, categoria, activo, created_at, updated_at) VALUES\n`;
+INSERT INTO productos (codigo_sku, nombre, descripcion, costo, precio_minorista, precio_mayorista, stock, stock_minimo, categoria, unidad_medida, activo, created_at, updated_at) VALUES\n`;
 
 productos.forEach((producto, index) => {
   const isLast = index === productos.length - 1;
   const comma = isLast ? ';' : ',';
   
-  sql += `('${producto.codigo.replace(/'/g, "''")}', '${producto.descripcion.replace(/'/g, "''")}', '${producto.descripcion.replace(/'/g, "''")}', ${producto.precioCosto}, ${producto.precioVenta}, ${producto.precioMayoreo}, ${producto.inventario}, ${producto.invMinimo}, '${producto.departamento.replace(/'/g, "''")}', true, NOW(), NOW())${comma}\n`;
+  sql += `('${producto.codigo.replace(/'/g, "''")}', '${producto.descripcion.replace(/'/g, "''")}', '${producto.descripcion.replace(/'/g, "''")}', ${producto.precioCosto}, ${producto.precioVenta}, ${producto.precioMayoreo}, ${producto.inventario}, ${producto.invMinimo}, '${producto.departamento.replace(/'/g, "''")}', 'UNIDAD', true, NOW(), NOW())${comma}\n`;
 });
 
 // Agregar comentarios finales
@@ -140,22 +143,34 @@ SELECT 'productos' as tabla, COUNT(*) as registros FROM productos
 UNION ALL
 SELECT 'ventas' as tabla, COUNT(*) as registros FROM ventas
 UNION ALL
+SELECT 'venta_items' as tabla, COUNT(*) as registros FROM venta_items
+UNION ALL
 SELECT 'clientes' as tabla, COUNT(*) as registros FROM clientes
 UNION ALL
-SELECT 'cajas' as tabla, COUNT(*) as registros FROM cajas
-UNION ALL
 SELECT 'movimientos_caja' as tabla, COUNT(*) as registros FROM movimientos_caja
+UNION ALL
+SELECT 'cajas_diarias' as tabla, COUNT(*) as registros FROM cajas_diarias
+UNION ALL
+SELECT 'arqueos_caja' as tabla, COUNT(*) as registros FROM arqueos_caja
+UNION ALL
+SELECT 'notificaciones' as tabla, COUNT(*) as registros FROM notificaciones
+UNION ALL
+SELECT 'notificaciones_sistema' as tabla, COUNT(*) as registros FROM notificaciones_sistema
+UNION ALL
+SELECT 'audit_log' as tabla, COUNT(*) as registros FROM audit_log
+UNION ALL
+SELECT 'error_log' as tabla, COUNT(*) as registros FROM error_log
 UNION ALL
 SELECT 'empleados' as tabla, COUNT(*) as registros FROM empleados;
 
 -- Mostrar productos cargados
 SELECT 
-  sku,
+  codigo_sku,
   nombre,
-  precio_costo,
-  precio_venta,
-  precio_mayoreo,
-  stock_actual,
+  costo,
+  precio_minorista,
+  precio_mayorista,
+  stock,
   stock_minimo,
   categoria
 FROM productos 
@@ -166,8 +181,8 @@ LIMIT 20;
 SELECT 
   categoria,
   COUNT(*) as cantidad_productos,
-  SUM(stock_actual) as stock_total,
-  AVG(precio_venta) as precio_promedio
+  SUM(stock) as stock_total,
+  AVG(precio_minorista) as precio_promedio
 FROM productos 
 GROUP BY categoria 
 ORDER BY cantidad_productos DESC;
@@ -176,7 +191,7 @@ ORDER BY cantidad_productos DESC;
 `;
 
 // Guardar el archivo SQL
-const outputPath = path.join(__dirname, '../database/migrations/limpiar-y-cargar-productos-completo.sql');
+const outputPath = path.join(__dirname, '../database/migrations/limpiar-y-cargar-productos-desde-produc.txt.sql');
 fs.writeFileSync(outputPath, sql);
 
 console.log(`✅ Procesados ${productos.length} productos`);

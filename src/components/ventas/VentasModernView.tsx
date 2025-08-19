@@ -26,7 +26,7 @@ import {
   Car,
   X
 } from 'lucide-react'
-import { useSearchFilter } from '../../hooks/useSearchFilter'
+import { useProductSearch } from '../../hooks/useProductSearch'
 
 interface CartItem {
   producto: any
@@ -65,31 +65,31 @@ export const VentasModernView: React.FC = () => {
     fetchClientes()
   }, [fetchProductos, fetchClientes])
 
-  // Enfocar búsqueda al cargar
+  // Enfocar búsqueda al cargar y manejar F10
   useEffect(() => {
     searchInputRef.current?.focus()
+    
+    const handleFocusSearch = () => {
+      searchInputRef.current?.focus()
+    }
+    
+    window.addEventListener('focusProductSearch', handleFocusSearch)
+    return () => window.removeEventListener('focusProductSearch', handleFocusSearch)
   }, [])
 
-  // Filtrar productos
-  const filteredProductos = useSearchFilter({
-    data: productos || [],
+  // Usar el nuevo hook de búsqueda con navegación por teclado
+  const {
+    filteredProducts: filteredProductos,
+    selectedIndex,
+    isNavigating,
+    containerRef,
+    selectedProductRef
+  } = useProductSearch({
+    products: productos || [],
     searchTerm,
-    searchFields: ['nombre', 'codigo_sku', 'categoria', 'descripcion'],
-    searchFunction: (producto, term) => {
-      const matchesSearch = 
-        producto.nombre.toLowerCase().includes(term) ||
-        producto.codigo_sku.toLowerCase().includes(term) ||
-        producto.categoria.toLowerCase().includes(term) ||
-        (producto.descripcion && producto.descripcion.toLowerCase().includes(term))
-      
-      const matchesCategory = selectedCategory === 'todas' || producto.categoria === selectedCategory
-      
-      return matchesSearch && matchesCategory
-    }
+    selectedCategory,
+    onProductSelect: handleProductSelect
   })
-
-  // Obtener categorías únicas
-  const categorias = ['todas', ...Array.from(new Set(productos?.map(p => p.categoria) || []))]
 
   // Funciones del carrito
   const handleProductSelect = (producto: any, cantidad: number = 1) => {
@@ -124,6 +124,9 @@ export const VentasModernView: React.FC = () => {
       duration: 2000
     })
   }
+
+  // Obtener categorías únicas
+  const categorias = ['todas', ...Array.from(new Set(productos?.map(p => p.categoria) || []))]
 
   const handleUpdateQuantity = (index: number, newCantidad: number) => {
     if (newCantidad <= 0) {
@@ -260,9 +263,18 @@ export const VentasModernView: React.FC = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Buscar por nombre, código SKU, descripción..."
-                  className="pl-10"
-                  helperText="Usa F10 para enfocar rápidamente"
+                  className={`pl-10 ${isNavigating ? 'ring-2 ring-primary-500 border-primary-500' : ''}`}
+                  helperText={
+                    isNavigating 
+                      ? "Navegación activa: ↑↓ para mover, Enter para seleccionar, Esc para cancelar"
+                      : "Usa F10 para enfocar rápidamente, ↑↓ para navegar"
+                  }
                 />
+                {isNavigating && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse"></div>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -307,18 +319,24 @@ export const VentasModernView: React.FC = () => {
         </div>
 
         {/* Lista de productos */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div ref={containerRef} className="flex-1 overflow-y-auto p-6">
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProductos?.map((producto) => {
+              {filteredProductos?.map((producto, index) => {
                 const precio = tipoPrecio === 'mayorista' ? producto.precio_mayorista : producto.precio_minorista
                 const enCarrito = cartItems.find(item => item.producto.id === producto.id)
                 const stockDisponible = producto.stock - (enCarrito?.cantidad || 0)
+                const isSelected = selectedIndex === index
                 
                 return (
                   <div
                     key={producto.id}
-                    className="ventas-product-card bg-dark-bg-secondary rounded-xl border border-dark-border hover:border-primary-500 p-5"
+                    ref={isSelected ? selectedProductRef : null}
+                    className={`ventas-product-card bg-dark-bg-secondary rounded-xl border p-5 transition-all duration-200 ${
+                      isSelected 
+                        ? 'border-primary-500 shadow-lg ring-2 ring-primary-500/20 bg-primary-50/50' 
+                        : 'border-dark-border hover:border-primary-500'
+                    }`}
                   >
                     {/* Header del producto */}
                     <div className="flex items-start justify-between mb-3">
@@ -397,15 +415,21 @@ export const VentasModernView: React.FC = () => {
           ) : (
             // Vista de lista
             <div className="space-y-3">
-              {filteredProductos?.map((producto) => {
+              {filteredProductos?.map((producto, index) => {
                 const precio = tipoPrecio === 'mayorista' ? producto.precio_mayorista : producto.precio_minorista
                 const enCarrito = cartItems.find(item => item.producto.id === producto.id)
                 const stockDisponible = producto.stock - (enCarrito?.cantidad || 0)
+                const isSelected = selectedIndex === index
                 
                 return (
                   <div
                     key={producto.id}
-                    className="bg-dark-bg-secondary rounded-lg border border-dark-border hover:border-primary-500 hover:shadow-dark-md transition-all duration-200 p-4"
+                    ref={isSelected ? selectedProductRef : null}
+                    className={`bg-dark-bg-secondary rounded-lg border hover:shadow-dark-md transition-all duration-200 p-4 ${
+                      isSelected 
+                        ? 'border-primary-500 shadow-lg ring-2 ring-primary-500/20 bg-primary-50/50' 
+                        : 'border-dark-border hover:border-primary-500'
+                    }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4 flex-1">

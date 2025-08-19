@@ -160,6 +160,15 @@ export const useGlobalNavigation = () => {
       category: 'Sistema'
     },
     {
+      key: 'F10',
+      action: () => {
+        // Disparar evento para enfocar el buscador de productos
+        window.dispatchEvent(new CustomEvent('focusProductSearch'))
+      },
+      description: 'Enfocar Buscador de Productos',
+      category: 'Ventas'
+    },
+    {
       key: 'F12',
       action: () => {
         // Disparar evento para abrir ayuda de shortcuts

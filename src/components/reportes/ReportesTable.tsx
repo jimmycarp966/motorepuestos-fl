@@ -148,7 +148,7 @@ const ReportesTable: React.FC = () => {
               <input
                 type="date"
                 value={filtros.fechaInicio}
-                onChange={(e) => setFiltros({ fechaInicio: e.target.value })}
+                onChange={(e) => setFiltros({ ...filtros, fechaInicio: e.target.value })}
                 className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
@@ -159,7 +159,7 @@ const ReportesTable: React.FC = () => {
               <input
                 type="date"
                 value={filtros.fechaFin}
-                onChange={(e) => setFiltros({ fechaFin: e.target.value })}
+                onChange={(e) => setFiltros({ ...filtros, fechaFin: e.target.value })}
                 className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
@@ -169,7 +169,7 @@ const ReportesTable: React.FC = () => {
               </label>
               <select
                 value={filtros.empleadoId || ''}
-                onChange={(e) => setFiltros({ empleadoId: e.target.value || undefined })}
+                onChange={(e) => setFiltros({ ...filtros, empleadoId: e.target.value || undefined })}
                 className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">Todos los empleados</option>
@@ -186,7 +186,7 @@ const ReportesTable: React.FC = () => {
               </label>
               <select
                 value={filtros.clienteId || ''}
-                onChange={(e) => setFiltros({ clienteId: e.target.value || undefined })}
+                onChange={(e) => setFiltros({ ...filtros, clienteId: e.target.value || undefined })}
                 className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">Todos los clientes</option>
@@ -203,7 +203,7 @@ const ReportesTable: React.FC = () => {
               </label>
               <select
                 value={filtros.metodoPago || ''}
-                onChange={(e) => setFiltros({ metodoPago: e.target.value || undefined })}
+                onChange={(e) => setFiltros({ ...filtros, metodoPago: e.target.value || undefined })}
                 className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">Todos los métodos</option>
@@ -219,7 +219,7 @@ const ReportesTable: React.FC = () => {
               </label>
               <select
                 value={filtros.tipoPrecio || ''}
-                onChange={(e) => setFiltros({ tipoPrecio: e.target.value || undefined })}
+                onChange={(e) => setFiltros({ ...filtros, tipoPrecio: e.target.value || undefined })}
                 className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">Todos los tipos</option>
@@ -444,7 +444,7 @@ const ReportesTable: React.FC = () => {
                       Producto
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
-                      Código
+                      SKU
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Categoría

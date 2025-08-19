@@ -103,11 +103,12 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
     const notification = {
       id: Date.now().toString(),
       type,
+      title: 'Reportes',
       message,
       duration: 5000,
     };
-    // Nota: Las notificaciones se manejarán desde el componente
-    
+    // Las notificaciones se manejarán desde el componente principal
+    console.log(`[Reportes] ${type.toUpperCase()}: ${message}`);
   };
 
   return {
@@ -117,6 +118,7 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
     set((state) => ({
       filtros: { ...state.filtros, ...nuevosFiltros }
     }));
+    console.log('Filtros actualizados:', { ...get().filtros, ...nuevosFiltros });
   },
 
   generarReporteVentas: async () => {
@@ -131,7 +133,6 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
           fecha,
           total,
           metodo_pago,
-          tipo_precio,
           empleados (
             nombre,
             email
@@ -146,12 +147,12 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
             subtotal,
             productos (
               nombre,
-              codigo
+              codigo_sku
             )
           )
         `)
-        .gte('fecha', filtros.fechaInicio)
-        .lte('fecha', filtros.fechaFin)
+        .gte('fecha', filtros.fechaInicio + 'T00:00:00')
+        .lte('fecha', filtros.fechaFin + 'T23:59:59')
         .order('fecha', { ascending: false });
 
       if (filtros.empleadoId) {
@@ -166,10 +167,6 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
         query = query.eq('metodo_pago', filtros.metodoPago);
       }
 
-      if (filtros.tipoPrecio) {
-        query = query.eq('tipo_precio', filtros.tipoPrecio);
-      }
-
       const { data, error } = await query;
 
       if (error) throw error;
@@ -179,7 +176,7 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
         fecha: venta.fecha,
         total: venta.total,
         metodoPago: venta.metodo_pago || 'efectivo',
-        tipoPrecio: venta.tipo_precio || 'minorista',
+        tipoPrecio: 'minorista', // Valor por defecto ya que no existe en la tabla
         empleado: {
           nombre: venta.empleados?.nombre || 'N/A',
           email: venta.empleados?.email || 'N/A',
@@ -191,7 +188,7 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
         items: venta.venta_items?.map(item => ({
           producto: {
             nombre: item.productos?.nombre || 'N/A',
-            codigo: item.productos?.codigo || 'N/A',
+            codigo: item.productos?.codigo_sku || 'N/A',
           },
           cantidad: item.cantidad,
           precioUnitario: item.precio_unitario,
@@ -223,7 +220,7 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
         .select(`
           id,
           nombre,
-          codigo,
+          codigo_sku,
           categoria,
           stock,
           precio_minorista,
@@ -245,9 +242,13 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
         const items = producto.venta_items || [];
         const itemsEnRango = items.filter(item => {
           const fechaVenta = item.ventas?.fecha;
-          return fechaVenta && 
-                 fechaVenta >= filtros.fechaInicio && 
-                 fechaVenta <= filtros.fechaFin;
+          if (!fechaVenta) return false;
+          
+          const fechaInicio = new Date(filtros.fechaInicio + 'T00:00:00');
+          const fechaFin = new Date(filtros.fechaFin + 'T23:59:59');
+          const fechaVentaDate = new Date(fechaVenta);
+          
+          return fechaVentaDate >= fechaInicio && fechaVentaDate <= fechaFin;
         });
 
         const totalVentas = itemsEnRango.length;
@@ -257,7 +258,7 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
         return {
           id: producto.id,
           nombre: producto.nombre,
-          codigo: producto.codigo,
+          codigo: producto.codigo_sku,
           categoria: producto.categoria,
           stock: producto.stock,
           precioMinorista: producto.precio_minorista,
@@ -300,8 +301,8 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
             nombre
           )
         `)
-        .gte('fecha', filtros.fechaInicio)
-        .lte('fecha', filtros.fechaFin)
+        .gte('fecha', filtros.fechaInicio + 'T00:00:00')
+        .lte('fecha', filtros.fechaFin + 'T23:59:59')
         .order('fecha', { ascending: false });
 
       if (error) throw error;
@@ -375,15 +376,15 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
           filename = `reporte_ventas_${new Date().toISOString().split('T')[0]}.csv`;
           csvContent = 'ID,Fecha,Total,Método Pago,Tipo Precio,Empleado,Cliente\n';
           reporteVentas.forEach(venta => {
-            csvContent += `${venta.id},${venta.fecha},${venta.total},${venta.metodoPago},${venta.tipoPrecio},"${venta.empleado.nombre}","${venta.cliente?.nombre || 'Sin cliente'}"\n`;
+            csvContent += `${venta.id},${venta.fecha},${venta.total},${venta.metodoPago},${venta.tipoPrecio},"${venta.empleado.nombre.replace(/"/g, '""')}","${(venta.cliente?.nombre || 'Sin cliente').replace(/"/g, '""')}"\n`;
           });
           break;
 
         case 'productos':
           filename = `reporte_productos_${new Date().toISOString().split('T')[0]}.csv`;
-          csvContent = 'ID,Nombre,Código,Categoría,Stock,Precio Minorista,Precio Mayorista,Total Ventas,Cantidad Vendida,Ingresos Generados\n';
+          csvContent = 'ID,Nombre,SKU,Categoría,Stock,Precio Minorista,Precio Mayorista,Total Ventas,Cantidad Vendida,Ingresos Generados\n';
           reporteProductos.forEach(producto => {
-            csvContent += `${producto.id},"${producto.nombre}",${producto.codigo},${producto.categoria},${producto.stock},${producto.precioMinorista},${producto.precioMayorista},${producto.totalVentas},${producto.cantidadVendida},${producto.ingresosGenerados}\n`;
+            csvContent += `${producto.id},"${producto.nombre.replace(/"/g, '""')}",${producto.codigo},${producto.categoria},${producto.stock},${producto.precioMinorista},${producto.precioMayorista},${producto.totalVentas},${producto.cantidadVendida},${producto.ingresosGenerados}\n`;
           });
           break;
 
@@ -391,13 +392,13 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
           filename = `reporte_caja_${new Date().toISOString().split('T')[0]}.csv`;
           csvContent = 'Fecha,Empleado,Apertura,Ingresos,Egresos,Ventas,Saldo Final\n';
           reporteCaja.forEach(caja => {
-            csvContent += `${caja.fecha},"${caja.empleado}",${caja.apertura},${caja.ingresos},${caja.egresos},${caja.ventas},${caja.saldoFinal}\n`;
+            csvContent += `${caja.fecha},"${caja.empleado.replace(/"/g, '""')}",${caja.apertura},${caja.ingresos},${caja.egresos},${caja.ventas},${caja.saldoFinal}\n`;
           });
           break;
       }
 
       // Crear y descargar archivo
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
@@ -406,6 +407,7 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
       addNotification('success', `Reporte ${tipo} exportado exitosamente`);
 
