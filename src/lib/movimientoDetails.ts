@@ -24,25 +24,8 @@ export interface MovimientoDetalle {
 export async function obtenerDetallesMovimiento(movimiento: MovimientoCaja): Promise<MovimientoDetalle> {
   const concepto = movimiento.concepto.toLowerCase()
   
-  // Si el concepto parece ser una venta (contiene "x" para cantidades o productos)
-  if (concepto.includes(' x') || concepto.includes('más') || 
-      (movimiento.tipo === 'ingreso' && !concepto.includes('gasto') && !concepto.includes('pago'))) {
-    
-    // El concepto ya contiene los productos vendidos, no necesitamos buscar en BD
-    const productos = parsearProductosDelConcepto(movimiento.concepto)
-    
-    return {
-      ...movimiento,
-      detalles: {
-        tipo: 'venta',
-        items: productos,
-        descripcion: movimiento.concepto
-      }
-    }
-  }
-  
-  // Si el concepto contiene "venta #" (formato antiguo), buscar detalles de la venta
-  if (concepto.includes('venta') || concepto.includes('venta #')) {
+  // PRIMERO: Si el concepto contiene "venta #" (formato antiguo), buscar detalles de la venta
+  if (concepto.includes('venta #') || concepto.includes('venta#')) {
     try {
       // Extraer ID de venta del concepto (asumiendo formato "Venta #123")
       const ventaMatch = concepto.match(/venta\s*#?([a-f0-9-]+)/i)
@@ -81,6 +64,23 @@ export async function obtenerDetallesMovimiento(movimiento: MovimientoCaja): Pro
       }
     } catch (error) {
       console.warn('Error al obtener detalles de venta:', error)
+    }
+  }
+  
+  // SEGUNDO: Si el concepto parece ser una venta (contiene "x" para cantidades o productos)
+  if (concepto.includes(' x') || concepto.includes('más') || 
+      (movimiento.tipo === 'ingreso' && !concepto.includes('gasto') && !concepto.includes('pago'))) {
+    
+    // El concepto ya contiene los productos vendidos, no necesitamos buscar en BD
+    const productos = parsearProductosDelConcepto(movimiento.concepto)
+    
+    return {
+      ...movimiento,
+      detalles: {
+        tipo: 'venta',
+        items: productos,
+        descripcion: movimiento.concepto
+      }
     }
   }
   
