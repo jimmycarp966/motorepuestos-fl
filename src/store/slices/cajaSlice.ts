@@ -292,7 +292,7 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
         }
       }))
 
-      // Si se cambió el método de pago, actualizar arqueos pendientes
+      // Si se cambió el método de pago, actualizar arqueos pendientes y ventas
       if (datosActualizados.metodo_pago && 
           datosActualizados.metodo_pago !== movimientoActual.metodo_pago) {
         
@@ -367,6 +367,32 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
               }
             }))
           }
+        }
+
+        // Actualizar ventas en el store para que el dashboard se actualice
+        // Buscar la venta correspondiente al movimiento y actualizar su método de pago
+        const ventas = get().ventas
+        const ventaActualizada = ventas.find(v => {
+          // Buscar por concepto que contenga el ID de la venta
+          const concepto = movimientoActual.concepto.toLowerCase()
+          if (concepto.includes('venta #') || concepto.includes('venta#')) {
+            const ventaMatch = concepto.match(/venta\s*#?([a-f0-9-]+)/i)
+            if (ventaMatch) {
+              return v.id === ventaMatch[1]
+            }
+          }
+          return false
+        })
+
+        if (ventaActualizada) {
+          // Actualizar la venta en el store
+          set((state) => ({
+            ventas: state.ventas.map(v => 
+              v.id === ventaActualizada.id 
+                ? { ...v, metodo_pago: datosActualizados.metodo_pago }
+                : v
+            )
+          }))
         }
       }
 
