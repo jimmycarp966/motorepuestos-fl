@@ -119,17 +119,34 @@ export function usePermissionGuard(): UserPermissions {
   const canAccess = useCallback((module: ModuleName): boolean => {
     if (!isAuthenticated || !user) return false
     
-    // En modo estricto, usar solo rolePermissions
-    if (config.strictRoles) {
-      const permissions = rolePermissions[module] || []
-      return permissions.length > 0
+    // Si el usuario es administrador, tiene acceso a todo
+    if (user.rol === 'Administrador') {
+      return true
     }
     
-    // Modo legacy: usar también permisos específicos del usuario
+    // Verificar permisos específicos del usuario
     const hasModuleInPermissions = user.permisos_modulos?.includes(module) || false
+    
+    // Log para debugging en desarrollo
+    if (config.debug) {
+      console.log(`🔐 [Permissions] Verificando acceso a ${module}:`, {
+        usuario: user.nombre,
+        rol: user.rol,
+        permisosEspecificos: user.permisos_modulos,
+        tienePermisoEspecifico: hasModuleInPermissions,
+        permisosDelRol: rolePermissions[module] || []
+      })
+    }
+    
+    // Si el usuario tiene permisos específicos definidos, SOLO usar esos
+    if (user.permisos_modulos && user.permisos_modulos.length > 0) {
+      return hasModuleInPermissions
+    }
+    
+    // Si no tiene permisos específicos definidos, usar permisos del rol
     const hasRolePermissions = (rolePermissions[module] || []).length > 0
     
-    return hasModuleInPermissions || hasRolePermissions
+    return hasRolePermissions
   }, [isAuthenticated, user, rolePermissions])
 
   // Verificación de navegación rápida (síncrona) para sidebar

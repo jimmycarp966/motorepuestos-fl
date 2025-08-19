@@ -125,7 +125,7 @@ const defaultConfig: AppConfig = {
     sessionTimeout: 3600000, // 1 hora
     maxLoginAttempts: 3,
     auditEnabled: true,
-    strictRoles: true
+    strictRoles: false // Cambiar a false para permitir permisos específicos del usuario
   },
   
   features: {

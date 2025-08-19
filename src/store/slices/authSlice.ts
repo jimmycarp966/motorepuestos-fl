@@ -112,9 +112,7 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
   // Cerrar sesión
   logout: async () => {
     try {
-      const { error } = await supabase.auth.signOut()
-      if (error) throw error
-
+      // Limpiar estado local primero
       set(() => ({
         auth: {
           session: null,
@@ -122,6 +120,14 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
           loading: false,
         }
       }))
+
+      // Luego cerrar sesión en Supabase
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        console.warn('Error en signOut de Supabase:', error)
+        // No lanzar error, ya limpiamos el estado local
+      }
 
       // Notificar éxito
       get().addNotification({
@@ -132,12 +138,23 @@ export const authSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'auth' | '
       })
 
     } catch (error: unknown) {
+      console.error('Error en logout:', error)
+      
+      // Asegurar que el estado se limpie incluso si hay error
+      set(() => ({
+        auth: {
+          session: null,
+          user: null,
+          loading: false,
+        }
+      }))
+
       // Notificar error
       get().addNotification({
         id: Date.now().toString(),
         type: 'error',
         title: 'Error al cerrar sesión',
-        message: error instanceof Error ? error.message : 'Error desconocido',
+        message: 'Se cerró la sesión localmente, pero hubo un problema con el servidor',
       })
     }
   },
