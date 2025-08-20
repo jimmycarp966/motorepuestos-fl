@@ -103,13 +103,15 @@ export const useDashboardKPIs = (): DashboardKPIs => {
       })
 
       // Log de TODAS las ventas para verificar cuáles NO se están contando
+      const hoyLocal = DateUtils.getTodayLocal()
+      console.log(`🔍 [Dashboard KPIs] FECHA HOY: ${hoyLocal}`)
       console.log(`🔍 [Dashboard KPIs] TODAS LAS VENTAS (${state.ventas.length} total):`, state.ventas.map(v => ({
         id: v.id,
         fecha: v.fecha,
         total: v.total,
         fechaParte: v.fecha.split('T')[0],
-        hoyLocal: DateUtils.getTodayLocal(),
-        esHoy: DateUtils.isSameAsToday(v.fecha),
+        hoyLocal: hoyLocal,
+        esHoy: v.fecha.split('T')[0] === hoyLocal,
         estado: v.estado
       })))
       

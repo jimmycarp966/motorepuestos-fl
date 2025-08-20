@@ -257,7 +257,10 @@ export class DateUtils {
     console.log(`🔍 [DateUtils.getCurrentLocalDate] Fecha actual:`, {
       fechaCompleta: now.toISOString(),
       fechaLocal: result,
-      timestamp: now.getTime()
+      timestamp: now.getTime(),
+      year: year,
+      month: month,
+      day: day
     })
     
     return result
@@ -342,6 +345,17 @@ export class DateUtils {
     try {
       const fechaParte = dateString.split('T')[0]
       const hoyLocal = this.getCurrentLocalDate()
+      
+      // LOG DETALLADO PARA DEBUGGING
+      console.log(`🔍 [DateUtils.isSameAsToday] DEBUG DETALLADO:`, {
+        fechaEntrada: dateString,
+        fechaParte: fechaParte,
+        hoyLocal: hoyLocal,
+        esHoy: fechaParte === hoyLocal,
+        timestamp: new Date().getTime(),
+        fechaCompleta: new Date().toISOString()
+      })
+      
       return fechaParte === hoyLocal
     } catch (error) {
       console.error('Error al comparar fecha con hoy:', error)
@@ -354,10 +368,6 @@ export class DateUtils {
    * Función centralizada para evitar inconsistencias
    */
   static getTodayLocal(): string {
-    const hoy = new Date()
-    const year = hoy.getFullYear()
-    const month = String(hoy.getMonth() + 1).padStart(2, '0')
-    const day = String(hoy.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
+    return this.getCurrentLocalDate()
   }
 }
