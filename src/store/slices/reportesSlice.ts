@@ -1,5 +1,6 @@
 import type { StateCreator } from 'zustand';
 import { supabase } from '../../lib/supabase';
+import { DateUtils } from '../../lib/dateUtils';
 import type { AppStore } from '../index';
 
 export interface FiltrosReporte {
@@ -88,8 +89,8 @@ export type ReportesSlice = ReportesState & ReportesActions;
 
 const initialState: ReportesState = {
   filtros: {
-    fechaInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-    fechaFin: new Date().toISOString().split('T')[0],
+    fechaInicio: DateUtils.getFirstDayOfMonth(new Date()),
+    fechaFin: DateUtils.getCurrentLocalDate(),
   },
   reporteVentas: [],
   reporteProductos: [],
@@ -373,7 +374,7 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
 
       switch (tipo) {
         case 'ventas':
-          filename = `reporte_ventas_${new Date().toISOString().split('T')[0]}.csv`;
+          filename = `reporte_ventas_${DateUtils.getCurrentLocalDate()}.csv`;
           csvContent = 'ID,Fecha,Total,Método Pago,Tipo Precio,Empleado,Cliente\n';
           reporteVentas.forEach(venta => {
             csvContent += `${venta.id},${venta.fecha},${venta.total},${venta.metodoPago},${venta.tipoPrecio},"${venta.empleado.nombre.replace(/"/g, '""')}","${(venta.cliente?.nombre || 'Sin cliente').replace(/"/g, '""')}"\n`;
@@ -381,7 +382,7 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
           break;
 
         case 'productos':
-          filename = `reporte_productos_${new Date().toISOString().split('T')[0]}.csv`;
+          filename = `reporte_productos_${DateUtils.getCurrentLocalDate()}.csv`;
           csvContent = 'ID,Nombre,SKU,Categoría,Stock,Precio Minorista,Precio Mayorista,Total Ventas,Cantidad Vendida,Ingresos Generados\n';
           reporteProductos.forEach(producto => {
             csvContent += `${producto.id},"${producto.nombre.replace(/"/g, '""')}",${producto.codigo},${producto.categoria},${producto.stock},${producto.precioMinorista},${producto.precioMayorista},${producto.totalVentas},${producto.cantidadVendida},${producto.ingresosGenerados}\n`;
@@ -389,7 +390,7 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
           break;
 
         case 'caja':
-          filename = `reporte_caja_${new Date().toISOString().split('T')[0]}.csv`;
+          filename = `reporte_caja_${DateUtils.getCurrentLocalDate()}.csv`;
           csvContent = 'Fecha,Empleado,Apertura,Ingresos,Egresos,Ventas,Saldo Final\n';
           reporteCaja.forEach(caja => {
             csvContent += `${caja.fecha},"${caja.empleado.replace(/"/g, '""')}",${caja.apertura},${caja.ingresos},${caja.egresos},${caja.ventas},${caja.saldoFinal}\n`;

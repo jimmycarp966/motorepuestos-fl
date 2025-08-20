@@ -236,7 +236,7 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
                        .from('clientes')
                        .update({
                          saldo_cuenta_corriente: supabase.sql`saldo_cuenta_corriente + ${total}`,
-                         updated_at: new Date().toISOString()
+                         updated_at: DateUtils.getCurrentLocalDateTime()
                        })
                        .eq('id', ventaData.cliente_id)
 

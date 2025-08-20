@@ -218,4 +218,104 @@ export class DateUtils {
   static fromTimestamp(timestamp: number): string {
     return new Date(timestamp).toISOString().split('T')[0]
   }
+
+  /**
+   * Obtiene la fecha y hora actual en formato ISO respetando la zona horaria local
+   * Esto evita problemas de zona horaria al crear fechas
+   */
+  static getCurrentLocalDateTime(): string {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hours = String(now.getHours()).padStart(2, '0')
+    const minutes = String(now.getMinutes()).padStart(2, '0')
+    const seconds = String(now.getSeconds()).padStart(2, '0')
+    const milliseconds = String(now.getMilliseconds()).padStart(3, '0')
+    
+    // Crear fecha ISO con zona horaria local
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`
+  }
+
+  /**
+   * Obtiene la fecha actual en formato ISO respetando la zona horaria local
+   */
+  static getCurrentLocalDate(): string {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  /**
+   * Formatea una fecha para mostrar en la UI de manera consistente
+   * Maneja problemas de zona horaria correctamente
+   */
+  static formatDateTimeForDisplay(dateString: string): string {
+    try {
+      const date = new Date(dateString)
+      
+      // Verificar si la fecha es válida
+      if (isNaN(date.getTime())) {
+        return 'Fecha inválida'
+      }
+
+      // Formatear usando la zona horaria local
+      return date.toLocaleString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      })
+    } catch (error) {
+      console.error('Error al formatear fecha:', error)
+      return 'Error de fecha'
+    }
+  }
+
+  /**
+   * Formatea solo la hora para mostrar en la UI
+   */
+  static formatTimeForDisplay(dateString: string): string {
+    try {
+      const date = new Date(dateString)
+      
+      if (isNaN(date.getTime())) {
+        return 'Hora inválida'
+      }
+
+      return date.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      })
+    } catch (error) {
+      console.error('Error al formatear hora:', error)
+      return 'Error de hora'
+    }
+  }
+
+  /**
+   * Verifica si una fecha está en la zona horaria correcta
+   * y la ajusta si es necesario
+   */
+  static ensureLocalTimezone(dateString: string): string {
+    try {
+      const date = new Date(dateString)
+      
+      if (isNaN(date.getTime())) {
+        return dateString
+      }
+
+      // Si la fecha parece estar en UTC, convertirla a local
+      const utcDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
+      return utcDate.toISOString()
+    } catch (error) {
+      console.error('Error al ajustar zona horaria:', error)
+      return dateString
+    }
+  }
 }

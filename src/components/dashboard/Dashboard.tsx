@@ -9,6 +9,7 @@ import {
   useErrorStates
 } from '../../lib/selectors'
 import { useCalendarSync } from '../../lib/calendarSync'
+import { DateUtils } from '../../lib/dateUtils'
 
 import { 
   TrendingUp, 
@@ -532,7 +533,7 @@ export const Dashboard: React.FC = () => {
                       gap: '0.5rem'
                     }}>
                       <Calendar size={12} />
-                      {new Date(venta.fecha).toLocaleDateString('es-ES')}
+                      {DateUtils.formatDate(venta.fecha, 'short')}
                     </div>
                   </div>
                   <div style={{ 
@@ -612,7 +613,7 @@ export const Dashboard: React.FC = () => {
                       gap: '0.5rem'
                     }}>
                       <Clock size={12} />
-                      {new Date(movimiento.fecha).toLocaleDateString('es-ES')}
+                      {DateUtils.formatDate(movimiento.fecha, 'short')}
                     </div>
                   </div>
                   <div style={{ 

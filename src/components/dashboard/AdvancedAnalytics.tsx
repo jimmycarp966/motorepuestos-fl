@@ -6,6 +6,7 @@ import {
 import { Card } from '../ui/card'
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { useAppStore } from '../../store'
+import { DateUtils } from '../../lib/dateUtils'
 
 interface KPICardProps {
   title: string
@@ -101,7 +102,7 @@ export const AdvancedAnalytics: React.FC = () => {
         return fechaVenta.toDateString() === fecha.toDateString()
       })
       return {
-        fecha: fecha.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' }),
+        fecha: DateUtils.formatDate(fecha, 'short'),
         ventas: ventasDelDia.length,
         ingresos: ventasDelDia.reduce((sum, v) => sum + v.total, 0)
       }

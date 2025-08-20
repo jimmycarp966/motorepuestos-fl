@@ -1,5 +1,6 @@
 import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
+import { DateUtils } from '../../lib/dateUtils'
 import type { AppStore } from '../index'
 import type { CajaState, MovimientoCaja, CajaDiaria, ArqueoCaja } from '../types'
 
@@ -35,7 +36,7 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
       }, 0) || 0
 
       // Determinar si la caja está abierta (si hay movimientos hoy)
-      const fechaHoy = new Date().toISOString().split('T')[0]
+      const fechaHoy = DateUtils.getCurrentLocalDate()
       const movimientosHoy = data?.filter(m => {
         const movimientoFecha = typeof m.fecha === 'string' ? m.fecha.split('T')[0] : m.fecha
         return movimientoFecha === fechaHoy
@@ -75,7 +76,7 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
           monto,
           concepto,
           empleado_id: currentUser.id,
-          fecha: new Date().toISOString()
+          fecha: DateUtils.getCurrentLocalDateTime()
         }])
         .select()
         .single()
@@ -115,7 +116,7 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
           monto,
           concepto,
           empleado_id: currentUser.id,
-          fecha: new Date().toISOString()
+          fecha: DateUtils.getCurrentLocalDateTime()
         }])
         .select()
         .single()
@@ -159,7 +160,7 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
             id: Date.now().toString(),
             montoInicial,
             empleado_id: currentUser.id,
-            fechaApertura: new Date().toISOString(),
+            fechaApertura: DateUtils.getCurrentLocalDateTime(),
             estado: 'abierta'
           }
         }
@@ -193,7 +194,7 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
 
       const arqueo: ArqueoCaja = {
         id: Date.now().toString(),
-        fecha: new Date().toISOString(),
+        fecha: DateUtils.getCurrentLocalDateTime(),
         montoEsperado,
         montoReal: saldoActual,
         diferencia,
@@ -297,7 +298,7 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
           datosActualizados.metodo_pago !== movimientoActual.metodo_pago) {
         
         // Obtener arqueo pendiente del día actual
-        const fechaHoy = new Date().toISOString().split('T')[0]
+        const fechaHoy = DateUtils.getCurrentLocalDate()
         const { data: arqueoPendiente } = await supabase
           .from('arqueos_caja')
           .select('*')

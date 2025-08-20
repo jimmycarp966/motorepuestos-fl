@@ -662,13 +662,7 @@ export const CajaTable: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         <div className="flex items-center">
                           <Calendar className="w-4 h-4 mr-2 text-dark-text-secondary" />
-                          {new Date(movimiento.fecha).toLocaleDateString('es-ES', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
+                          {DateUtils.formatDateTimeForDisplay(movimiento.fecha)}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -772,10 +766,7 @@ export const CajaTable: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-2 text-dark-text-secondary" />
-                        {new Date(venta.fecha).toLocaleTimeString('es-ES', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
+                        {DateUtils.formatTimeForDisplay(venta.fecha)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
