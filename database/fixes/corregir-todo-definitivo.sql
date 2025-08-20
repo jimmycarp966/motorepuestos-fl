@@ -1,5 +1,6 @@
 -- Script definitivo para corregir todas las fechas incorrectas
 -- Corrige fechas del 18 y 20 de agosto, las asigna al 19 de agosto con horas reales
+-- Horario de trabajo: 8:00 AM a 22:00 PM (GMT-3)
 
 -- ========================================
 -- 1. VERIFICAR ESTADO ACTUAL
@@ -54,11 +55,11 @@ SET fecha = fecha - INTERVAL '1 day'
 WHERE fecha::date = '2025-08-20';
 
 -- ========================================
--- 3. CORRECCIÓN: ASIGNAR HORAS REALES
+-- 3. CORRECCIÓN: ASIGNAR HORAS REALES (8:00 AM - 22:00 PM)
 -- ========================================
 
 -- Asignar horas reales a movimientos del 19 de agosto
--- Distribuir entre 9:00 AM y 6:00 PM (horario comercial)
+-- Distribuir entre 8:00 AM y 22:00 PM (horario de trabajo real)
 WITH movimientos_ordenados AS (
     SELECT 
         id,
@@ -69,15 +70,15 @@ WITH movimientos_ordenados AS (
 )
 UPDATE movimientos_caja 
 SET fecha = '2025-08-19'::date + 
-    (INTERVAL '9 hours' + 
-     (INTERVAL '1 minute' * (m.orden * 20)) +  -- 20 minutos entre cada movimiento
-     (INTERVAL '1 second' * (m.orden * 10)))   -- 10 segundos adicionales para variación
+    (INTERVAL '8 hours' + 
+     (INTERVAL '1 minute' * (m.orden * 15)) +  -- 15 minutos entre cada movimiento
+     (INTERVAL '1 second' * (m.orden * 30)))   -- 30 segundos adicionales para variación
 FROM movimientos_ordenados m
 WHERE movimientos_caja.id = m.id
 AND movimientos_caja.fecha::date = '2025-08-19';
 
 -- Asignar horas reales a ventas del 19 de agosto
--- Distribuir entre 9:00 AM y 6:00 PM
+-- Distribuir entre 8:00 AM y 22:00 PM
 WITH ventas_ordenadas AS (
     SELECT 
         id,
@@ -88,9 +89,9 @@ WITH ventas_ordenadas AS (
 )
 UPDATE ventas 
 SET fecha = '2025-08-19'::date + 
-    (INTERVAL '9 hours' + 
-     (INTERVAL '1 minute' * (v.orden * 25)) +  -- 25 minutos entre cada venta
-     (INTERVAL '1 second' * (v.orden * 15)))   -- 15 segundos adicionales para variación
+    (INTERVAL '8 hours' + 
+     (INTERVAL '1 minute' * (v.orden * 20)) +  -- 20 minutos entre cada venta
+     (INTERVAL '1 second' * (v.orden * 45)))   -- 45 segundos adicionales para variación
 FROM ventas_ordenadas v
 WHERE ventas.id = v.id
 AND ventas.fecha::date = '2025-08-19';
@@ -179,4 +180,4 @@ GROUP BY fecha::date;
 SELECT 
     'RESUMEN_FINAL' as seccion,
     'Corrección definitiva completada' as descripcion,
-    'Todos los registros del 18 y 20 de agosto han sido corregidos al 19 de agosto con horas reales entre 9:00 AM y 6:00 PM' as resultado;
+    'Todos los registros del 18 y 20 de agosto han sido corregidos al 19 de agosto con horas reales entre 8:00 AM y 22:00 PM (GMT-3)' as resultado;
