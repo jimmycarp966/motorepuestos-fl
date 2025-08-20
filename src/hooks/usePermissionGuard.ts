@@ -122,6 +122,7 @@ export function usePermissionGuard(): UserPermissions {
     
     // Si el usuario es administrador, tiene acceso a todo
     if (user.rol === 'Administrador') {
+      console.log(`🔐 [Admin Access] Administrador ${user.nombre} accediendo a ${module} - PERMITIDO`)
       return true
     }
     

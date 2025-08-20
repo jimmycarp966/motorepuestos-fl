@@ -69,7 +69,7 @@ export const useDashboardKPIs = (): DashboardKPIs => {
   return useAppStore(
     useCallback((state: AppStore) => {
       // Usar fecha actual del sistema de sincronización
-      const fechaHoy = calendarSync.currentDate
+      const fechaHoy = DateUtils.getCurrentLocalDate()
       const unaSemanaPasada = DateUtils.subtractDays(fechaHoy, 7)
       const unMesPasado = DateUtils.subtractDays(fechaHoy, 30)
 

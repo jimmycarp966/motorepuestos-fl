@@ -212,25 +212,51 @@ export const Dashboard: React.FC = () => {
       if (lastCheckDate !== currentDate) {
         console.log(`🔄 [Dashboard] Cambio de día detectado en monitoreo: ${lastCheckDate} → ${currentDate}`)
         localStorage.setItem('dashboard_last_check_date', currentDate)
-        loadDashboardData(true)
+        
+        // Forzar refresco completo de datos
+        Promise.all([
+          fetchVentas(),
+          fetchProductos(),
+          fetchClientes(),
+          fetchMovimientos()
+        ]).then(() => {
+          addNotification({
+            id: `day-change-${Date.now()}`,
+            type: 'info',
+            title: 'Nuevo Día',
+            message: `Dashboard actualizado para ${currentDate}`,
+            duration: 3000
+          })
+        }).catch(error => {
+          console.error('Error al actualizar datos del nuevo día:', error)
+        })
       }
     }
 
-    // Verificar cada minuto si cambió el día
-    const intervalId = setInterval(checkDayChange, 60000)
+    // Verificar cada 30 segundos si cambió el día
+    const intervalId = setInterval(checkDayChange, 30000)
     
     // Verificar cuando la ventana se vuelve activa
     const handleFocus = () => {
       checkDayChange()
     }
     
+    // Verificar cuando el usuario regresa a la pestaña
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        checkDayChange()
+      }
+    }
+    
     window.addEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
     
     return () => {
       clearInterval(intervalId)
       window.removeEventListener('focus', handleFocus)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [loadDashboardData])
+  }, [fetchVentas, fetchProductos, fetchClientes, fetchMovimientos, addNotification])
 
   // Sistema de retry automático
   useEffect(() => {
