@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useAppStore } from '../../store'
 // import { useComponentShortcuts, createShortcut } from '../../hooks/useKeyboardShortcuts'
 import { Button } from '../ui/button'
@@ -65,7 +65,7 @@ export const FacturacionTable: React.FC = () => {
   const [showConfig, setShowConfig] = useState(false)
 
   // Refs
-  // const searchInputRef = useRef<HTMLInputElement>(null) // Comentado temporalmente para debug
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   // Shortcuts específicos para Facturación
   // const facturacionShortcuts = [
@@ -116,9 +116,9 @@ export const FacturacionTable: React.FC = () => {
   // Cargar datos al montar el componente
   useEffect(() => {
     console.log('🔧 [FacturacionTable] Cargando datos...')
-    fetchProductos()
-    fetchClientes()
-  }, [fetchProductos, fetchClientes])
+    // fetchProductos()
+    // fetchClientes()
+  }, [])
 
   // Filtrar productos basado en el término de búsqueda
   // const filteredProductos = useSearchFilter({
@@ -147,63 +147,22 @@ export const FacturacionTable: React.FC = () => {
 
   // Manejar selección de producto
   const handleProductSelect = (producto: any) => {
-    const existingItem = cartItems.find(item => item.producto.id === producto.id)
-    
-    if (existingItem) {
-      setCartItems(cartItems.map(item => 
-        item.producto.id === producto.id 
-          ? { ...item, cantidad: item.cantidad + 1, subtotal: (item.cantidad + 1) * item.precio_unitario }
-          : item
-      ))
-    } else {
-      const precio = tipoComprobante === 'A' ? producto.precio_mayorista : producto.precio_minorista
-      const newItem: CartItem = {
-        producto,
-        cantidad: 1,
-        precio_unitario: precio,
-        subtotal: precio,
-        tipo_precio: tipoComprobante === 'A' ? 'mayorista' : 'minorista'
-      }
-      setCartItems([...cartItems, newItem])
-    }
-    
-    setSearchTerm('')
-    setShowProductSuggestions(false)
-    setSelectedSuggestionIndex(-1)
+    console.log('🔧 [FacturacionTable] Producto seleccionado:', producto)
   }
 
   // Manejar cambio de cantidad
   const handleQuantityChange = (index: number, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      setCartItems(cartItems.filter((_, i) => i !== index))
-    } else {
-      setCartItems(cartItems.map((item, i) => 
-        i === index 
-          ? { ...item, cantidad: newQuantity, subtotal: newQuantity * item.precio_unitario }
-          : item
-      ))
-    }
+    console.log('🔧 [FacturacionTable] Cambio cantidad:', index, newQuantity)
   }
 
   // Manejar cambio de precio
   const handlePriceChange = (index: number, newPrice: number) => {
-    setCartItems(cartItems.map((item, i) => 
-      i === index 
-        ? { ...item, precio_unitario: newPrice, subtotal: item.cantidad * newPrice }
-        : item
-    ))
+    console.log('🔧 [FacturacionTable] Cambio precio:', index, newPrice)
   }
 
   // Manejar cambio de tipo de precio
   const handlePriceTypeChange = (index: number, newType: 'minorista' | 'mayorista') => {
-    const producto = cartItems[index].producto
-    const newPrice = newType === 'mayorista' ? producto.precio_mayorista : producto.precio_minorista
-    
-    setCartItems(cartItems.map((item, i) => 
-      i === index 
-        ? { ...item, tipo_precio: newType, precio_unitario: newPrice, subtotal: item.cantidad * newPrice }
-        : item
-    ))
+    console.log('🔧 [FacturacionTable] Cambio tipo precio:', index, newType)
   }
 
   // Manejar búsqueda de cliente
@@ -221,72 +180,7 @@ export const FacturacionTable: React.FC = () => {
 
   // Finalizar facturación
   const handleFinalizarFactura = async () => {
-    if (cartItems.length === 0) {
-      addNotification({
-        id: `error-${Date.now()}`,
-        type: 'error',
-        title: 'Error',
-        message: 'El carrito está vacío',
-        duration: 3000
-      })
-      return
-    }
-
-    if (!selectedCliente) {
-      addNotification({
-        id: `error-${Date.now()}`,
-        type: 'error',
-        title: 'Error',
-        message: 'Debe seleccionar un cliente',
-        duration: 3000
-      })
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      const facturaData = {
-        cliente_id: selectedCliente.id,
-        metodo_pago: metodoPago,
-        tipo_precio: tipoComprobante === 'A' ? 'mayorista' : 'minorista',
-        tipo_comprobante: tipoComprobante,
-        items: cartItems.map(item => ({
-          producto_id: item.producto.id,
-          cantidad: item.cantidad,
-          precio_unitario: item.precio_unitario,
-          subtotal: item.subtotal,
-          tipo_precio: item.tipo_precio
-        }))
-      }
-
-      await registrarFactura(facturaData)
-
-      // Limpiar formulario
-      setCartItems([])
-      setSelectedCliente(null)
-      setSearchTerm('')
-      setShowProductSuggestions(false)
-
-      addNotification({
-        id: `success-${Date.now()}`,
-        type: 'success',
-        title: 'Factura Creada',
-        message: `Factura ${tipoComprobante} registrada exitosamente`,
-        duration: 5000
-      })
-
-    } catch (error: any) {
-      addNotification({
-        id: `error-${Date.now()}`,
-        type: 'error',
-        title: 'Error',
-        message: error.message || 'Error al crear la factura',
-        duration: 5000
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+    console.log('🔧 [FacturacionTable] Finalizar facturación')
   }
 
   console.log('🔧 [FacturacionTable] Renderizando componente')
@@ -345,208 +239,6 @@ export const FacturacionTable: React.FC = () => {
           Probar Componente
         </Button>
       </div>
-      
-      {/* Búsqueda de Productos */}
-      <Card className="p-4">
-        <div className="relative">
-          <div className="flex items-center gap-2 mb-4">
-            <Search className="w-5 h-5 text-dark-text-secondary" />
-            <Input
-              ref={searchInputRef}
-              placeholder="Buscar productos por nombre o código..."
-              value={searchTerm}
-              onChange={(e) => handleProductSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
-                  handleProductSelect(filteredProductos[selectedSuggestionIndex])
-                } else if (e.key === 'ArrowDown') {
-                  e.preventDefault()
-                  setSelectedSuggestionIndex(prev => 
-                    prev < filteredProductos.length - 1 ? prev + 1 : prev
-                  )
-                } else if (e.key === 'ArrowUp') {
-                  e.preventDefault()
-                  setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1)
-                }
-              }}
-            />
-          </div>
-
-          {/* Sugerencias de productos */}
-          {showProductSuggestions && filteredProductos.length > 0 && (
-            <div className="absolute z-10 w-full bg-white border border-dark-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-              {filteredProductos.map((producto, index) => (
-                <div
-                  key={producto.id}
-                  onClick={() => handleProductSelect(producto)}
-                  className={`px-4 py-2 cursor-pointer ${
-                    index === selectedSuggestionIndex ? 'bg-blue-100' : 'hover:bg-gray-100'
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">{producto.nombre}</div>
-                      <div className="text-sm text-gray-600">
-                        Código: {producto.codigo_sku} | Stock: {producto.stock}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-medium">
-                        ${tipoComprobante === 'A' ? producto.precio_mayorista : producto.precio_minorista}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {tipoComprobante === 'A' ? 'Mayorista' : 'Minorista'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </Card>
-
-      {/* Carrito */}
-      <Card className="p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-dark-text-primary">Carrito de Facturación</h3>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-dark-text-secondary">
-              {cartItems.length} productos
-            </span>
-            <Button
-              onClick={() => setCartItems([])}
-              variant="outline"
-              size="sm"
-              disabled={cartItems.length === 0}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Limpiar
-            </Button>
-          </div>
-        </div>
-
-        {cartItems.length === 0 ? (
-          <div className="text-center py-8">
-            <Package className="w-12 h-12 mx-auto text-dark-border mb-4" />
-            <p className="text-dark-text-secondary">No hay productos en el carrito</p>
-            <p className="text-sm text-dark-text-secondary">Busca productos para comenzar</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {cartItems.map((item, index) => (
-              <div key={index} className="flex items-center gap-4 p-4 border border-dark-border rounded-lg">
-                <div className="flex-1">
-                  <div className="font-medium">{item.producto.nombre}</div>
-                  <div className="text-sm text-dark-text-secondary">
-                    Código: {item.producto.codigo_sku}
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={() => handleQuantityChange(index, item.cantidad - 1)}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <ArrowDown className="w-4 h-4" />
-                  </Button>
-                  <span className="w-12 text-center">{item.cantidad}</span>
-                  <Button
-                    onClick={() => handleQuantityChange(index, item.cantidad + 1)}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <ArrowUp className="w-4 h-4" />
-                  </Button>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <select
-                    value={item.tipo_precio}
-                    onChange={(e) => handlePriceTypeChange(index, e.target.value as 'minorista' | 'mayorista')}
-                    className="px-2 py-1 border border-dark-border rounded text-sm"
-                  >
-                    <option value="minorista">Minorista</option>
-                    <option value="mayorista">Mayorista</option>
-                  </select>
-                  <Input
-                    type="number"
-                    value={item.precio_unitario}
-                    onChange={(e) => handlePriceChange(index, parseFloat(e.target.value) || 0)}
-                    className="w-20 text-sm"
-                  />
-                </div>
-
-                <div className="text-right">
-                  <div className="font-medium text-green-600">
-                    ${item.subtotal.toLocaleString()}
-                  </div>
-                </div>
-
-                <Button
-                  onClick={() => handleQuantityChange(index, 0)}
-                  variant="ghost"
-                  size="sm"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-
-            {/* Total */}
-            <div className="border-t border-dark-border pt-4">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold">Total:</span>
-                <span className="text-2xl font-bold text-green-600">
-                  ${totalCarrito.toLocaleString()}
-                </span>
-              </div>
-            </div>
-
-            {/* Botón Finalizar */}
-            <Button
-              onClick={handleFinalizarFactura}
-              disabled={isSubmitting || cartItems.length === 0 || !selectedCliente}
-              className="w-full"
-              size="lg"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Procesando...
-                </>
-              ) : (
-                <>
-                  <FileText className="w-5 h-5 mr-2" />
-                  Finalizar Facturación
-                </>
-              )}
-            </Button>
-          </div>
-        )}
-      </Card>
-
-      {/* Atajos de teclado */}
-      {showConfig && (
-        <Card className="p-4">
-          <h3 className="text-lg font-semibold mb-4">Atajos de Teclado</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-2">
-              <kbd className="px-2 py-1 bg-gray-200 rounded text-sm">F10</kbd>
-              <span className="text-sm">Enfocar buscador</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <kbd className="px-2 py-1 bg-gray-200 rounded text-sm">F11</kbd>
-              <span className="text-sm">Finalizar facturación</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <kbd className="px-2 py-1 bg-gray-200 rounded text-sm">F12</kbd>
-              <span className="text-sm">Limpiar carrito</span>
-            </div>
-          </div>
-        </Card>
-      )}
     </div>
   )
 }
