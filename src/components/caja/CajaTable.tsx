@@ -282,6 +282,10 @@ export const CajaTable: React.FC = () => {
       metodoPago: v.metodo_pago
     })
     
+    if (esHoy) {
+      console.log(`🚨 [CajaTable] ¡VENTA CONTADA COMO HOY! ID: ${v.id}, Fecha: ${fechaOriginal}, Total: ${v.total}`)
+    }
+    
     return esHoy
   })
 
