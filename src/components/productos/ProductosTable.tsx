@@ -186,8 +186,9 @@ export const ProductosTable: React.FC = () => {
     crudOps.handleRefresh()
   }
 
+  console.log('🔍 [ProductosTable] Renderizando con space-y-6')
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ border: '5px solid green' }}>
       {/* Filtros adicionales */}
       <div className="flex flex-col sm:flex-row gap-4 bg-dark-bg-secondary p-4 rounded-lg border border-dark-border">
         {/* Filtro por Categoría */}
