@@ -80,14 +80,16 @@ export const useDashboardKPIs = (): DashboardKPIs => {
         totalVentas: state.ventas.length
       })
 
-      // Filtrar ventas de hoy - usar DateUtils.isToday para comparación correcta
+      // Filtrar ventas de hoy - comparación directa de fechas
       const ventasHoy = state.ventas.filter(v => {
         if (v.estado === 'eliminada') return false
-        const esHoy = DateUtils.isToday(v.fecha)
+        const ventaFecha = new Date(v.fecha).toISOString().split('T')[0]
+        const esHoy = ventaFecha === fechaHoy
         if (esHoy) {
           console.log(`✅ [Dashboard KPIs] Venta de hoy encontrada:`, {
             id: v.id,
             fecha: v.fecha,
+            fechaFormateada: ventaFecha,
             total: v.total,
             concepto: v.concepto
           })
@@ -114,7 +116,8 @@ export const useDashboardKPIs = (): DashboardKPIs => {
       // Calcular saldo de caja - solo movimientos del día actual (excluyendo eliminados)
       const movimientosHoy = state.caja.movimientos.filter(m => {
         if (m.estado === 'eliminada') return false
-        return DateUtils.isToday(m.fecha)
+        const movimientoFecha = new Date(m.fecha).toISOString().split('T')[0]
+        return movimientoFecha === fechaHoy
       })
       
       const saldoCaja = movimientosHoy.reduce((sum, m) => {
