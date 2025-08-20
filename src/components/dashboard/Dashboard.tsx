@@ -75,6 +75,27 @@ export const Dashboard: React.FC = () => {
     }
   }, [])
 
+  // FORZAR LIMPIEZA DE CACHE Y RECARGA AL INICIAR
+  React.useEffect(() => {
+    console.log('🚀 [Dashboard] Iniciando dashboard con limpieza de cache forzada')
+    
+    // Limpiar cache del navegador
+    if ('caches' in window) {
+      caches.keys().then(names => {
+        names.forEach(name => {
+          caches.delete(name)
+        })
+        console.log('🧹 [Dashboard] Cache del navegador limpiado')
+      })
+    }
+    
+    // Forzar recarga de datos
+    setTimeout(() => {
+      console.log('🔄 [Dashboard] Forzando recarga inicial de datos')
+      loadDashboardData(true)
+    }, 1000)
+  }, [])
+
   // Usar selectores optimizados con validaciones
   const kpis = useDashboardKPIs()
   const ventasRecientes = useVentasRecientes(5)

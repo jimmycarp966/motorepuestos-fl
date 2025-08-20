@@ -118,11 +118,19 @@ export function usePermissionGuard(): UserPermissions {
 
   // Verificar acceso a módulo (función síncrona para navegación)
   const canAccess = useCallback((module: ModuleName): boolean => {
-    if (!isAuthenticated || !user) return false
+    console.log(`🔐 [Permissions] Verificando acceso a ${module}`, {
+      isAuthenticated,
+      user: user ? { id: user.id, nombre: user.nombre, rol: user.rol, activo: user.activo } : null
+    })
+    
+    if (!isAuthenticated || !user) {
+      console.log(`❌ [Permissions] Acceso denegado a ${module}: No autenticado o sin usuario`)
+      return false
+    }
     
     // Si el usuario es administrador, tiene acceso a todo
     if (user.rol === 'Administrador') {
-      console.log(`🔐 [Admin Access] Administrador ${user.nombre} accediendo a ${module} - PERMITIDO`)
+      console.log(`✅ [Admin Access] Administrador ${user.nombre} accediendo a ${module} - PERMITIDO`)
       return true
     }
     
@@ -142,11 +150,14 @@ export function usePermissionGuard(): UserPermissions {
     
     // Si el usuario tiene permisos específicos definidos, SOLO usar esos
     if (user.permisos_modulos && user.permisos_modulos.length > 0) {
-      return hasModuleInPermissions
+      const result = hasModuleInPermissions
+      console.log(`🔐 [Permissions] Usando permisos específicos para ${module}: ${result}`)
+      return result
     }
     
     // Si no tiene permisos específicos definidos, usar permisos del rol
     const hasRolePermissions = (rolePermissions[module] || []).length > 0
+    console.log(`🔐 [Permissions] Usando permisos del rol para ${module}: ${hasRolePermissions}`)
     
     return hasRolePermissions
   }, [isAuthenticated, user, rolePermissions])
