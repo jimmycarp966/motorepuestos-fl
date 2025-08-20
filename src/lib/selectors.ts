@@ -86,12 +86,15 @@ export const useDashboardKPIs = (): DashboardKPIs => {
         
         const esHoy = DateUtils.isSameAsToday(v.fecha)
         
-        console.log(`🔍 [Dashboard KPIs] Comparando venta:`, {
-          id: v.id,
-          fechaOriginal: v.fecha,
-          esHoy: esHoy,
-          total: v.total
-        })
+        // Solo log para las ventas que SÍ se están contando como hoy
+        if (esHoy) {
+          console.log(`🚨 [Dashboard KPIs] VENTA CONTADA COMO HOY:`, {
+            id: v.id,
+            fechaOriginal: v.fecha,
+            total: v.total,
+            estado: v.estado
+          })
+        }
         
         return esHoy
       })
@@ -105,13 +108,36 @@ export const useDashboardKPIs = (): DashboardKPIs => {
       // Log de TODAS las ventas para verificar cuáles NO se están contando
       const hoyLocal = DateUtils.getTodayLocal()
       console.log(`🔍 [Dashboard KPIs] FECHA HOY: ${hoyLocal}`)
-      console.log(`🔍 [Dashboard KPIs] TODAS LAS VENTAS (${state.ventas.length} total):`, state.ventas.map(v => ({
+      
+      // Agrupar ventas por fecha para ver el patrón
+      const ventasPorFecha = state.ventas.reduce((acc, v) => {
+        const fechaParte = v.fecha.split('T')[0]
+        if (!acc[fechaParte]) {
+          acc[fechaParte] = []
+        }
+        acc[fechaParte].push({
+          id: v.id,
+          fecha: v.fecha,
+          total: v.total,
+          estado: v.estado
+        })
+        return acc
+      }, {} as Record<string, any[]>)
+      
+      console.log(`🔍 [Dashboard KPIs] VENTAS POR FECHA:`, ventasPorFecha)
+      
+      // Mostrar solo las ventas que NO son de hoy para comparar
+      const ventasNoHoy = state.ventas.filter(v => {
+        const fechaParte = v.fecha.split('T')[0]
+        return fechaParte !== hoyLocal && v.estado !== 'eliminada'
+      }).slice(0, 5) // Solo las primeras 5 para no saturar el log
+      
+      console.log(`🔍 [Dashboard KPIs] EJEMPLOS DE VENTAS NO HOY (primeras 5):`, ventasNoHoy.map(v => ({
         id: v.id,
         fecha: v.fecha,
         total: v.total,
         fechaParte: v.fecha.split('T')[0],
         hoyLocal: hoyLocal,
-        esHoy: v.fecha.split('T')[0] === hoyLocal,
         estado: v.estado
       })))
       
