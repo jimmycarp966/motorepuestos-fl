@@ -315,7 +315,20 @@ export const CajaTable: React.FC = () => {
     fecha: v.fecha,
     total: v.total,
     metodoPago: v.metodo_pago,
-    fechaLocal: new Date(v.fecha).toLocaleDateString('en-CA')
+    fechaParte: v.fecha.split('T')[0],
+    hoyUTC: new Date().toISOString().split('T')[0]
+  })))
+
+  // Log de TODAS las ventas para verificar cuáles NO se están contando
+  console.log(`🔍 [CajaTable] TODAS LAS VENTAS (${(ventas || []).length} total):`, (ventas || []).map(v => ({
+    id: v.id,
+    fecha: v.fecha,
+    total: v.total,
+    metodoPago: v.metodo_pago,
+    fechaParte: v.fecha.split('T')[0],
+    hoyUTC: new Date().toISOString().split('T')[0],
+    esHoy: v.fecha.split('T')[0] === new Date().toISOString().split('T')[0],
+    estado: v.estado
   })))
 
   // Suma manual para verificar

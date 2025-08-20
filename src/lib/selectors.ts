@@ -111,6 +111,17 @@ export const useDashboardKPIs = (): DashboardKPIs => {
         total: ventasHoy.reduce((sum, v) => sum + v.total, 0),
         ventas: ventasHoy.map(v => ({ id: v.id, fecha: v.fecha, total: v.total }))
       })
+
+      // Log de TODAS las ventas para verificar cuáles NO se están contando
+      console.log(`🔍 [Dashboard KPIs] TODAS LAS VENTAS (${state.ventas.length} total):`, state.ventas.map(v => ({
+        id: v.id,
+        fecha: v.fecha,
+        total: v.total,
+        fechaParte: v.fecha.split('T')[0],
+        hoyUTC: new Date().toISOString().split('T')[0],
+        esHoy: v.fecha.split('T')[0] === new Date().toISOString().split('T')[0],
+        estado: v.estado
+      })))
       
       // Filtrar ventas de la semana (excluyendo eliminadas)
       const ventasSemanaPasada = state.ventas.filter(v => 
