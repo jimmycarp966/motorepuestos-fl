@@ -150,7 +150,8 @@ export const useVentasRecientes = (limit: number = 5) => {
   return useAppStore(
     useCallback((state: AppStore) => 
       state.ventas
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .filter(v => v.estado !== 'eliminada') // Excluir ventas eliminadas
+        .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()) // Usar fecha de venta, no created_at
         .slice(0, limit)
     , [limit]),
     shallow
@@ -162,7 +163,8 @@ export const useMovimientosRecientes = (limit: number = 5) => {
   return useAppStore(
     useCallback((state: AppStore) =>
       state.caja.movimientos
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .filter(m => m.estado !== 'eliminada') // Excluir movimientos eliminados
+        .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()) // Usar fecha de movimiento, no created_at
         .slice(0, limit)
     , [limit]),
     shallow

@@ -75,40 +75,60 @@ export const Dashboard: React.FC = () => {
     }
   }, [])
 
-  // FORZAR LIMPIEZA DE CACHE Y RECARGA AL INICIAR
+  // FORZAR LIMPIEZA COMPLETA DEL CACHE Y ESTADO
   React.useEffect(() => {
-    console.log('🚀 [Dashboard] Iniciando dashboard con limpieza de cache forzada')
+    console.log('🚀 [Dashboard] LIMPIEZA COMPLETA FORZADA - Iniciando...')
     
-    // Limpiar cache del navegador
+    // 1. Limpiar cache del navegador
     if ('caches' in window) {
       caches.keys().then(names => {
         names.forEach(name => {
           caches.delete(name)
+          console.log(`🧹 [Dashboard] Cache eliminado: ${name}`)
         })
-        console.log('🧹 [Dashboard] Cache del navegador limpiado')
       })
     }
     
-    // Limpiar localStorage de fechas antiguas
-    const currentDate = DateUtils.getCurrentLocalDate()
-    const lastLoadDate = localStorage.getItem('dashboard_last_load_date')
-    const lastCheckDate = localStorage.getItem('dashboard_last_check_date')
+    // 2. Limpiar localStorage completamente
+    const keysToRemove = [
+      'dashboard_last_load_date',
+      'dashboard_last_check_date',
+      'calendar_sync_date',
+      'app_state',
+      'ventas_cache',
+      'productos_cache'
+    ]
     
-    if (lastLoadDate && lastLoadDate !== currentDate) {
-      localStorage.removeItem('dashboard_last_load_date')
-      console.log(`🧹 [Dashboard] Limpiando fecha antigua del localStorage: ${lastLoadDate}`)
-    }
+    keysToRemove.forEach(key => {
+      localStorage.removeItem(key)
+      console.log(`🧹 [Dashboard] localStorage eliminado: ${key}`)
+    })
     
-    if (lastCheckDate && lastCheckDate !== currentDate) {
-      localStorage.removeItem('dashboard_last_check_date')
-      console.log(`🧹 [Dashboard] Limpiando fecha antigua del localStorage: ${lastCheckDate}`)
-    }
+    // 3. Limpiar sessionStorage
+    sessionStorage.clear()
+    console.log('🧹 [Dashboard] sessionStorage limpiado')
     
-    // Forzar recarga de datos
+    // 4. Forzar recarga de datos con timeout
     setTimeout(() => {
-      console.log('🔄 [Dashboard] Forzando recarga inicial de datos')
+      console.log('🔄 [Dashboard] Forzando recarga completa de datos...')
       loadDashboardData(true)
-    }, 1000)
+      
+      // 5. Forzar actualización del store
+      setTimeout(() => {
+        console.log('🔄 [Dashboard] Forzando actualización del store...')
+        useAppStore.setState({ 
+          ventas: [],
+          movimientos: [],
+          productos: [],
+          clientes: []
+        })
+        
+        // 6. Recargar datos nuevamente
+        setTimeout(() => {
+          loadDashboardData(true)
+        }, 1000)
+      }, 1000)
+    }, 2000)
   }, [])
 
   // DEBUGGING: Verificar fechas de ventas
