@@ -39,7 +39,7 @@ export interface UserPermissions {
 // Mapeo de roles a permisos granulares
 const ROLE_PERMISSIONS: Record<string, Record<ModuleName, Permission[]>> = {
   Administrador: {
-    dashboard: ['read'],
+    dashboard: ['read', 'manage'],
     empleados: ['read', 'create', 'update', 'delete', 'manage'],
     productos: ['read', 'create', 'update', 'delete', 'manage'],
     clientes: ['read', 'create', 'update', 'delete', 'manage'],
@@ -162,6 +162,17 @@ export function usePermissionGuard(): UserPermissions {
 
     if (!user.activo) {
       return { canNavigate: false, reason: 'Usuario inactivo' }
+    }
+
+    // Log específico para debugging de administradores
+    if (user.rol === 'Administrador') {
+      console.log(`🔐 [Admin Debug] Verificando acceso a ${module}:`, {
+        usuario: user.nombre,
+        rol: user.rol,
+        isAuthenticated,
+        userActivo: user.activo,
+        canAccessResult: canAccess(module)
+      })
     }
 
     if (!canAccess(module)) {

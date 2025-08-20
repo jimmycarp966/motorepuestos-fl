@@ -187,7 +187,7 @@ export const ProductosTable: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Filtros adicionales */}
       <div className="flex flex-col sm:flex-row gap-4 bg-dark-bg-secondary p-4 rounded-lg border border-dark-border">
         {/* Filtro por Categoría */}

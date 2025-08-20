@@ -95,32 +95,39 @@ export const EmpleadosTable: React.FC = () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-dark-text-primary">Gestión de Empleados</CardTitle>
-          <div className="flex space-x-2">
-            {canManage && (
-              <Button 
-                onClick={() => setShowForm(true)}
-                variant="default"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Nuevo Empleado
-              </Button>
-            )}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-dark-text-primary">Empleados</h1>
+          <p className="text-dark-text-secondary">Gestiona el personal de la empresa</p>
+        </div>
+        <div className="flex space-x-2">
+          {canManage && (
+            <Button 
+              onClick={() => setShowForm(true)}
+              variant="default"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo Empleado
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Búsqueda */}
+      <Card>
+        <CardHeader>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-500 w-4 h-4" />
+            <Input
+              placeholder="Buscar empleados..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
-        </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-500 w-4 h-4" />
-          <Input
-            placeholder="Buscar empleados..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </CardHeader>
+        </CardHeader>
       <CardContent>
         {loading ? (
           <div className="text-center py-8 text-dark-text-secondary">Cargando empleados...</div>
@@ -201,5 +208,6 @@ export const EmpleadosTable: React.FC = () => {
         )}
       </CardContent>
     </Card>
+    </div>
   )
 }
