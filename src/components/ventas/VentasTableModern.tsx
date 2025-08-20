@@ -150,7 +150,7 @@ export const VentasTableModern: React.FC = () => {
       return 0
     })
 
-    return sortedProductos.slice(0, 6) // Mostrar 6 resultados
+    return sortedProductos // Mostrar TODOS los resultados que coincidan
   }, [productos, searchTerm, selectedCategory])
 
   // Obtener categorías únicas

@@ -37,14 +37,15 @@
 - **Enter**: Agregar producto seleccionado al carrito
 - **Escape**: Cerrar sugerencias
 
-### 3. Más Resultados Visibles
+### 3. Todos los Resultados Visibles
 
-**Funcionalidad**: Se muestran 6 resultados en lugar de 4, permitiendo ver más opciones sin hacer scroll.
+**Funcionalidad**: Se muestran TODOS los productos que coincidan con la búsqueda, sin límite artificial.
 
 #### Características:
-- **6 resultados**: Más opciones visibles de una vez
-- **Scroll automático**: Si hay más de 6 resultados, puedes navegar con flechas
-- **Altura optimizada**: La lista mantiene una altura razonable en la pantalla
+- **Resultados completos**: Si buscas "forte" y hay 100 productos con esa palabra, se muestran los 100
+- **Scroll automático**: La lista se desplaza automáticamente al navegar con flechas
+- **Altura optimizada**: La lista mantiene una altura razonable con scroll interno
+- **Sin límites**: No hay restricción en el número de resultados mostrados
 
 ### 4. Indicadores Visuales Mejorados
 
@@ -86,8 +87,8 @@ const filteredProductos = useMemo(() => {
     return 0
   })
   
-  return sortedProductos.slice(0, 6) // 6 resultados
-}, [productos, searchTerm])
+     return sortedProductos // TODOS los resultados
+ }, [productos, searchTerm])
 ```
 
 #### 2. Scroll Automático:
@@ -173,7 +174,7 @@ const scrollToSelected = (index: number) => {
 ### 2. **Escalabilidad**:
 - Funciona bien con catálogos grandes de productos
 - Mantiene rendimiento incluso con miles de productos
-- Límite de 6 resultados para evitar sobrecarga visual
+- Muestra todos los resultados relevantes sin límites artificiales
 
 ## Próximas Mejoras Sugeridas
 

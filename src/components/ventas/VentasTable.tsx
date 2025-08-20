@@ -145,7 +145,7 @@ export const VentasTable: React.FC = () => {
   // Filtrar productos para autocompletado con priorización de códigos exactos
   const filteredProductos = useMemo(() => {
     if (!productos || !searchTerm.trim()) {
-      return productos.slice(0, 6)
+      return productos.slice(0, 6) // Solo mostrar 6 cuando no hay búsqueda
     }
 
     const term = searchTerm.toLowerCase().trim()
@@ -191,7 +191,7 @@ export const VentasTable: React.FC = () => {
       return 0
     })
 
-    return sortedProductos.slice(0, 6) // Mostrar 6 resultados
+    return sortedProductos // Mostrar TODOS los resultados que coincidan
   }, [productos, searchTerm])
 
   // Filtrar clientes para búsqueda
