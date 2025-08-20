@@ -80,21 +80,25 @@ export const useDashboardKPIs = (): DashboardKPIs => {
         totalVentas: state.ventas.length
       })
 
-      // Filtrar ventas de hoy - comparación robusta de fechas
+      // Filtrar ventas de hoy - SOLUCIÓN DEFINITIVA con UTC directo
       const ventasHoy = state.ventas.filter(v => {
         if (v.estado === 'eliminada') return false
         
-        // Convertir la fecha de la venta a fecha local
-        const ventaDate = new Date(v.fecha)
-        const ventaFechaLocal = ventaDate.toLocaleDateString('en-CA') // Formato YYYY-MM-DD
+        // SOLUCIÓN DEFINITIVA: Comparar directamente las fechas UTC sin conversión de zona horaria
+        const fechaOriginal = v.fecha
+        const fechaParte = fechaOriginal.split('T')[0] // Obtiene solo "2025-08-19" de "2025-08-19T23:06:15+00:00"
         
-        const esHoy = ventaFechaLocal === fechaHoy
+        // Obtener la fecha de hoy en formato UTC
+        const hoy = new Date()
+        const hoyUTC = hoy.toISOString().split('T')[0] // Formato YYYY-MM-DD en UTC
         
-        console.log(`🔍 [Dashboard KPIs] Comparando venta:`, {
+        const esHoy = fechaParte === hoyUTC
+        
+        console.log(`🔍 [Dashboard KPIs] Comparando venta SOLUCIÓN DEFINITIVA:`, {
           id: v.id,
           fechaOriginal: v.fecha,
-          fechaLocal: ventaFechaLocal,
-          fechaHoy: fechaHoy,
+          fechaParte: fechaParte,
+          hoyUTC: hoyUTC,
           esHoy: esHoy,
           total: v.total
         })
@@ -122,17 +126,21 @@ export const useDashboardKPIs = (): DashboardKPIs => {
       const movimientosHoy = state.caja.movimientos.filter(m => {
         if (m.estado === 'eliminada') return false
         
-        // Convertir la fecha del movimiento a fecha local
-        const movimientoDate = new Date(m.fecha)
-        const movimientoFechaLocal = movimientoDate.toLocaleDateString('en-CA') // Formato YYYY-MM-DD
+        // SOLUCIÓN DEFINITIVA: Comparar directamente las fechas UTC sin conversión de zona horaria
+        const fechaOriginal = m.fecha
+        const fechaParte = fechaOriginal.split('T')[0] // Obtiene solo "2025-08-19" de "2025-08-19T23:06:15+00:00"
         
-        const esHoy = movimientoFechaLocal === fechaHoy
+        // Obtener la fecha de hoy en formato UTC
+        const hoy = new Date()
+        const hoyUTC = hoy.toISOString().split('T')[0] // Formato YYYY-MM-DD en UTC
         
-        console.log(`🔍 [Dashboard KPIs] Comparando movimiento:`, {
+        const esHoy = fechaParte === hoyUTC
+        
+        console.log(`🔍 [Dashboard KPIs] Comparando movimiento SOLUCIÓN DEFINITIVA:`, {
           id: m.id,
           fechaOriginal: m.fecha,
-          fechaLocal: movimientoFechaLocal,
-          fechaHoy: fechaHoy,
+          fechaParte: fechaParte,
+          hoyUTC: hoyUTC,
           esHoy: esHoy,
           tipo: m.tipo,
           monto: m.monto
