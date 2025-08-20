@@ -214,9 +214,28 @@ export const CajaTable: React.FC = () => {
     verificarArqueoCompletado()
   }
 
-  // Calcular estadísticas usando DateUtils
+  // Calcular estadísticas usando comparación robusta de fechas
   const movimientosHoy = movimientos.filter(m => {
-    return DateUtils.isToday(m.fecha)
+    if (m.estado === 'eliminada') return false
+    
+    // Convertir la fecha del movimiento a fecha local
+    const movimientoDate = new Date(m.fecha)
+    const movimientoFechaLocal = movimientoDate.toLocaleDateString('en-CA') // Formato YYYY-MM-DD
+    const fechaHoy = DateUtils.getCurrentLocalDate()
+    
+    const esHoy = movimientoFechaLocal === fechaHoy
+    
+    console.log(`🔍 [CajaTable] Comparando movimiento:`, {
+      id: m.id,
+      fechaOriginal: m.fecha,
+      fechaLocal: movimientoFechaLocal,
+      fechaHoy: fechaHoy,
+      esHoy: esHoy,
+      tipo: m.tipo,
+      monto: m.monto
+    })
+    
+    return esHoy
   })
 
   const ingresosHoy = movimientosHoy
@@ -229,7 +248,25 @@ export const CajaTable: React.FC = () => {
 
   // Calcular estadísticas de ventas
   const ventasHoy = (ventas || []).filter(v => {
-    return DateUtils.isToday(v.fecha)
+    if (v.estado === 'eliminada') return false
+    
+    // Convertir la fecha de la venta a fecha local
+    const ventaDate = new Date(v.fecha)
+    const ventaFechaLocal = ventaDate.toLocaleDateString('en-CA') // Formato YYYY-MM-DD
+    const fechaHoy = DateUtils.getCurrentLocalDate()
+    
+    const esHoy = ventaFechaLocal === fechaHoy
+    
+    console.log(`🔍 [CajaTable] Comparando venta:`, {
+      id: v.id,
+      fechaOriginal: v.fecha,
+      fechaLocal: ventaFechaLocal,
+      fechaHoy: fechaHoy,
+      esHoy: esHoy,
+      total: v.total
+    })
+    
+    return esHoy
   })
 
   const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0)

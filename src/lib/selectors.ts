@@ -80,20 +80,25 @@ export const useDashboardKPIs = (): DashboardKPIs => {
         totalVentas: state.ventas.length
       })
 
-      // Filtrar ventas de hoy - comparación directa de fechas
+      // Filtrar ventas de hoy - comparación robusta de fechas
       const ventasHoy = state.ventas.filter(v => {
         if (v.estado === 'eliminada') return false
-        const ventaFecha = new Date(v.fecha).toISOString().split('T')[0]
-        const esHoy = ventaFecha === fechaHoy
-        if (esHoy) {
-          console.log(`✅ [Dashboard KPIs] Venta de hoy encontrada:`, {
-            id: v.id,
-            fecha: v.fecha,
-            fechaFormateada: ventaFecha,
-            total: v.total,
-            concepto: v.concepto
-          })
-        }
+        
+        // Convertir la fecha de la venta a fecha local
+        const ventaDate = new Date(v.fecha)
+        const ventaFechaLocal = ventaDate.toLocaleDateString('en-CA') // Formato YYYY-MM-DD
+        
+        const esHoy = ventaFechaLocal === fechaHoy
+        
+        console.log(`🔍 [Dashboard KPIs] Comparando venta:`, {
+          id: v.id,
+          fechaOriginal: v.fecha,
+          fechaLocal: ventaFechaLocal,
+          fechaHoy: fechaHoy,
+          esHoy: esHoy,
+          total: v.total
+        })
+        
         return esHoy
       })
       
@@ -116,8 +121,24 @@ export const useDashboardKPIs = (): DashboardKPIs => {
       // Calcular saldo de caja - solo movimientos del día actual (excluyendo eliminados)
       const movimientosHoy = state.caja.movimientos.filter(m => {
         if (m.estado === 'eliminada') return false
-        const movimientoFecha = new Date(m.fecha).toISOString().split('T')[0]
-        return movimientoFecha === fechaHoy
+        
+        // Convertir la fecha del movimiento a fecha local
+        const movimientoDate = new Date(m.fecha)
+        const movimientoFechaLocal = movimientoDate.toLocaleDateString('en-CA') // Formato YYYY-MM-DD
+        
+        const esHoy = movimientoFechaLocal === fechaHoy
+        
+        console.log(`🔍 [Dashboard KPIs] Comparando movimiento:`, {
+          id: m.id,
+          fechaOriginal: m.fecha,
+          fechaLocal: movimientoFechaLocal,
+          fechaHoy: fechaHoy,
+          esHoy: esHoy,
+          tipo: m.tipo,
+          monto: m.monto
+        })
+        
+        return esHoy
       })
       
       const saldoCaja = movimientosHoy.reduce((sum, m) => {
@@ -400,9 +421,12 @@ export const useEstadoCaja = () => {
         .filter(m => m.tipo === 'egreso')
         .reduce((sum, m) => sum + m.monto, 0)
 
-      const saldoTotal = state.caja.movimientos.reduce((sum, m) => {
-        return m.tipo === 'ingreso' ? sum + m.monto : sum - m.monto
-      }, 0)
+      // Calcular saldo total solo de movimientos activos (no eliminados)
+      const saldoTotal = state.caja.movimientos
+        .filter(m => m.estado !== 'eliminada')
+        .reduce((sum, m) => {
+          return m.tipo === 'ingreso' ? sum + m.monto : sum - m.monto
+        }, 0)
 
       return {
         cajaAbierta: state.caja.cajaAbierta,
