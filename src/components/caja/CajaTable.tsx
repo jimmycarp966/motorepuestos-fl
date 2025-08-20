@@ -221,20 +221,28 @@ export const CajaTable: React.FC = () => {
   const movimientosHoy = movimientos.filter(m => {
     if (m.estado === 'eliminada') return false
     
-    // Convertir la fecha del movimiento a fecha local
+    // CORRECCIÓN: Usar la fecha original directamente sin conversión de zona horaria
     const movimientoDate = new Date(m.fecha)
-    const movimientoFechaLocal = movimientoDate.toLocaleDateString('en-CA') // Formato YYYY-MM-DD
+    
+    // Obtener la fecha local en formato YYYY-MM-DD usando la zona horaria local
+    const year = movimientoDate.getFullYear()
+    const month = String(movimientoDate.getMonth() + 1).padStart(2, '0')
+    const day = String(movimientoDate.getDate()).padStart(2, '0')
+    const movimientoFechaLocal = `${year}-${month}-${day}`
     
     const esHoy = movimientoFechaLocal === fechaHoy
     
-    console.log(`🔍 [CajaTable] Comparando movimiento:`, {
+    console.log(`🔍 [CajaTable] Comparando movimiento CORREGIDO:`, {
       id: m.id,
       fechaOriginal: m.fecha,
       fechaLocal: movimientoFechaLocal,
       fechaHoy: fechaHoy,
       esHoy: esHoy,
       tipo: m.tipo,
-      monto: m.monto
+      monto: m.monto,
+      year: year,
+      month: month,
+      day: day
     })
     
     return esHoy
@@ -257,9 +265,15 @@ export const CajaTable: React.FC = () => {
       return false
     }
     
-    // Convertir la fecha de la venta a fecha local
+    // CORRECCIÓN: Usar la fecha original directamente sin conversión de zona horaria
+    // Las fechas ya vienen en formato ISO y necesitamos comparar la fecha local real
     const ventaDate = new Date(v.fecha)
-    const ventaFechaLocal = ventaDate.toLocaleDateString('en-CA') // Formato YYYY-MM-DD
+    
+    // Obtener la fecha local en formato YYYY-MM-DD usando la zona horaria local
+    const year = ventaDate.getFullYear()
+    const month = String(ventaDate.getMonth() + 1).padStart(2, '0')
+    const day = String(ventaDate.getDate()).padStart(2, '0')
+    const ventaFechaLocal = `${year}-${month}-${day}`
     
     // Debug adicional para zona horaria
     const ventaISO = ventaDate.toISOString()
@@ -267,7 +281,7 @@ export const CajaTable: React.FC = () => {
     
     const esHoy = ventaFechaLocal === fechaHoy
     
-    console.log(`🔍 [CajaTable] Comparando venta:`, {
+    console.log(`🔍 [CajaTable] Comparando venta CORREGIDA:`, {
       id: v.id,
       fechaOriginal: v.fecha,
       fechaISO: ventaISO,
@@ -276,7 +290,10 @@ export const CajaTable: React.FC = () => {
       fechaHoy: fechaHoy,
       esHoy: esHoy,
       total: v.total,
-      metodoPago: v.metodo_pago
+      metodoPago: v.metodo_pago,
+      year: year,
+      month: month,
+      day: day
     })
     
     return esHoy
@@ -305,6 +322,19 @@ export const CajaTable: React.FC = () => {
       metodoPago: v.metodo_pago
     }))
   })
+
+  // Log detallado de TODAS las ventas que se están contando como "hoy"
+  console.log(`🔍 [CajaTable] VENTAS CONTADAS COMO HOY (${ventasHoy.length} ventas):`, ventasHoy.map(v => ({
+    id: v.id,
+    fecha: v.fecha,
+    total: v.total,
+    metodoPago: v.metodo_pago,
+    fechaLocal: new Date(v.fecha).toLocaleDateString('en-CA')
+  })))
+
+  // Suma manual para verificar
+  const sumaManual = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0)
+  console.log(`🔍 [CajaTable] SUMA MANUAL: ${sumaManual} vs totalVentasHoy: ${totalVentasHoy}`)
 
   // Obtener icono para método de pago
   const getMetodoPagoIcon = (metodo: string) => {
