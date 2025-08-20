@@ -215,13 +215,15 @@ export const CajaTable: React.FC = () => {
   }
 
   // Calcular estadísticas usando comparación robusta de fechas
+  const fechaHoy = DateUtils.getCurrentLocalDate()
+  console.log(`🔍 [CajaTable] Fecha de hoy: ${fechaHoy}`)
+  
   const movimientosHoy = movimientos.filter(m => {
     if (m.estado === 'eliminada') return false
     
     // Convertir la fecha del movimiento a fecha local
     const movimientoDate = new Date(m.fecha)
     const movimientoFechaLocal = movimientoDate.toLocaleDateString('en-CA') // Formato YYYY-MM-DD
-    const fechaHoy = DateUtils.getCurrentLocalDate()
     
     const esHoy = movimientoFechaLocal === fechaHoy
     
@@ -253,7 +255,6 @@ export const CajaTable: React.FC = () => {
     // Convertir la fecha de la venta a fecha local
     const ventaDate = new Date(v.fecha)
     const ventaFechaLocal = ventaDate.toLocaleDateString('en-CA') // Formato YYYY-MM-DD
-    const fechaHoy = DateUtils.getCurrentLocalDate()
     
     const esHoy = ventaFechaLocal === fechaHoy
     
@@ -275,6 +276,17 @@ export const CajaTable: React.FC = () => {
     acc[metodo] = (acc[metodo] || 0) + (v.total || 0)
     return acc
   }, {} as Record<string, number>)
+
+  // Log final de resultados
+  console.log(`🔍 [CajaTable] RESULTADOS FINALES:`, {
+    fechaHoy: fechaHoy,
+    movimientosHoy: movimientosHoy.length,
+    ingresosHoy: ingresosHoy,
+    egresosHoy: egresosHoy,
+    saldoHoy: ingresosHoy - egresosHoy,
+    ventasHoy: ventasHoy.length,
+    totalVentasHoy: totalVentasHoy
+  })
 
   // Obtener icono para método de pago
   const getMetodoPagoIcon = (metodo: string) => {
@@ -356,7 +368,7 @@ export const CajaTable: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-dark-text-secondary">Saldo Actual</p>
               <p className="text-2xl font-bold text-dark-text-primary">
-                ${saldo.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                ${(ingresosHoy - egresosHoy).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
               </p>
             </div>
           </div>
