@@ -962,14 +962,42 @@ export const Dashboard: React.FC = () => {
 
       {/* Botón de debug para desarrollo */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="mb-4 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-          <div className="flex items-center justify-between">
+        <div style={{
+          marginTop: '1.5rem',
+          padding: '1rem',
+          backgroundColor: 'rgba(255, 193, 7, 0.1)',
+          border: '1px solid rgba(255, 193, 7, 0.2)',
+          borderRadius: '0.5rem'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '1rem'
+          }}>
             <div>
-              <h3 className="text-yellow-600 font-semibold mb-2">🔧 Debug Panel</h3>
-              <p className="text-sm text-yellow-700 mb-2">
+              <h3 style={{ 
+                color: '#FF9800', 
+                fontWeight: '600', 
+                marginBottom: '0.5rem',
+                fontSize: '1rem'
+              }}>
+                🔧 Debug Panel
+              </h3>
+              <p style={{ 
+                fontSize: '0.875rem', 
+                color: '#FF9800', 
+                marginBottom: '0.25rem',
+                margin: 0
+              }}>
                 Fecha actual: {DateUtils.getCurrentLocalDate()}
               </p>
-              <p className="text-sm text-yellow-700">
+              <p style={{ 
+                fontSize: '0.875rem', 
+                color: '#FF9800',
+                margin: 0
+              }}>
                 Usuario: {user?.nombre} ({user?.rol})
               </p>
             </div>
@@ -978,7 +1006,19 @@ export const Dashboard: React.FC = () => {
                 console.log('🔄 [Debug] Forzando recarga manual')
                 loadDashboardData(true)
               }}
-              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#FF9800',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F57C00'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FF9800'}
             >
               🔄 Recargar Datos
             </button>
