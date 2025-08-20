@@ -75,60 +75,43 @@ export const Dashboard: React.FC = () => {
     }
   }, [])
 
-  // FORZAR LIMPIEZA COMPLETA DEL CACHE Y ESTADO
+  // LIMPIEZA SUAVE DEL CACHE AL INICIAR
   React.useEffect(() => {
-    console.log('🚀 [Dashboard] LIMPIEZA COMPLETA FORZADA - Iniciando...')
+    console.log('🚀 [Dashboard] Iniciando con limpieza suave de cache...')
     
-    // 1. Limpiar cache del navegador
+    // 1. Limpiar cache del navegador solo si es necesario
     if ('caches' in window) {
       caches.keys().then(names => {
-        names.forEach(name => {
-          caches.delete(name)
-          console.log(`🧹 [Dashboard] Cache eliminado: ${name}`)
-        })
+        if (names.length > 0) {
+          names.forEach(name => {
+            caches.delete(name)
+            console.log(`🧹 [Dashboard] Cache eliminado: ${name}`)
+          })
+        }
       })
     }
     
-    // 2. Limpiar localStorage completamente
-    const keysToRemove = [
+    // 2. Limpiar solo localStorage de fechas antiguas
+    const currentDate = DateUtils.getCurrentLocalDate()
+    const keysToCheck = [
       'dashboard_last_load_date',
       'dashboard_last_check_date',
-      'calendar_sync_date',
-      'app_state',
-      'ventas_cache',
-      'productos_cache'
+      'calendar_sync_date'
     ]
     
-    keysToRemove.forEach(key => {
-      localStorage.removeItem(key)
-      console.log(`🧹 [Dashboard] localStorage eliminado: ${key}`)
+    keysToCheck.forEach(key => {
+      const storedDate = localStorage.getItem(key)
+      if (storedDate && storedDate !== currentDate) {
+        localStorage.removeItem(key)
+        console.log(`🧹 [Dashboard] Fecha antigua eliminada: ${key} = ${storedDate}`)
+      }
     })
     
-    // 3. Limpiar sessionStorage
-    sessionStorage.clear()
-    console.log('🧹 [Dashboard] sessionStorage limpiado')
-    
-    // 4. Forzar recarga de datos con timeout
+    // 3. Recargar datos una sola vez
     setTimeout(() => {
-      console.log('🔄 [Dashboard] Forzando recarga completa de datos...')
-      loadDashboardData(true)
-      
-      // 5. Forzar actualización del store
-      setTimeout(() => {
-        console.log('🔄 [Dashboard] Forzando actualización del store...')
-        useAppStore.setState({ 
-          ventas: [],
-          movimientos: [],
-          productos: [],
-          clientes: []
-        })
-        
-        // 6. Recargar datos nuevamente
-        setTimeout(() => {
-          loadDashboardData(true)
-        }, 1000)
-      }, 1000)
-    }, 2000)
+      console.log('🔄 [Dashboard] Recargando datos iniciales...')
+      loadDashboardData(false) // No es retry, es carga inicial
+    }, 1000)
   }, [])
 
   // DEBUGGING: Verificar fechas de ventas
@@ -516,7 +499,9 @@ export const Dashboard: React.FC = () => {
       padding: 'clamp(0.75rem, 3vw, 1rem)', 
       fontFamily: 'Inter, system-ui, sans-serif',
       backgroundColor: '#000000',
-      minHeight: '100vh'
+      minHeight: '100vh',
+      border: '3px solid blue',
+      margin: '20px'
     }}>
 
       {/* Header del Dashboard */}
