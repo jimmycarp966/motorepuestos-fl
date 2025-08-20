@@ -80,25 +80,15 @@ export const useDashboardKPIs = (): DashboardKPIs => {
         totalVentas: state.ventas.length
       })
 
-      // Filtrar ventas de hoy - SOLUCIÓN DEFINITIVA con UTC directo
+      // Filtrar ventas de hoy usando función utilitaria centralizada
       const ventasHoy = state.ventas.filter(v => {
         if (v.estado === 'eliminada') return false
         
-        // SOLUCIÓN DEFINITIVA: Comparar directamente las fechas UTC sin conversión de zona horaria
-        const fechaOriginal = v.fecha
-        const fechaParte = fechaOriginal.split('T')[0] // Obtiene solo "2025-08-19" de "2025-08-19T23:06:15+00:00"
+        const esHoy = DateUtils.isSameAsToday(v.fecha)
         
-        // Obtener la fecha de hoy en formato UTC
-        const hoy = new Date()
-        const hoyUTC = hoy.toISOString().split('T')[0] // Formato YYYY-MM-DD en UTC
-        
-        const esHoy = fechaParte === hoyUTC
-        
-        console.log(`🔍 [Dashboard KPIs] Comparando venta SOLUCIÓN DEFINITIVA:`, {
+        console.log(`🔍 [Dashboard KPIs] Comparando venta:`, {
           id: v.id,
           fechaOriginal: v.fecha,
-          fechaParte: fechaParte,
-          hoyUTC: hoyUTC,
           esHoy: esHoy,
           total: v.total
         })
@@ -118,8 +108,8 @@ export const useDashboardKPIs = (): DashboardKPIs => {
         fecha: v.fecha,
         total: v.total,
         fechaParte: v.fecha.split('T')[0],
-        hoyUTC: new Date().toISOString().split('T')[0],
-        esHoy: v.fecha.split('T')[0] === new Date().toISOString().split('T')[0],
+        hoyLocal: DateUtils.getTodayLocal(),
+        esHoy: DateUtils.isSameAsToday(v.fecha),
         estado: v.estado
       })))
       
@@ -137,21 +127,11 @@ export const useDashboardKPIs = (): DashboardKPIs => {
       const movimientosHoy = state.caja.movimientos.filter(m => {
         if (m.estado === 'eliminada') return false
         
-        // SOLUCIÓN DEFINITIVA: Comparar directamente las fechas UTC sin conversión de zona horaria
-        const fechaOriginal = m.fecha
-        const fechaParte = fechaOriginal.split('T')[0] // Obtiene solo "2025-08-19" de "2025-08-19T23:06:15+00:00"
+        const esHoy = DateUtils.isSameAsToday(m.fecha)
         
-        // Obtener la fecha de hoy en formato UTC
-        const hoy = new Date()
-        const hoyUTC = hoy.toISOString().split('T')[0] // Formato YYYY-MM-DD en UTC
-        
-        const esHoy = fechaParte === hoyUTC
-        
-        console.log(`🔍 [Dashboard KPIs] Comparando movimiento SOLUCIÓN DEFINITIVA:`, {
+        console.log(`🔍 [Dashboard KPIs] Comparando movimiento:`, {
           id: m.id,
           fechaOriginal: m.fecha,
-          fechaParte: fechaParte,
-          hoyUTC: hoyUTC,
           esHoy: esHoy,
           tipo: m.tipo,
           monto: m.monto
@@ -311,7 +291,9 @@ export const useProductosStockCritico = () => {
 export const useVentasStats = (): VentasStats => {
   return useAppStore(
     useCallback((state: AppStore) => {
-      const fechaHoy = DateUtils.getCurrentDate()
+      // Usar función utilitaria centralizada
+      const fechaHoy = DateUtils.getTodayLocal()
+      
       const inicioSemana = DateUtils.subtractDays(fechaHoy, 7)
       const inicioMes = DateUtils.subtractDays(fechaHoy, 30)
 

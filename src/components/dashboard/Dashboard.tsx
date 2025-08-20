@@ -129,8 +129,7 @@ export const Dashboard: React.FC = () => {
     console.log('🔍 [Dashboard Debug] Fecha actual:', fechaHoy)
     
     const ventasHoy = ventas.filter(v => {
-      const ventaFecha = new Date(v.fecha).toISOString().split('T')[0]
-      return ventaFecha === fechaHoy
+      return DateUtils.isSameAsToday(v.fecha)
     })
     
     console.log('🔍 [Dashboard Debug] Ventas de hoy (comparación directa):', {

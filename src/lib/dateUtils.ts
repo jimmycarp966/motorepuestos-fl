@@ -7,13 +7,10 @@ export class DateUtils {
   /**
    * Obtiene la fecha actual en formato YYYY-MM-DD
    * Usa la zona horaria local (no UTC)
+   * @deprecated Usar getCurrentLocalDate() en su lugar para mayor claridad
    */
   static getCurrentDate(): string {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = String(now.getMonth() + 1).padStart(2, '0')
-    const day = String(now.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
+    return this.getCurrentLocalDate()
   }
 
   /**
@@ -335,5 +332,32 @@ export class DateUtils {
       console.error('Error al ajustar zona horaria:', error)
       return dateString
     }
+  }
+
+  /**
+   * Compara si una fecha es igual a la fecha actual (hoy)
+   * Usa la zona horaria local para evitar problemas de UTC
+   */
+  static isSameAsToday(dateString: string): boolean {
+    try {
+      const fechaParte = dateString.split('T')[0]
+      const hoyLocal = this.getCurrentLocalDate()
+      return fechaParte === hoyLocal
+    } catch (error) {
+      console.error('Error al comparar fecha con hoy:', error)
+      return false
+    }
+  }
+
+  /**
+   * Obtiene la fecha de hoy en formato YYYY-MM-DD usando zona horaria local
+   * Función centralizada para evitar inconsistencias
+   */
+  static getTodayLocal(): string {
+    const hoy = new Date()
+    const year = hoy.getFullYear()
+    const month = String(hoy.getMonth() + 1).padStart(2, '0')
+    const day = String(hoy.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   }
 }
