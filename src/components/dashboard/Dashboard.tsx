@@ -494,14 +494,16 @@ export const Dashboard: React.FC = () => {
     }
   ]
 
-  console.log('🔍 [Dashboard] Renderizando dashboard')
+  console.log('🔍 [Dashboard] Renderizando dashboard - VERSION FINAL')
   return (
     <div style={{ 
       padding: 'clamp(0.75rem, 3vw, 1rem)', 
       fontFamily: 'Inter, system-ui, sans-serif',
-      backgroundColor: '#000000',
       minHeight: '100vh',
-      border: '5px solid blue'
+      border: '20px solid purple',
+      backgroundColor: 'orange',
+      fontSize: '24px',
+      fontWeight: 'bold'
     }}>
 
       {/* Header del Dashboard */}
