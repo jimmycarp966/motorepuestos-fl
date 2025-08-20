@@ -499,9 +499,7 @@ export const Dashboard: React.FC = () => {
       padding: 'clamp(0.75rem, 3vw, 1rem)', 
       fontFamily: 'Inter, system-ui, sans-serif',
       backgroundColor: '#000000',
-      minHeight: '100vh',
-      border: '3px solid blue',
-      margin: '20px'
+      minHeight: '100vh'
     }}>
 
       {/* Header del Dashboard */}
