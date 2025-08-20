@@ -656,12 +656,14 @@ export interface AppStore extends
   ArqueoSlice,
   CalendarioSlice,
   UISlice, 
-  NotificationsSlice,
-  FacturacionSlice {
+  NotificationsSlice {
   // Propiedades adicionales para slices que no están en el store principal
   cajaHistorial: CajaHistorialState
   
-  // Facturación actions
+  // Facturación state y actions
+  facturacion: FacturacionState
+  facturacionLoading: boolean
+  facturacionError: string | null
   fetchFacturas: (page?: number, pageSize?: number) => Promise<void>
   registrarFactura: (facturaData: CreateFacturaData) => Promise<any>
   updateFactura: (facturaId: string, updates: Partial<CreateFacturaData>) => Promise<any>

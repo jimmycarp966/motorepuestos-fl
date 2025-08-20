@@ -17,12 +17,16 @@ const initialState: FacturacionState = {
 export const facturacionSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'facturacion' | 'facturacionLoading' | 'facturacionError' | 'fetchFacturas' | 'registrarFactura' | 'updateFactura'>> = (set, get) => {
   
   return {
-    facturacion: initialState.facturas,
-    loading: initialState.loading,
-    error: initialState.error,
+    facturacion: initialState,
+    facturacionLoading: initialState.loading,
+    facturacionError: initialState.error,
 
     fetchFacturas: async (page = 1, pageSize = 50) => {
-      set((state) => ({ facturacion: { ...state.facturacion, loading: true, error: null } }))
+      set((state) => ({ 
+        facturacion: { ...state.facturacion, loading: true, error: null },
+        facturacionLoading: true,
+        facturacionError: null
+      }))
       
       try {
         const from = (page - 1) * pageSize
@@ -50,7 +54,8 @@ export const facturacionSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'fa
             ...state.facturacion, 
             facturas: data || [], 
             loading: false 
-          } 
+          },
+          facturacionLoading: false
         }))
 
         // Log de auditoría
@@ -70,7 +75,9 @@ export const facturacionSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'fa
             ...state.facturacion, 
             loading: false, 
             error: handledError.message 
-          } 
+          },
+          facturacionLoading: false,
+          facturacionError: handledError.message
         }))
 
         // Log de error
@@ -89,7 +96,11 @@ export const facturacionSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'fa
       const currentUser = get().auth.user
       if (!currentUser) throw new Error('Usuario no autenticado')
 
-      set((state) => ({ facturacion: { ...state.facturacion, loading: true, error: null } }))
+      set((state) => ({ 
+        facturacion: { ...state.facturacion, loading: true, error: null },
+        facturacionLoading: true,
+        facturacionError: null
+      }))
 
       try {
         // Validaciones de negocio
@@ -202,7 +213,9 @@ export const facturacionSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'fa
             ...state.facturacion, 
             loading: false, 
             error: handledError.message 
-          } 
+          },
+          facturacionLoading: false,
+          facturacionError: handledError.message
         }))
 
         // Log de error
@@ -232,7 +245,11 @@ export const facturacionSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'fa
       const currentUser = get().auth.user
       if (!currentUser) throw new Error('Usuario no autenticado')
 
-      set((state) => ({ facturacion: { ...state.facturacion, loading: true, error: null } }))
+      set((state) => ({ 
+        facturacion: { ...state.facturacion, loading: true, error: null },
+        facturacionLoading: true,
+        facturacionError: null
+      }))
 
       try {
         const { data, error } = await supabase
@@ -266,7 +283,9 @@ export const facturacionSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'fa
             ...state.facturacion, 
             loading: false, 
             error: handledError.message 
-          } 
+          },
+          facturacionLoading: false,
+          facturacionError: handledError.message
         }))
 
         throw handledError

@@ -252,6 +252,7 @@ function App() {
                currentModule === 'productos' ? 'Productos' :
                currentModule === 'clientes' ? 'Clientes' :
                currentModule === 'ventas' ? 'Ventas' :
+               currentModule === 'facturacion' ? 'Facturación' :
                currentModule === 'caja' ? 'Caja' :
                currentModule === 'reportes' ? 'Reportes' : 'Dashboard'}
             </div>

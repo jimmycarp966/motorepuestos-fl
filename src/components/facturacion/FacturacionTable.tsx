@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAppStore } from '../../store'
-import { useComponentShortcuts, createShortcut } from '../../hooks/useKeyboardShortcuts'
+// import { useComponentShortcuts, createShortcut } from '../../hooks/useKeyboardShortcuts'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
 import { Input } from '../ui/input'
@@ -23,7 +23,7 @@ import {
   AlertCircle,
   Download
 } from 'lucide-react'
-import { useSearchFilter } from '../../hooks/useSearchFilter'
+// import { useSearchFilter } from '../../hooks/useSearchFilter'
 
 interface CartItem {
   producto: any
@@ -34,6 +34,7 @@ interface CartItem {
 }
 
 export const FacturacionTable: React.FC = () => {
+  console.log('🔧 [FacturacionTable] Componente montado')
   
   // Estados del store
   const productos = useAppStore((state) => state.productos)
@@ -43,6 +44,12 @@ export const FacturacionTable: React.FC = () => {
   const fetchClientes = useAppStore((state) => state.fetchClientes)
   const registrarFactura = useAppStore((state) => state.registrarFactura)
   const addNotification = useAppStore((state) => state.addNotification)
+  
+  console.log('🔧 [FacturacionTable] Estados del store:', {
+    productos: productos?.productos?.length || 0,
+    clientes: clientes?.length || 0,
+    registrarFactura: typeof registrarFactura
+  })
   
   // Estados locales
   const [searchTerm, setSearchTerm] = useState('')
@@ -58,67 +65,78 @@ export const FacturacionTable: React.FC = () => {
   const [showConfig, setShowConfig] = useState(false)
 
   // Refs
-  const searchInputRef = useRef<HTMLInputElement>(null)
+  // const searchInputRef = useRef<HTMLInputElement>(null) // Comentado temporalmente para debug
 
   // Shortcuts específicos para Facturación
-  const facturacionShortcuts = [
-    createShortcut('F10', () => {
-      // Enfocar el campo de búsqueda
-      if (searchInputRef.current) {
-        searchInputRef.current.focus()
-        addNotification({
-          id: `shortcut-${Date.now()}`,
-          type: 'info',
-          title: 'Atajo F10',
-          message: 'Campo de búsqueda enfocado',
-          duration: 1500
-        })
-      }
-    }, 'Enfocar buscador de productos'),
-    
-    createShortcut('F11', () => {
-      // Finalizar facturación si hay items en el carrito
-      if (cartItems.length > 0) {
-        handleFinalizarFactura()
-        addNotification({
-          id: `shortcut-${Date.now()}`,
-          type: 'info',
-          title: 'Atajo F11',
-          message: 'Finalizando facturación...',
-          duration: 1500
-        })
-      }
-    }, 'Finalizar facturación'),
-    
-    createShortcut('F12', () => {
-      // Limpiar carrito
-      setCartItems([])
-      addNotification({
-        id: `shortcut-${Date.now()}`,
-        type: 'info',
-        title: 'Atajo F12',
-        message: 'Carrito limpiado',
-        duration: 1500
-      })
-    }, 'Limpiar carrito')
-  ]
+  // const facturacionShortcuts = [
+  //   createShortcut('F10', () => {
+  //     // Enfocar el campo de búsqueda
+  //     if (searchInputRef.current) {
+  //       searchInputRef.current.focus()
+  //       addNotification({
+  //       id: `shortcut-${Date.now()}`,
+  //       type: 'info',
+  //       title: 'Atajo F10',
+  //       message: 'Campo de búsqueda enfocado',
+  //       duration: 1500
+  //     })
+  //   }
+  // }, 'Enfocar buscador de productos'),
+  
+  //   createShortcut('F11', () => {
+  //     // Finalizar facturación si hay items en el carrito
+  //     if (cartItems.length > 0) {
+  //       handleFinalizarFactura()
+  //       addNotification({
+  //       id: `shortcut-${Date.now()}`,
+  //       type: 'info',
+  //       title: 'Atajo F11',
+  //       message: 'Finalizando facturación...',
+  //       duration: 1500
+  //     })
+  //   }
+  // }, 'Finalizar facturación'),
+  
+  //   createShortcut('F12', () => {
+  //     // Limpiar carrito
+  //     setCartItems([])
+  //     addNotification({
+  //       id: `shortcut-${Date.now()}`,
+  //       type: 'info',
+  //       title: 'Atajo F12',
+  //       message: 'Carrito limpiado',
+  //       duration: 1500
+  //     })
+  //   }, 'Limpiar carrito')
+  // ]
 
   // Registrar shortcuts
-  useComponentShortcuts(facturacionShortcuts)
+  // useComponentShortcuts(facturacionShortcuts) // Comentado temporalmente para debug
 
   // Cargar datos al montar el componente
   useEffect(() => {
+    console.log('🔧 [FacturacionTable] Cargando datos...')
     fetchProductos()
     fetchClientes()
   }, [fetchProductos, fetchClientes])
 
   // Filtrar productos basado en el término de búsqueda
-  const filteredProductos = useSearchFilter(productos.productos, searchTerm, ['nombre', 'codigo_sku'])
+  // const filteredProductos = useSearchFilter({
+  //   data: productos.productos || [],
+  //   searchTerm,
+  //   searchFields: ['nombre', 'codigo_sku']
+  // })
+  
+  const filteredProductos = productos.productos || []
+  
+  console.log('🔧 [FacturacionTable] Productos filtrados:', filteredProductos.length)
 
   // Calcular total del carrito
-  const totalCarrito = useMemo(() => {
-    return cartItems.reduce((sum, item) => sum + item.subtotal, 0)
-  }, [cartItems])
+  // const totalCarrito = useMemo(() => {
+  //   return cartItems.reduce((sum, item) => sum + item.subtotal, 0)
+  // }, [cartItems])
+  
+  const totalCarrito = cartItems.reduce((sum, item) => sum + item.subtotal, 0)
 
   // Manejar búsqueda de productos
   const handleProductSearch = (term: string) => {
@@ -271,6 +289,8 @@ export const FacturacionTable: React.FC = () => {
     }
   }
 
+  console.log('🔧 [FacturacionTable] Renderizando componente')
+  
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -294,94 +314,38 @@ export const FacturacionTable: React.FC = () => {
           </Button>
         </div>
       </div>
-
-      {/* Configuración de Facturación */}
-      <Card className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-dark-text-primary mb-2">
-              Tipo de Comprobante
-            </label>
-            <select
-              value={tipoComprobante}
-              onChange={(e) => setTipoComprobante(e.target.value as 'A' | 'B' | 'C')}
-              className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="A">Factura A (Responsable Inscripto)</option>
-              <option value="B">Factura B (Consumidor Final)</option>
-              <option value="C">Factura C (Exento)</option>
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-dark-text-primary mb-2">
-              Método de Pago
-            </label>
-            <select
-              value={metodoPago}
-              onChange={(e) => setMetodoPago(e.target.value as any)}
-              className="w-full px-3 py-2 border border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="efectivo">Efectivo</option>
-              <option value="tarjeta">Tarjeta</option>
-              <option value="transferencia">Transferencia</option>
-              <option value="cuenta_corriente">Cuenta Corriente</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-dark-text-primary mb-2">
-              Cliente
-            </label>
-            <div className="relative">
-              <Input
-                placeholder="Buscar cliente..."
-                value={searchClientTerm}
-                onChange={(e) => handleClientSearch(e.target.value)}
-                onFocus={() => setShowClientSearch(true)}
-              />
-              {showClientSearch && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-dark-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                  {clientes
-                    .filter(cliente => 
-                      cliente.nombre.toLowerCase().includes(searchClientTerm.toLowerCase()) ||
-                      cliente.email?.toLowerCase().includes(searchClientTerm.toLowerCase())
-                    )
-                    .map(cliente => (
-                      <div
-                        key={cliente.id}
-                        onClick={() => handleClientSelect(cliente)}
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                      >
-                        <div className="font-medium">{cliente.nombre}</div>
-                        {cliente.email && (
-                          <div className="text-sm text-gray-600">{cliente.email}</div>
-                        )}
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-            {selectedCliente && (
-              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-green-800">
-                    {selectedCliente.nombre}
-                  </span>
-                  <Button
-                    onClick={() => setSelectedCliente(null)}
-                    variant="ghost"
-                    size="sm"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
+      
+      {/* Contenido simplificado para debug */}
+      <div className="p-4 bg-dark-bg-secondary rounded-lg">
+        <h2 className="text-lg font-semibold text-dark-text-primary mb-4">Debug Info</h2>
+        <div className="space-y-2 text-sm text-dark-text-secondary">
+          <p>Productos cargados: {productos?.productos?.length || 0}</p>
+          <p>Clientes cargados: {clientes?.length || 0}</p>
+          <p>Items en carrito: {cartItems.length}</p>
+          <p>Total carrito: ${totalCarrito}</p>
+          <p>Cliente seleccionado: {selectedCliente?.nombre || 'Ninguno'}</p>
         </div>
-      </Card>
-
+      </div>
+      
+      {/* Botón de prueba */}
+      <div className="p-4 bg-dark-bg-secondary rounded-lg">
+        <Button
+          onClick={() => {
+            console.log('🔧 [FacturacionTable] Botón de prueba clickeado')
+            addNotification({
+              id: `test-${Date.now()}`,
+              type: 'info',
+              title: 'Prueba',
+              message: 'El componente está funcionando correctamente',
+              duration: 3000
+            })
+          }}
+          className="w-full"
+        >
+          Probar Componente
+        </Button>
+      </div>
+      
       {/* Búsqueda de Productos */}
       <Card className="p-4">
         <div className="relative">
