@@ -79,9 +79,11 @@ function App() {
   // Establecer el primer módulo disponible cuando el usuario se autentica
   useEffect(() => {
     if (user && currentModule === 'dashboard') {
-      const firstAvailableModule = permissions.getFirstAvailableModule()
-      if (firstAvailableModule !== 'dashboard') {
-        console.log(`🔄 [App] Redirigiendo a primer módulo disponible: ${firstAvailableModule}`)
+      // Verificar si el usuario puede acceder al dashboard
+      const canAccessDashboard = permissions.canAccess('dashboard')
+      if (!canAccessDashboard) {
+        const firstAvailableModule = permissions.getFirstAvailableModule()
+        console.log(`🔄 [App] Usuario no puede acceder al dashboard, redirigiendo a: ${firstAvailableModule}`)
         setCurrentModule(firstAvailableModule)
       }
     }
