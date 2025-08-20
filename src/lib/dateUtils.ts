@@ -110,6 +110,14 @@ export class DateUtils {
       dateStr = `${year}-${month}-${day}`
     }
     
+    // LOG DE DEBUGGING
+    console.log(`🔍 [DateUtils.isToday] Comparando:`, {
+      fechaEntrada: date,
+      fechaEntradaFormateada: dateStr,
+      fechaActual: today,
+      esHoy: dateStr === today
+    })
+    
     return dateStr === today
   }
 
@@ -246,7 +254,16 @@ export class DateUtils {
     const year = now.getFullYear()
     const month = String(now.getMonth() + 1).padStart(2, '0')
     const day = String(now.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
+    const result = `${year}-${month}-${day}`
+    
+    // LOG DE DEBUGGING
+    console.log(`🔍 [DateUtils.getCurrentLocalDate] Fecha actual:`, {
+      fechaCompleta: now.toISOString(),
+      fechaLocal: result,
+      timestamp: now.getTime()
+    })
+    
+    return result
   }
 
   /**

@@ -73,10 +73,32 @@ export const useDashboardKPIs = (): DashboardKPIs => {
       const unaSemanaPasada = DateUtils.subtractDays(fechaHoy, 7)
       const unMesPasado = DateUtils.subtractDays(fechaHoy, 30)
 
+      console.log(`🔍 [Dashboard KPIs] Fechas calculadas:`, {
+        fechaHoy,
+        unaSemanaPasada,
+        unMesPasado,
+        totalVentas: state.ventas.length
+      })
+
       // Filtrar ventas de hoy - usar DateUtils.isToday para comparación correcta
       const ventasHoy = state.ventas.filter(v => {
         if (v.estado === 'eliminada') return false
-        return DateUtils.isToday(v.fecha)
+        const esHoy = DateUtils.isToday(v.fecha)
+        if (esHoy) {
+          console.log(`✅ [Dashboard KPIs] Venta de hoy encontrada:`, {
+            id: v.id,
+            fecha: v.fecha,
+            total: v.total,
+            concepto: v.concepto
+          })
+        }
+        return esHoy
+      })
+      
+      console.log(`🔍 [Dashboard KPIs] Ventas de hoy:`, {
+        cantidad: ventasHoy.length,
+        total: ventasHoy.reduce((sum, v) => sum + v.total, 0),
+        ventas: ventasHoy.map(v => ({ id: v.id, fecha: v.fecha, total: v.total }))
       })
       
       // Filtrar ventas de la semana (excluyendo eliminadas)
@@ -104,7 +126,7 @@ export const useDashboardKPIs = (): DashboardKPIs => {
         p.activo && p.stock <= p.stock_minimo && p.stock > 0
       ).length
 
-      return {
+      const result = {
         totalVentasHoy: ventasHoy.reduce((sum, v) => sum + v.total, 0),
         cantidadVentasHoy: ventasHoy.length,
         saldoCaja,
@@ -114,6 +136,10 @@ export const useDashboardKPIs = (): DashboardKPIs => {
         ventasSemanaPasada: ventasSemanaPasada.reduce((sum, v) => sum + v.total, 0),
         ingresosMes: ventasMes.reduce((sum, v) => sum + v.total, 0)
       }
+
+      console.log(`🔍 [Dashboard KPIs] Resultado final:`, result)
+      
+      return result
     }, [calendarSync.currentDate]),
     shallow
   )

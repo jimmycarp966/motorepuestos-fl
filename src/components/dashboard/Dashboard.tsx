@@ -96,6 +96,37 @@ export const Dashboard: React.FC = () => {
     }, 1000)
   }, [])
 
+  // DEBUGGING: Verificar fechas de ventas
+  React.useEffect(() => {
+    const ventas = useAppStore.getState().ventas
+    console.log('🔍 [Dashboard Debug] Todas las ventas:', ventas.map(v => ({
+      id: v.id,
+      fecha: v.fecha,
+      fechaFormateada: new Date(v.fecha).toLocaleDateString('es-ES'),
+      total: v.total,
+      concepto: v.concepto
+    })))
+    
+    const fechaHoy = DateUtils.getCurrentLocalDate()
+    console.log('🔍 [Dashboard Debug] Fecha actual:', fechaHoy)
+    
+    const ventasHoy = ventas.filter(v => {
+      const ventaFecha = new Date(v.fecha).toISOString().split('T')[0]
+      return ventaFecha === fechaHoy
+    })
+    
+    console.log('🔍 [Dashboard Debug] Ventas de hoy (comparación directa):', {
+      cantidad: ventasHoy.length,
+      total: ventasHoy.reduce((sum, v) => sum + v.total, 0),
+      ventas: ventasHoy.map(v => ({
+        id: v.id,
+        fecha: v.fecha,
+        fechaFormateada: new Date(v.fecha).toLocaleDateString('es-ES'),
+        total: v.total
+      }))
+    })
+  }, [])
+
   // Usar selectores optimizados con validaciones
   const kpis = useDashboardKPIs()
   const ventasRecientes = useVentasRecientes(5)
