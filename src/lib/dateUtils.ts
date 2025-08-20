@@ -339,24 +339,35 @@ export class DateUtils {
 
   /**
    * Compara si una fecha es igual a la fecha actual (hoy)
-   * Usa la zona horaria local para evitar problemas de UTC
+   * Convierte la fecha UTC a zona horaria local antes de comparar
    */
   static isSameAsToday(dateString: string): boolean {
     try {
-      const fechaParte = dateString.split('T')[0]
+      // Convertir la fecha UTC a zona horaria local
+      const fechaUTC = new Date(dateString)
+      const fechaLocal = new Date(fechaUTC.getTime() - (fechaUTC.getTimezoneOffset() * 60000))
+      
+      // Extraer solo la parte de fecha (YYYY-MM-DD)
+      const year = fechaLocal.getFullYear()
+      const month = String(fechaLocal.getMonth() + 1).padStart(2, '0')
+      const day = String(fechaLocal.getDate()).padStart(2, '0')
+      const fechaParteLocal = `${year}-${month}-${day}`
+      
       const hoyLocal = this.getCurrentLocalDate()
       
       // LOG DETALLADO PARA DEBUGGING
       console.log(`🔍 [DateUtils.isSameAsToday] DEBUG DETALLADO:`, {
         fechaEntrada: dateString,
-        fechaParte: fechaParte,
+        fechaUTC: fechaUTC.toISOString(),
+        fechaLocal: fechaLocal.toISOString(),
+        fechaParteLocal: fechaParteLocal,
         hoyLocal: hoyLocal,
-        esHoy: fechaParte === hoyLocal,
-        timestamp: new Date().getTime(),
-        fechaCompleta: new Date().toISOString()
+        esHoy: fechaParteLocal === hoyLocal,
+        timezoneOffset: fechaUTC.getTimezoneOffset(),
+        timestamp: new Date().getTime()
       })
       
-      return fechaParte === hoyLocal
+      return fechaParteLocal === hoyLocal
     } catch (error) {
       console.error('Error al comparar fecha con hoy:', error)
       return false
