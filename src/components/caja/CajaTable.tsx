@@ -221,28 +221,24 @@ export const CajaTable: React.FC = () => {
   const movimientosHoy = movimientos.filter(m => {
     if (m.estado === 'eliminada') return false
     
-    // CORRECCIÓN: Usar la fecha original directamente sin conversión de zona horaria
-    const movimientoDate = new Date(m.fecha)
+    // SOLUCIÓN DEFINITIVA: Comparar directamente las fechas UTC sin conversión de zona horaria
+    const fechaOriginal = m.fecha
+    const fechaParte = fechaOriginal.split('T')[0] // Obtiene solo "2025-08-19" de "2025-08-19T23:06:15+00:00"
     
-    // Obtener la fecha local en formato YYYY-MM-DD usando la zona horaria local
-    const year = movimientoDate.getFullYear()
-    const month = String(movimientoDate.getMonth() + 1).padStart(2, '0')
-    const day = String(movimientoDate.getDate()).padStart(2, '0')
-    const movimientoFechaLocal = `${year}-${month}-${day}`
+    // Obtener la fecha de hoy en formato UTC
+    const hoy = new Date()
+    const hoyUTC = hoy.toISOString().split('T')[0] // Formato YYYY-MM-DD en UTC
     
-    const esHoy = movimientoFechaLocal === fechaHoy
+    const esHoy = fechaParte === hoyUTC
     
-    console.log(`🔍 [CajaTable] Comparando movimiento CORREGIDO:`, {
+    console.log(`🔍 [CajaTable] Comparando movimiento SOLUCIÓN DEFINITIVA:`, {
       id: m.id,
       fechaOriginal: m.fecha,
-      fechaLocal: movimientoFechaLocal,
-      fechaHoy: fechaHoy,
+      fechaParte: fechaParte,
+      hoyUTC: hoyUTC,
       esHoy: esHoy,
       tipo: m.tipo,
-      monto: m.monto,
-      year: year,
-      month: month,
-      day: day
+      monto: m.monto
     })
     
     return esHoy
@@ -265,35 +261,25 @@ export const CajaTable: React.FC = () => {
       return false
     }
     
-    // CORRECCIÓN: Usar la fecha original directamente sin conversión de zona horaria
-    // Las fechas ya vienen en formato ISO y necesitamos comparar la fecha local real
-    const ventaDate = new Date(v.fecha)
+    // SOLUCIÓN DEFINITIVA: Comparar directamente las fechas UTC sin conversión de zona horaria
+    // Extraer solo la fecha (YYYY-MM-DD) de la fecha ISO original
+    const fechaOriginal = v.fecha
+    const fechaParte = fechaOriginal.split('T')[0] // Obtiene solo "2025-08-19" de "2025-08-19T23:06:15+00:00"
     
-    // Obtener la fecha local en formato YYYY-MM-DD usando la zona horaria local
-    const year = ventaDate.getFullYear()
-    const month = String(ventaDate.getMonth() + 1).padStart(2, '0')
-    const day = String(ventaDate.getDate()).padStart(2, '0')
-    const ventaFechaLocal = `${year}-${month}-${day}`
+    // Obtener la fecha de hoy en formato UTC
+    const hoy = new Date()
+    const hoyUTC = hoy.toISOString().split('T')[0] // Formato YYYY-MM-DD en UTC
     
-    // Debug adicional para zona horaria
-    const ventaISO = ventaDate.toISOString()
-    const ventaLocalString = ventaDate.toString()
+    const esHoy = fechaParte === hoyUTC
     
-    const esHoy = ventaFechaLocal === fechaHoy
-    
-    console.log(`🔍 [CajaTable] Comparando venta CORREGIDA:`, {
+    console.log(`🔍 [CajaTable] Comparando venta SOLUCIÓN DEFINITIVA:`, {
       id: v.id,
       fechaOriginal: v.fecha,
-      fechaISO: ventaISO,
-      fechaLocalString: ventaLocalString,
-      fechaLocal: ventaFechaLocal,
-      fechaHoy: fechaHoy,
+      fechaParte: fechaParte,
+      hoyUTC: hoyUTC,
       esHoy: esHoy,
       total: v.total,
-      metodoPago: v.metodo_pago,
-      year: year,
-      month: month,
-      day: day
+      metodoPago: v.metodo_pago
     })
     
     return esHoy
