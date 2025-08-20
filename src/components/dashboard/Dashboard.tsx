@@ -89,6 +89,21 @@ export const Dashboard: React.FC = () => {
       })
     }
     
+    // Limpiar localStorage de fechas antiguas
+    const currentDate = DateUtils.getCurrentLocalDate()
+    const lastLoadDate = localStorage.getItem('dashboard_last_load_date')
+    const lastCheckDate = localStorage.getItem('dashboard_last_check_date')
+    
+    if (lastLoadDate && lastLoadDate !== currentDate) {
+      localStorage.removeItem('dashboard_last_load_date')
+      console.log(`🧹 [Dashboard] Limpiando fecha antigua del localStorage: ${lastLoadDate}`)
+    }
+    
+    if (lastCheckDate && lastCheckDate !== currentDate) {
+      localStorage.removeItem('dashboard_last_check_date')
+      console.log(`🧹 [Dashboard] Limpiando fecha antigua del localStorage: ${lastCheckDate}`)
+    }
+    
     // Forzar recarga de datos
     setTimeout(() => {
       console.log('🔄 [Dashboard] Forzando recarga inicial de datos')
@@ -924,6 +939,32 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Botón de debug para desarrollo */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mb-4 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-yellow-600 font-semibold mb-2">🔧 Debug Panel</h3>
+              <p className="text-sm text-yellow-700 mb-2">
+                Fecha actual: {DateUtils.getCurrentLocalDate()}
+              </p>
+              <p className="text-sm text-yellow-700">
+                Usuario: {user?.nombre} ({user?.rol})
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                console.log('🔄 [Debug] Forzando recarga manual')
+                loadDashboardData(true)
+              }}
+              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+            >
+              🔄 Recargar Datos
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
