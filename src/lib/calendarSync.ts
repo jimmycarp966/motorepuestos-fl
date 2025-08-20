@@ -47,10 +47,10 @@ export class CalendarSyncManager {
 
   // Monitorear cambios de día
   private startMonitoring() {
-    // Verificar cada minuto si cambió el día
+    // Verificar cada 30 segundos si cambió el día (más frecuente para mayor precisión)
     this.intervalId = setInterval(() => {
       this.checkDayChange()
-    }, 60000) // 1 minuto
+    }, 30000) // 30 segundos
 
     // También verificar cuando la ventana se vuelve activa
     if (typeof window !== 'undefined') {
@@ -60,6 +60,13 @@ export class CalendarSyncManager {
 
       window.addEventListener('online', () => {
         this.checkDayChange()
+      })
+
+      // Verificar cuando el usuario regresa a la pestaña
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          this.checkDayChange()
+        }
       })
     }
   }

@@ -57,6 +57,24 @@ const formatearVentaParaMostrar = (venta: any) => {
 }
 
 export const Dashboard: React.FC = () => {
+  // Limpiar localStorage de fechas antiguas al iniciar
+  React.useEffect(() => {
+    const currentDate = DateUtils.getCurrentLocalDate()
+    const lastLoadDate = localStorage.getItem('dashboard_last_load_date')
+    const lastCheckDate = localStorage.getItem('dashboard_last_check_date')
+    
+    // Si las fechas guardadas no coinciden con la fecha actual, limpiarlas
+    if (lastLoadDate && lastLoadDate !== currentDate) {
+      localStorage.removeItem('dashboard_last_load_date')
+      console.log(`🧹 [Dashboard] Limpiando fecha antigua del localStorage: ${lastLoadDate}`)
+    }
+    
+    if (lastCheckDate && lastCheckDate !== currentDate) {
+      localStorage.removeItem('dashboard_last_check_date')
+      console.log(`🧹 [Dashboard] Limpiando fecha de verificación antigua: ${lastCheckDate}`)
+    }
+  }, [])
+
   // Usar selectores optimizados con validaciones
   const kpis = useDashboardKPIs()
   const ventasRecientes = useVentasRecientes(5)
@@ -98,6 +116,34 @@ export const Dashboard: React.FC = () => {
 
   // Función para cargar datos con manejo de errores mejorado
   const loadDashboardData = React.useCallback(async (isRetry = false) => {
+    // Verificar si cambió el día y forzar actualización
+    const currentDate = DateUtils.getCurrentLocalDate()
+    const lastLoadDate = localStorage.getItem('dashboard_last_load_date')
+    
+    if (lastLoadDate !== currentDate) {
+      console.log(`🔄 [Dashboard] Cambio de día detectado: ${lastLoadDate} → ${currentDate}`)
+      localStorage.setItem('dashboard_last_load_date', currentDate)
+      
+      // Forzar refresco completo de datos
+      try {
+        await Promise.all([
+          fetchVentas(),
+          fetchProductos(),
+          fetchClientes(),
+          fetchMovimientos()
+        ])
+        
+        addNotification({
+          id: `day-change-${Date.now()}`,
+          type: 'info',
+          title: 'Nuevo Día',
+          message: `Dashboard actualizado para ${currentDate}`,
+          duration: 3000
+        })
+      } catch (error) {
+        console.error('Error al actualizar datos del nuevo día:', error)
+      }
+    }
     try {
       if (!isRetry) {
         console.log('🔄 [Dashboard] Cargando datos...')
@@ -155,6 +201,35 @@ export const Dashboard: React.FC = () => {
 
   useEffect(() => {
     loadDashboardData()
+  }, [loadDashboardData])
+
+  // Monitorear cambios de día
+  useEffect(() => {
+    const checkDayChange = () => {
+      const currentDate = DateUtils.getCurrentLocalDate()
+      const lastCheckDate = localStorage.getItem('dashboard_last_check_date')
+      
+      if (lastCheckDate !== currentDate) {
+        console.log(`🔄 [Dashboard] Cambio de día detectado en monitoreo: ${lastCheckDate} → ${currentDate}`)
+        localStorage.setItem('dashboard_last_check_date', currentDate)
+        loadDashboardData(true)
+      }
+    }
+
+    // Verificar cada minuto si cambió el día
+    const intervalId = setInterval(checkDayChange, 60000)
+    
+    // Verificar cuando la ventana se vuelve activa
+    const handleFocus = () => {
+      checkDayChange()
+    }
+    
+    window.addEventListener('focus', handleFocus)
+    
+    return () => {
+      clearInterval(intervalId)
+      window.removeEventListener('focus', handleFocus)
+    }
   }, [loadDashboardData])
 
   // Sistema de retry automático

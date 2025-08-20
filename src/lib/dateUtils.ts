@@ -93,9 +93,10 @@ export class DateUtils {
 
   /**
    * Verifica si una fecha es hoy
+   * Maneja correctamente las zonas horarias y fechas en diferentes formatos
    */
   static isToday(date: string | Date): boolean {
-    const today = this.getCurrentDate()
+    const today = this.getCurrentLocalDate()
     let dateStr: string
     
     if (typeof date === 'string') {
