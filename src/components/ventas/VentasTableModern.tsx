@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useAppStore } from '../../store'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
@@ -57,6 +57,7 @@ export const VentasTableModern: React.FC = () => {
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1)
 
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const suggestionsContainerRef = useRef<HTMLDivElement>(null)
 
   // Cargar datos
   useEffect(() => {
@@ -96,12 +97,16 @@ export const VentasTableModern: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [cartItems.length])
 
-  // Filtrar productos
-  const filteredProductos = useSearchFilter({
-    data: productos || [],
-    searchTerm,
-    searchFields: ['nombre', 'codigo_sku', 'categoria', 'descripcion'],
-    searchFunction: (producto, term) => {
+  // Filtrar productos con priorización de códigos exactos
+  const filteredProductos = useMemo(() => {
+    if (!productos || !searchTerm.trim()) {
+      return productos.filter(p => selectedCategory === 'todas' || p.categoria === selectedCategory).slice(0, 6)
+    }
+
+    const term = searchTerm.toLowerCase().trim()
+    
+    // Filtrar productos que coincidan con el término de búsqueda y categoría
+    const matchingProductos = productos.filter(producto => {
       const matchesSearch = 
         producto.nombre.toLowerCase().includes(term) ||
         producto.codigo_sku.toLowerCase().includes(term) ||
@@ -111,8 +116,42 @@ export const VentasTableModern: React.FC = () => {
       const matchesCategory = selectedCategory === 'todas' || producto.categoria === selectedCategory
       
       return matchesSearch && matchesCategory
-    }
-  })
+    })
+
+    // Ordenar por prioridad: códigos exactos primero, luego coincidencias parciales
+    const sortedProductos = matchingProductos.sort((a, b) => {
+      const aCodeExact = a.codigo_sku.toLowerCase() === term
+      const bCodeExact = b.codigo_sku.toLowerCase() === term
+      
+      // Si ambos son códigos exactos, mantener orden original
+      if (aCodeExact && bCodeExact) return 0
+      
+      // Si solo uno es código exacto, priorizarlo
+      if (aCodeExact && !bCodeExact) return -1
+      if (!aCodeExact && bCodeExact) return 1
+      
+      // Si ninguno es código exacto, priorizar coincidencias en código sobre nombre
+      const aCodeStarts = a.codigo_sku.toLowerCase().startsWith(term)
+      const bCodeStarts = b.codigo_sku.toLowerCase().startsWith(term)
+      
+      if (aCodeStarts && !bCodeStarts) return -1
+      if (!aCodeStarts && bCodeStarts) return 1
+      
+      // Si ambos empiezan con el código, mantener orden original
+      if (aCodeStarts && bCodeStarts) return 0
+      
+      // Para el resto, priorizar coincidencias en nombre
+      const aNameStarts = a.nombre.toLowerCase().startsWith(term)
+      const bNameStarts = b.nombre.toLowerCase().startsWith(term)
+      
+      if (aNameStarts && !bNameStarts) return -1
+      if (!aNameStarts && bNameStarts) return 1
+      
+      return 0
+    })
+
+    return sortedProductos.slice(0, 6) // Mostrar 6 resultados
+  }, [productos, searchTerm, selectedCategory])
 
   // Obtener categorías únicas
   const categorias = ['todas', ...Array.from(new Set(productos?.map(p => p.categoria) || []))]
@@ -161,6 +200,30 @@ export const VentasTableModern: React.FC = () => {
     }, 100)
   }
 
+  // Función para hacer scroll al elemento seleccionado
+  const scrollToSelected = (index: number) => {
+    if (suggestionsContainerRef.current) {
+      const container = suggestionsContainerRef.current
+      const items = container.querySelectorAll('[data-suggestion-index]')
+      const selectedItem = items[index] as HTMLElement
+      
+      if (selectedItem) {
+        const containerRect = container.getBoundingClientRect()
+        const itemRect = selectedItem.getBoundingClientRect()
+        
+        // Calcular si el elemento está fuera de la vista
+        const isAbove = itemRect.top < containerRect.top
+        const isBelow = itemRect.bottom > containerRect.bottom
+        
+        if (isAbove) {
+          container.scrollTop -= (containerRect.top - itemRect.top) + 10
+        } else if (isBelow) {
+          container.scrollTop += (itemRect.bottom - containerRect.bottom) + 10
+        }
+      }
+    }
+  }
+
   // Manejar teclas en el buscador
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -172,12 +235,18 @@ export const VentasTableModern: React.FC = () => {
       }
     } else if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setSelectedSuggestionIndex(prev => 
-        prev < filteredProductos.length - 1 ? prev + 1 : prev
-      )
+      const newIndex = selectedSuggestionIndex < filteredProductos.length - 1 ? selectedSuggestionIndex + 1 : selectedSuggestionIndex
+      setSelectedSuggestionIndex(newIndex)
+      if (newIndex !== selectedSuggestionIndex) {
+        scrollToSelected(newIndex)
+      }
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
-      setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1)
+      const newIndex = selectedSuggestionIndex > 0 ? selectedSuggestionIndex - 1 : -1
+      setSelectedSuggestionIndex(newIndex)
+      if (newIndex !== selectedSuggestionIndex && newIndex >= 0) {
+        scrollToSelected(newIndex)
+      }
     } else if (e.key === 'Escape') {
       setShowSuggestions(false)
       setSelectedSuggestionIndex(-1)
@@ -332,14 +401,18 @@ export const VentasTableModern: React.FC = () => {
               
               {/* Dropdown de sugerencias */}
               {showSuggestions && searchTerm.length > 0 && filteredProductos.length > 0 && (
-                <div className="absolute top-full left-0 right-0 bg-dark-bg-tertiary border border-dark-border rounded-lg shadow-dark-lg z-50 max-h-64 overflow-y-auto mt-1">
-                  {filteredProductos.slice(0, 8).map((producto, index) => {
+                <div 
+                  ref={suggestionsContainerRef}
+                  className="absolute top-full left-0 right-0 bg-dark-bg-tertiary border border-dark-border rounded-lg shadow-dark-lg z-50 max-h-64 overflow-y-auto mt-1"
+                >
+                  {filteredProductos.map((producto, index) => {
                     const precio = tipoPrecio === 'mayorista' ? producto.precio_mayorista : producto.precio_minorista
                     const enCarrito = cartItems.find(item => item.producto.id === producto.id)
                     
                     return (
                       <div
                         key={producto.id}
+                        data-suggestion-index={index}
                         className={`p-3 cursor-pointer border-b border-dark-border last:border-b-0 hover:bg-dark-bg-secondary transition-colors ${
                           index === selectedSuggestionIndex ? 'bg-primary-500/20 border-primary-500/30' : ''
                         }`}
@@ -352,7 +425,19 @@ export const VentasTableModern: React.FC = () => {
                             </div>
                             <div>
                               <div className="font-medium text-dark-text-primary">{producto.nombre}</div>
-                              <div className="text-sm text-dark-text-secondary">{producto.codigo_sku} • {producto.categoria}</div>
+                              <div className="flex items-center gap-1 text-sm">
+                                <span className={`${
+                                  producto.codigo_sku.toLowerCase() === searchTerm.toLowerCase().trim() 
+                                    ? 'text-green-600 font-semibold' 
+                                    : 'text-dark-text-secondary'
+                                }`}>
+                                  {producto.codigo_sku}
+                                </span>
+                                {producto.codigo_sku.toLowerCase() === searchTerm.toLowerCase().trim() && (
+                                  <span className="text-xs text-green-600">✓</span>
+                                )}
+                                <span className="text-dark-text-secondary">• {producto.categoria}</span>
+                              </div>
                             </div>
                           </div>
                           <div className="text-right">

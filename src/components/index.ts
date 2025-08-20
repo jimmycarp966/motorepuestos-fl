@@ -26,6 +26,7 @@ export { CajaTable } from './caja/CajaTable'
 export { MovimientoForm } from './caja/MovimientoForm'
 export { AbrirCajaForm } from './caja/AbrirCajaForm'
 export { GastosForm } from './caja/GastosForm'
+export { EditarProductosVentaModal } from './caja/EditarProductosVentaModal'
 
 // Reportes
 export { default as ReportesTable } from './reportes/ReportesTable';

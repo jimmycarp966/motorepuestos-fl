@@ -14,7 +14,7 @@ const initialState: VentasState = {
   error: null,
 }
 
-export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas' | 'ventasLoading' | 'ventasError' | 'fetchVentas' | 'registrarVenta'>> = (set, get) => {
+export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas' | 'ventasLoading' | 'ventasError' | 'fetchVentas' | 'registrarVenta' | 'updateVenta'>> = (set, get) => {
   
   return {
     ventas: initialState.ventas,
@@ -311,6 +311,72 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
            }
          )
        }
-     )
+     ),
+
+     updateVenta: async (ventaId: string, ventaActualizada: any) => {
+       set((state) => ({ loading: true, error: null }))
+       
+       try {
+         // Actualizar la venta principal
+         const { error: errorVenta } = await supabase
+           .from('ventas')
+           .update({
+             total: ventaActualizada.total,
+             updated_at: DateUtils.getCurrentLocalDateTime()
+           })
+           .eq('id', ventaId)
+
+         if (errorVenta) throw errorVenta
+
+         // Eliminar items existentes
+         const { error: errorDeleteItems } = await supabase
+           .from('venta_items')
+           .delete()
+           .eq('venta_id', ventaId)
+
+         if (errorDeleteItems) throw errorDeleteItems
+
+         // Insertar nuevos items
+         if (ventaActualizada.items && ventaActualizada.items.length > 0) {
+           const itemsToInsert = ventaActualizada.items.map((item: any) => ({
+             venta_id: ventaId,
+             producto_id: item.producto.id,
+             cantidad: item.cantidad,
+             precio_unitario: item.precio_unitario,
+             subtotal: item.subtotal,
+             tipo_precio: item.tipo_precio
+           }))
+
+           const { error: errorInsertItems } = await supabase
+             .from('venta_items')
+             .insert(itemsToInsert)
+
+           if (errorInsertItems) throw errorInsertItems
+         }
+
+         // Actualizar estado local
+         set((state) => ({
+           ventas: state.ventas.map(v => 
+             v.id === ventaId 
+               ? { ...v, ...ventaActualizada }
+               : v
+           ),
+           loading: false,
+           error: null
+         }))
+
+         // Actualizar movimiento de caja relacionado
+         get().fetchMovimientos?.()
+
+         return true
+       } catch (error: any) {
+         console.error('❌ [VentasSlice] Error en updateVenta:', error)
+         set((state) => ({ 
+           loading: false, 
+           error: error.message || 'Error desconocido al actualizar venta'
+         }))
+         throw error
+       }
+     }
   }
 }

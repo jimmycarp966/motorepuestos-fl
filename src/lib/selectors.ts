@@ -73,20 +73,26 @@ export const useDashboardKPIs = (): DashboardKPIs => {
       const unaSemanaPasada = DateUtils.subtractDays(fechaHoy, 7)
       const unMesPasado = DateUtils.subtractDays(fechaHoy, 30)
 
-      // Filtrar ventas de hoy - asegurar que funcione con fechas completas
+      // Filtrar ventas de hoy - asegurar que funcione con fechas completas (excluyendo eliminadas)
       const ventasHoy = state.ventas.filter(v => {
+        if (v.estado === 'eliminada') return false
         const ventaFecha = typeof v.fecha === 'string' ? v.fecha.split('T')[0] : v.fecha
         return ventaFecha === fechaHoy
       })
       
-      // Filtrar ventas de la semana
-      const ventasSemanaPasada = state.ventas.filter(v => v.fecha >= unaSemanaPasada)
+      // Filtrar ventas de la semana (excluyendo eliminadas)
+      const ventasSemanaPasada = state.ventas.filter(v => 
+        v.estado !== 'eliminada' && v.fecha >= unaSemanaPasada
+      )
       
-      // Filtrar ventas del mes
-      const ventasMes = state.ventas.filter(v => v.fecha >= unMesPasado)
+      // Filtrar ventas del mes (excluyendo eliminadas)
+      const ventasMes = state.ventas.filter(v => 
+        v.estado !== 'eliminada' && v.fecha >= unMesPasado
+      )
 
-      // Calcular saldo de caja - solo movimientos del día actual
+      // Calcular saldo de caja - solo movimientos del día actual (excluyendo eliminados)
       const movimientosHoy = state.caja.movimientos.filter(m => {
+        if (m.estado === 'eliminada') return false
         const movimientoFecha = typeof m.fecha === 'string' ? m.fecha.split('T')[0] : m.fecha
         return movimientoFecha === fechaHoy
       })

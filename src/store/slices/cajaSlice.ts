@@ -30,14 +30,16 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
         .order('created_at', { ascending: false })
       if (error) throw error
 
-      // Calcular saldo
+      // Calcular saldo (excluyendo movimientos eliminados)
       const saldo = data?.reduce((acc, mov) => {
+        if (mov.estado === 'eliminada') return acc
         return mov.tipo === 'ingreso' ? acc + mov.monto : acc - mov.monto
       }, 0) || 0
 
-      // Determinar si la caja está abierta (si hay movimientos hoy)
+      // Determinar si la caja está abierta (si hay movimientos hoy, excluyendo eliminados)
       const fechaHoy = DateUtils.getCurrentLocalDate()
       const movimientosHoy = data?.filter(m => {
+        if (m.estado === 'eliminada') return false
         const movimientoFecha = typeof m.fecha === 'string' ? m.fecha.split('T')[0] : m.fecha
         return movimientoFecha === fechaHoy
       }) || []
@@ -423,9 +425,13 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
     }
 
     try {
+      // Marcar como eliminado en lugar de borrar
       const { error } = await supabase
         .from('movimientos_caja')
-        .delete()
+        .update({
+          estado: 'eliminada',
+          updated_at: DateUtils.getCurrentLocalDateTime()
+        })
         .eq('id', movimientoId)
 
       if (error) throw error
@@ -434,9 +440,33 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
       set((state) => ({
         caja: {
           ...state.caja,
-          movimientos: state.caja.movimientos.filter(mov => mov.id !== movimientoId)
+          movimientos: state.caja.movimientos.map(mov => 
+            mov.id === movimientoId 
+              ? { ...mov, estado: 'eliminada' }
+              : mov
+          )
         }
       }))
+
+      // Si es una venta, también marcar la venta como eliminada
+      const movimiento = get().caja.movimientos.find(m => m.id === movimientoId)
+      if (movimiento && movimiento.concepto.toLowerCase().includes('venta')) {
+        const ventaMatch = movimiento.concepto.match(/venta\s*#?([a-f0-9-]+)/i)
+        if (ventaMatch) {
+          const ventaId = ventaMatch[1]
+          try {
+            await supabase
+              .from('ventas')
+              .update({
+                estado: 'eliminada',
+                updated_at: DateUtils.getCurrentLocalDateTime()
+              })
+              .eq('id', ventaId)
+          } catch (ventaError) {
+            console.warn('Error al marcar venta como eliminada:', ventaError)
+          }
+        }
+      }
 
       return true
     } catch (error: any) {

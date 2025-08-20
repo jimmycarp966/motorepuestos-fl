@@ -485,6 +485,7 @@ export interface VentasSlice {
   error: string | null
   fetchVentas: () => Promise<void>
   registrarVenta: (data: CreateVentaData) => Promise<void>
+  updateVenta: (ventaId: string, ventaActualizada: any) => Promise<boolean>
 }
 
 export interface ClientesSlice {

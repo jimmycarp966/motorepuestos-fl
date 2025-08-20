@@ -658,7 +658,9 @@ export const CajaTable: React.FC = () => {
                   const icono = detalles ? obtenerIconoMovimiento(detalles) : '💰'
                   
                   return (
-                    <tr key={movimiento.id} className="hover:bg-dark-bg-tertiary">
+                    <tr key={movimiento.id} className={`hover:bg-dark-bg-tertiary ${
+                      movimiento.estado === 'eliminada' ? 'opacity-50' : ''
+                    }`}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                         <div className="flex items-center">
                           <Calendar className="w-4 h-4 mr-2 text-dark-text-secondary" />
@@ -666,23 +668,30 @@ export const CajaTable: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          movimiento.tipo === 'ingreso' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {movimiento.tipo === 'ingreso' ? (
-                            <TrendingUp className="w-3 h-3 mr-1" />
-                          ) : (
-                            <TrendingDown className="w-3 h-3 mr-1" />
+                        <div className="flex items-center space-x-2">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            movimiento.tipo === 'ingreso' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {movimiento.tipo === 'ingreso' ? (
+                              <TrendingUp className="w-3 h-3 mr-1" />
+                            ) : (
+                              <TrendingDown className="w-3 h-3 mr-1" />
+                            )}
+                            {movimiento.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}
+                          </span>
+                          {movimiento.estado === 'eliminada' && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                              Eliminada
+                            </span>
                           )}
-                          {movimiento.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}
-                        </span>
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-dark-text-primary">
                         <div className="flex items-center">
                           <span className="mr-2 text-lg">{icono}</span>
-                          <div>
+                          <div className={movimiento.estado === 'eliminada' ? 'line-through' : ''}>
                             <div className="font-medium">{detallesFormateados}</div>
                             {detalles?.detalles?.tipo === 'venta' && detalles.detalles.items && detalles.detalles.items.length > 3 && (
                               <div className="text-xs text-dark-text-secondary mt-1">
@@ -693,7 +702,9 @@ export const CajaTable: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <span className={movimiento.tipo === 'ingreso' ? 'text-green-600' : 'text-red-600'}>
+                        <span className={`${movimiento.tipo === 'ingreso' ? 'text-green-600' : 'text-red-600'} ${
+                          movimiento.estado === 'eliminada' ? 'line-through' : ''
+                        }`}>
                           {movimiento.tipo === 'ingreso' ? '+' : '-'}${movimiento.monto.toFixed(2)}
                         </span>
                       </td>
@@ -762,7 +773,9 @@ export const CajaTable: React.FC = () => {
               </thead>
               <tbody className="bg-dark-bg-secondary divide-y divide-dark-border">
                 {ventasHoy.slice(0, 10).map((venta) => (
-                  <tr key={venta.id} className="hover:bg-dark-bg-tertiary">
+                  <tr key={venta.id} className={`hover:bg-dark-bg-tertiary ${
+                    venta.estado === 'eliminada' ? 'opacity-50' : ''
+                  }`}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-primary">
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-2 text-dark-text-secondary" />
@@ -770,15 +783,24 @@ export const CajaTable: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getMetodoPagoColor(venta.metodo_pago || 'efectivo')}`}>
-                        {getMetodoPagoIcon(venta.metodo_pago || 'efectivo')}
-                        <span className="ml-1 capitalize">
-                          {(venta.metodo_pago || 'efectivo').replace('_', ' ')}
+                      <div className="flex items-center space-x-2">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getMetodoPagoColor(venta.metodo_pago || 'efectivo')}`}>
+                          {getMetodoPagoIcon(venta.metodo_pago || 'efectivo')}
+                          <span className="ml-1 capitalize">
+                            {(venta.metodo_pago || 'efectivo').replace('_', ' ')}
+                          </span>
                         </span>
-                      </span>
+                        {venta.estado === 'eliminada' && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Eliminada
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                      ${(venta.total || 0).toFixed(2)}
+                      <span className={venta.estado === 'eliminada' ? 'line-through' : ''}>
+                        ${(venta.total || 0).toFixed(2)}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-dark-text-secondary">
                       <div className="flex items-center">

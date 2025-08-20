@@ -10,9 +10,12 @@ import {
   TrendingUp,
   TrendingDown,
   CreditCard,
-  Receipt
+  Receipt,
+  Package,
+  Edit
 } from 'lucide-react'
-import type { MovimientoCaja } from '../../store/types'
+import type { MovimientoCaja, Venta } from '../../store/types'
+import { EditarProductosVentaModal } from './EditarProductosVentaModal'
 
 interface EditarMovimientoModalProps {
   movimiento: MovimientoCaja | null
@@ -27,10 +30,13 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
   onClose,
   onSave
 }) => {
+  const ventas = useAppStore((state) => state.ventas)
   const [concepto, setConcepto] = useState('')
   const [monto, setMonto] = useState('')
   const [metodoPago, setMetodoPago] = useState('efectivo')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showProductosModal, setShowProductosModal] = useState(false)
+  const [ventaRelacionada, setVentaRelacionada] = useState<Venta | null>(null)
 
   // Actualizar estado cuando cambia el movimiento
   React.useEffect(() => {
@@ -38,8 +44,19 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
       setConcepto(movimiento.concepto)
       setMonto(movimiento.monto.toString())
       setMetodoPago(movimiento.metodo_pago)
+      
+      // Buscar si es una venta relacionada
+      const concepto = movimiento.concepto.toLowerCase()
+      if (concepto.includes('venta #') || concepto.includes('venta#')) {
+        const ventaMatch = concepto.match(/venta\s*#?([a-f0-9-]+)/i)
+        if (ventaMatch) {
+          const ventaId = ventaMatch[1]
+          const venta = ventas.find(v => v.id === ventaId)
+          setVentaRelacionada(venta || null)
+        }
+      }
     }
-  }, [movimiento])
+  }, [movimiento, ventas])
 
   // Opciones de método de pago
   const metodosPago = [
@@ -77,6 +94,32 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
     setMonto(movimiento.monto.toString())
     setMetodoPago(movimiento.metodo_pago)
     onClose()
+  }
+
+  const handleEditarProductos = () => {
+    setShowProductosModal(true)
+  }
+
+  const handleGuardarProductos = async (ventaActualizada: Venta) => {
+    try {
+      // Actualizar la venta en el store
+      const updateVenta = useAppStore.getState().updateVenta
+      if (updateVenta) {
+        await updateVenta(ventaActualizada.id, ventaActualizada)
+      }
+      
+      // Actualizar el monto del movimiento
+      const nuevoMonto = ventaActualizada.total
+      const datosActualizados = {
+        monto: nuevoMonto,
+        concepto: `Venta #${ventaActualizada.id.slice(0, 8)} - ${ventaActualizada.total.toFixed(2)}`
+      }
+      
+      await onSave(datosActualizados)
+      setShowProductosModal(false)
+    } catch (error) {
+      console.error('Error al actualizar productos:', error)
+    }
   }
 
   return (
@@ -147,6 +190,35 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
             </div>
           </div>
 
+          {/* Botón para editar productos si es una venta */}
+          {ventaRelacionada && (
+            <div>
+              <Label>Productos de la Venta</Label>
+              <div className="mt-2 p-3 border border-gray-300 rounded-lg bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-dark-text-primary">
+                      Venta #{ventaRelacionada.id.slice(0, 8)}
+                    </p>
+                    <p className="text-xs text-dark-text-secondary">
+                      {ventaRelacionada.items?.length || 0} productos
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={handleEditarProductos}
+                    variant="outline"
+                    size="sm"
+                    className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                  >
+                    <Package className="w-4 h-4 mr-2" />
+                    Editar Productos
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div>
             <Label htmlFor="metodo-pago">Método de Pago</Label>
             <div className="grid grid-cols-2 gap-2 mt-2">
@@ -200,6 +272,14 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
           </div>
         </form>
       </div>
+
+      {/* Modal para editar productos */}
+      <EditarProductosVentaModal
+        venta={ventaRelacionada}
+        isOpen={showProductosModal}
+        onClose={() => setShowProductosModal(false)}
+        onSave={handleGuardarProductos}
+      />
     </div>
   )
 }

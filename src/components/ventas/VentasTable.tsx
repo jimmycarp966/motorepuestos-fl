@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useAppStore } from '../../store'
 import { useComponentShortcuts, createShortcut } from '../../hooks/useKeyboardShortcuts'
 import { Button } from '../ui/button'
@@ -142,19 +142,57 @@ export const VentasTable: React.FC = () => {
     }
   }, [arqueoCompletadoHoy, addNotification])
 
-  // Filtrar productos para autocompletado
-  const filteredProductos = useSearchFilter({
-    data: productos || [],
-    searchTerm,
-    searchFields: ['nombre', 'codigo_sku', 'categoria'],
-    searchFunction: (producto, term) => {
-      return (
-        producto.nombre.toLowerCase().includes(term.toLowerCase()) ||
-        producto.codigo_sku.toLowerCase().includes(term.toLowerCase()) ||
-        producto.categoria.toLowerCase().includes(term.toLowerCase())
-      )
+  // Filtrar productos para autocompletado con priorización de códigos exactos
+  const filteredProductos = useMemo(() => {
+    if (!productos || !searchTerm.trim()) {
+      return productos.slice(0, 6)
     }
-  }).slice(0, 12) // Aumentar a 12 sugerencias
+
+    const term = searchTerm.toLowerCase().trim()
+    
+    // Filtrar productos que coincidan con el término de búsqueda
+    const matchingProductos = productos.filter(producto => {
+      return (
+        producto.nombre.toLowerCase().includes(term) ||
+        producto.codigo_sku.toLowerCase().includes(term) ||
+        producto.categoria.toLowerCase().includes(term)
+      )
+    })
+
+    // Ordenar por prioridad: códigos exactos primero, luego coincidencias parciales
+    const sortedProductos = matchingProductos.sort((a, b) => {
+      const aCodeExact = a.codigo_sku.toLowerCase() === term
+      const bCodeExact = b.codigo_sku.toLowerCase() === term
+      
+      // Si ambos son códigos exactos, mantener orden original
+      if (aCodeExact && bCodeExact) return 0
+      
+      // Si solo uno es código exacto, priorizarlo
+      if (aCodeExact && !bCodeExact) return -1
+      if (!aCodeExact && bCodeExact) return 1
+      
+      // Si ninguno es código exacto, priorizar coincidencias en código sobre nombre
+      const aCodeStarts = a.codigo_sku.toLowerCase().startsWith(term)
+      const bCodeStarts = b.codigo_sku.toLowerCase().startsWith(term)
+      
+      if (aCodeStarts && !bCodeStarts) return -1
+      if (!aCodeStarts && bCodeStarts) return 1
+      
+      // Si ambos empiezan con el código, mantener orden original
+      if (aCodeStarts && bCodeStarts) return 0
+      
+      // Para el resto, priorizar coincidencias en nombre
+      const aNameStarts = a.nombre.toLowerCase().startsWith(term)
+      const bNameStarts = b.nombre.toLowerCase().startsWith(term)
+      
+      if (aNameStarts && !bNameStarts) return -1
+      if (!aNameStarts && bNameStarts) return 1
+      
+      return 0
+    })
+
+    return sortedProductos.slice(0, 6) // Mostrar 6 resultados
+  }, [productos, searchTerm])
 
   // Filtrar clientes para búsqueda
   const filteredClientes = useSearchFilter({
@@ -264,6 +302,33 @@ export const VentasTable: React.FC = () => {
     setSelectedCliente(null)
   }
 
+  // Ref para el contenedor de sugerencias
+  const suggestionsContainerRef = useRef<HTMLDivElement>(null)
+
+  // Función para hacer scroll al elemento seleccionado
+  const scrollToSelected = (index: number) => {
+    if (suggestionsContainerRef.current) {
+      const container = suggestionsContainerRef.current
+      const items = container.querySelectorAll('[data-suggestion-index]')
+      const selectedItem = items[index] as HTMLElement
+      
+      if (selectedItem) {
+        const containerRect = container.getBoundingClientRect()
+        const itemRect = selectedItem.getBoundingClientRect()
+        
+        // Calcular si el elemento está fuera de la vista
+        const isAbove = itemRect.top < containerRect.top
+        const isBelow = itemRect.bottom > containerRect.bottom
+        
+        if (isAbove) {
+          container.scrollTop -= (containerRect.top - itemRect.top) + 10
+        } else if (isBelow) {
+          container.scrollTop += (itemRect.bottom - containerRect.bottom) + 10
+        }
+      }
+    }
+  }
+
   // Manejo de teclado para búsqueda
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -275,12 +340,18 @@ export const VentasTable: React.FC = () => {
       }
     } else if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setSelectedSuggestionIndex(prev => 
-        prev < filteredProductos.length - 1 ? prev + 1 : prev
-      )
+      const newIndex = selectedSuggestionIndex < filteredProductos.length - 1 ? selectedSuggestionIndex + 1 : selectedSuggestionIndex
+      setSelectedSuggestionIndex(newIndex)
+      if (newIndex !== selectedSuggestionIndex) {
+        scrollToSelected(newIndex)
+      }
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
-      setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1)
+      const newIndex = selectedSuggestionIndex > 0 ? selectedSuggestionIndex - 1 : -1
+      setSelectedSuggestionIndex(newIndex)
+      if (newIndex !== selectedSuggestionIndex && newIndex >= 0) {
+        scrollToSelected(newIndex)
+      }
     } else if (e.key === 'Escape') {
       setShowProductSuggestions(false)
       setSelectedSuggestionIndex(-1)
@@ -441,10 +512,14 @@ export const VentasTable: React.FC = () => {
               
               {/* Sugerencias de productos */}
               {showProductSuggestions && filteredProductos.length > 0 && (
-                <div className="absolute top-full left-0 right-0 bg-dark-bg-tertiary border border-dark-border rounded-lg shadow-dark-lg z-50 max-h-80 overflow-y-auto">
+                <div 
+                  ref={suggestionsContainerRef}
+                  className="absolute top-full left-0 right-0 bg-dark-bg-tertiary border border-dark-border rounded-lg shadow-dark-lg z-50 max-h-80 overflow-y-auto"
+                >
                   {filteredProductos.map((producto, index) => (
                     <div
                       key={producto.id}
+                      data-suggestion-index={index}
                       className={`p-2 cursor-pointer hover:bg-dark-bg-secondary transition-colors ${
                         index === selectedSuggestionIndex ? 'bg-primary-500/20 border-l-4 border-primary-500' : ''
                       }`}
@@ -458,7 +533,18 @@ export const VentasTable: React.FC = () => {
                             </div>
                             <div>
                               <h4 className="font-medium text-dark-text-primary text-sm leading-tight">{producto.nombre}</h4>
-                              <p className="text-xs text-dark-text-secondary">{producto.codigo_sku}</p>
+                              <div className="flex items-center gap-1">
+                                <p className={`text-xs ${
+                                  producto.codigo_sku.toLowerCase() === searchTerm.toLowerCase().trim() 
+                                    ? 'text-green-600 font-semibold' 
+                                    : 'text-dark-text-secondary'
+                                }`}>
+                                  {producto.codigo_sku}
+                                </p>
+                                {producto.codigo_sku.toLowerCase() === searchTerm.toLowerCase().trim() && (
+                                  <span className="text-xs text-green-600">✓</span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -488,7 +574,7 @@ export const VentasTable: React.FC = () => {
             </div>
             
             <p className="text-xs text-dark-text-secondary mt-2">
-              Presiona Enter para agregar el primer producto, o usa las flechas para navegar
+              Presiona Enter para agregar el producto seleccionado, usa las flechas para navegar. Los códigos exactos aparecen primero.
             </p>
           </Card>
 
