@@ -21,12 +21,16 @@ export { VentasTable } from './ventas/VentasTable'
 export { VentasModernView } from './ventas/VentasModernView'
 export { VentasTableModern } from './ventas/VentasTableModern'
 
+// Facturación
+export { FacturacionTable } from './facturacion/FacturacionTable'
+
 // Caja
 export { CajaTable } from './caja/CajaTable'
 export { MovimientoForm } from './caja/MovimientoForm'
 export { AbrirCajaForm } from './caja/AbrirCajaForm'
 export { GastosForm } from './caja/GastosForm'
 export { EditarProductosVentaModal } from './caja/EditarProductosVentaModal'
+export { default as CajaDiariaModal } from './caja/CajaDiariaModal'
 
 // Reportes
 export { default as ReportesTable } from './reportes/ReportesTable';

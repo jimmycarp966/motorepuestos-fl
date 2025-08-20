@@ -15,18 +15,20 @@ import {
   Shield,
   Menu,
   X,
-  Keyboard
+  Keyboard,
+  Receipt
 } from 'lucide-react'
 
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: '#2979FF', shortcut: 'F1' },
   { id: 'ventas', label: 'Ventas', icon: ShoppingCart, color: '#7C4DFF', shortcut: 'F2' },
-  { id: 'productos', label: 'Productos', icon: Package, color: '#2979FF', shortcut: 'F3' },
-  { id: 'clientes', label: 'Clientes', icon: UserCheck, color: '#4CAF50', shortcut: 'F4' },
-  { id: 'empleados', label: 'Empleados', icon: Users, color: '#7C4DFF', shortcut: 'F5' },
-  { id: 'caja', label: 'Caja', icon: DollarSign, color: '#FF9800', shortcut: 'F6' },
-  { id: 'reportes', label: 'Reportes', icon: BarChart3, color: '#2979FF', shortcut: 'F7' },
+  { id: 'facturacion', label: 'Facturación', icon: Receipt, color: '#E91E63', shortcut: 'F3' },
+  { id: 'productos', label: 'Productos', icon: Package, color: '#2979FF', shortcut: 'F4' },
+  { id: 'clientes', label: 'Clientes', icon: UserCheck, color: '#4CAF50', shortcut: 'F5' },
+  { id: 'empleados', label: 'Empleados', icon: Users, color: '#7C4DFF', shortcut: 'F6' },
+  { id: 'caja', label: 'Caja', icon: DollarSign, color: '#FF9800', shortcut: 'F7' },
+  { id: 'reportes', label: 'Reportes', icon: BarChart3, color: '#2979FF', shortcut: 'F8' },
 ]
 
 export const Sidebar: React.FC = () => {

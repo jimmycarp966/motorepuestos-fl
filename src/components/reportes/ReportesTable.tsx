@@ -12,9 +12,11 @@ import {
   DollarSign,
   BarChart3,
   RefreshCw,
-  X
+  X,
+  Eye
 } from 'lucide-react';
 import { DateUtils } from '../../lib/dateUtils';
+import CajaDiariaModal from '../caja/CajaDiariaModal';
 
 const ReportesTable: React.FC = () => {
   const {
@@ -38,6 +40,10 @@ const ReportesTable: React.FC = () => {
 
   const [tipoReporte, setTipoReporte] = useState<'ventas' | 'productos' | 'caja'>('ventas');
   const [showFiltros, setShowFiltros] = useState(false);
+  const [cajaDiariaModal, setCajaDiariaModal] = useState<{ isOpen: boolean; fecha: string }>({
+    isOpen: false,
+    fecha: ''
+  });
 
   useEffect(() => {
     fetchEmpleados();
@@ -524,6 +530,9 @@ const ReportesTable: React.FC = () => {
                     <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
                       Saldo Final
                     </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-text-secondary uppercase tracking-wider">
+                      Acciones
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-dark-bg-secondary divide-y divide-dark-border">
@@ -550,6 +559,15 @@ const ReportesTable: React.FC = () => {
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-dark-text-primary">
                         ${caja.saldoFinal.toLocaleString()}
                       </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-dark-text-primary">
+                        <button
+                          onClick={() => setCajaDiariaModal({ isOpen: true, fecha: caja.fecha })}
+                          className="flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors"
+                        >
+                          <Eye className="w-3 h-3" />
+                          Ver Caja
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -558,6 +576,13 @@ const ReportesTable: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Modal de Caja Diaria */}
+      <CajaDiariaModal
+        isOpen={cajaDiariaModal.isOpen}
+        onClose={() => setCajaDiariaModal({ isOpen: false, fecha: '' })}
+        fecha={cajaDiariaModal.fecha}
+      />
     </div>
   );
 };

@@ -1,220 +1,276 @@
 import type { StateCreator } from 'zustand'
 import { supabase } from '../../lib/supabase'
-import { getAFIPService } from '../../lib/afipBrowserService'
+import { DateUtils } from '../../lib/dateUtils'
+import { AuditLogger } from '../../lib/auditLogger'
+import { BusinessRules } from '../../lib/businessRules'
+import { ErrorHandler } from '../../lib/errorHandler'
+import { createBusinessError, ERROR_CODES } from '../../lib/auditLogger'
+import type { AppStore } from '../index'
+import type { FacturacionState, CreateFacturaData } from '../types'
 
-// Interfaces
-interface ComprobanteElectronico {
-  id: string
-  venta_id: string
-  tipo_comprobante: string
-  punto_venta: number
-  numero_comprobante: number
-  fecha_emision: string
-  fecha_vencimiento?: string
-  cae?: string
-  cae_vto?: string
-  resultado: string
-  motivo_rechazo?: string
-  observaciones?: string
-  xml_request?: string
-  xml_response?: string
-  created_at: string
-  updated_at: string
+const initialState: FacturacionState = {
+  facturas: [],
+  loading: false,
+  error: null,
 }
 
-interface ConfiguracionAFIP {
-  id: string
-  cuit: string
-  punto_venta: number
-  condicion_iva: string
-  ambiente: string
-  certificado_path?: string
-  clave_privada_path?: string
-  activo: boolean
-  created_at: string
-  updated_at: string
-}
+export const facturacionSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'facturacion' | 'facturacionLoading' | 'facturacionError' | 'fetchFacturas' | 'registrarFactura' | 'updateFactura'>> = (set, get) => {
+  
+  return {
+    facturacion: initialState.facturas,
+    loading: initialState.loading,
+    error: initialState.error,
 
-export interface FacturacionSlice {
-  // State
-  comprobantes: ComprobanteElectronico[]
-  configuracion: ConfiguracionAFIP | null
-  facturacionLoading: boolean
-  facturacionError: string | null
-  lastComprobante: ComprobanteElectronico | null
-
-  // Actions
-  fetchComprobantes: () => Promise<void>
-  fetchConfiguracionAFIP: () => Promise<void>
-  generarComprobante: (ventaId: string) => Promise<ComprobanteElectronico | null>
-  verificarEstadoAFIP: () => Promise<boolean>
-  clearFacturacionError: () => void
-  clearLastComprobante: () => void
-  setConfiguracion: (config: ConfiguracionAFIP) => void
-}
-
-export const facturacionSlice: StateCreator<FacturacionSlice> = (set, get) => ({
-  // Initial state
-  comprobantes: [],
-  configuracion: null,
-  facturacionLoading: false,
-  facturacionError: null,
-  lastComprobante: null,
-
-  // Actions
-  fetchComprobantes: async () => {
-    set({ facturacionLoading: true, facturacionError: null })
-    
-    try {
-      const { data, error } = await supabase
-        .from('comprobantes_electronicos')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
+    fetchFacturas: async (page = 1, pageSize = 50) => {
+      set((state) => ({ facturacion: { ...state.facturacion, loading: true, error: null } }))
       
-      set({ comprobantes: data || [], facturacionLoading: false })
-    } catch (error: any) {
-      set({ 
-        facturacionError: error.message || 'Error al cargar comprobantes',
-        facturacionLoading: false 
-      })
-    }
-  },
-
-  fetchConfiguracionAFIP: async () => {
-    set({ facturacionLoading: true, facturacionError: null })
-    
-    try {
-      const { data, error } = await supabase
-        .from('configuracion_afip')
-        .select('*')
-        .eq('activo', true)
-        .single()
-
-      if (error) throw error
-      
-      set({ configuracion: data, facturacionLoading: false })
-    } catch (error: any) {
-      set({ 
-        facturacionError: error.message || 'Error al cargar configuración AFIP',
-        facturacionLoading: false 
-      })
-    }
-  },
-
-  generarComprobante: async (ventaId: string) => {
-    set({ facturacionLoading: true, facturacionError: null })
-    
-    try {
-      // Obtener datos de la venta
-      const { data: venta, error: ventaError } = await supabase
-        .from('ventas')
-        .select(`
-          *,
-          cliente:clientes(*),
-          items:venta_items(
+      try {
+        const from = (page - 1) * pageSize
+        const to = from + pageSize - 1
+        
+        // Optimización: Una sola consulta con joins y paginación inteligente
+        const { data, error, count } = await supabase
+          .from('facturas')
+          .select(`
             *,
-            producto:productos(*)
-          )
-        `)
-        .eq('id', ventaId)
-        .single()
+            cliente:clientes(*),
+            empleado:empleados(*),
+            items:factura_items(
+              *,
+              producto:productos(*)
+            )
+          `)
+          .order('created_at', { ascending: false })
+          .range(from, to)
+        
+        if (error) throw error
 
-      if (ventaError) throw ventaError
-
-      // Generar comprobante usando AFIP Service
-      const afipService = getAFIPService()
-      
-      const request = {
-        tipoComprobante: 'B', // Por defecto Factura B
-        puntoVenta: 1,
-        concepto: 1, // Productos
-        tipoDoc: 96, // DNI por defecto
-        nroDoc: venta.cliente?.documento || '99999999',
-        fechaServicio: new Date().toISOString().split('T')[0],
-        fechaVtoPago: new Date().toISOString().split('T')[0],
-        impTotal: venta.total,
-        impTotConc: 0,
-        impNeto: venta.total / 1.21,
-        impOpEx: 0,
-        impIVA: venta.total - (venta.total / 1.21),
-        impTrib: 0,
-        items: venta.items.map((item: any) => ({
-          descripcion: item.producto.nombre,
-          cantidad: item.cantidad,
-          precioUnitario: item.precio_unitario,
-          bonif: 0,
-          impIVA: item.subtotal * 0.21,
-          impTotal: item.subtotal
+        set((state) => ({ 
+          facturacion: { 
+            ...state.facturacion, 
+            facturas: data || [], 
+            loading: false 
+          } 
         }))
-      }
 
-      const response = await afipService.generarComprobante(request)
-
-      // Guardar en base de datos
-      const { data: comprobante, error: dbError } = await supabase
-        .from('comprobantes_electronicos')
-        .insert({
-          venta_id: ventaId,
-          tipo_comprobante: request.tipoComprobante,
-          punto_venta: request.puntoVenta,
-          numero_comprobante: 1,
-          cae: response.cae,
-          cae_vto: response.caeVto,
-          resultado: response.resultado,
-          observaciones: response.observaciones,
-          xml_request: JSON.stringify(request),
-          xml_response: JSON.stringify(response)
+        // Log de auditoría
+        await AuditLogger.log({
+          action: 'FETCH_FACTURAS',
+          entity: 'facturas',
+          entityId: 'multiple',
+          details: { page, pageSize, count: data?.length || 0 },
+          userId: get().auth.user?.id
         })
-        .select()
-        .single()
 
-      if (dbError) throw dbError
+      } catch (error: any) {
+        const handledError = ErrorHandler.handle(error)
+        
+        set((state) => ({ 
+          facturacion: { 
+            ...state.facturacion, 
+            loading: false, 
+            error: handledError.message 
+          } 
+        }))
 
-      // Actualizar estado
-      const currentComprobantes = get().comprobantes
-      set({ 
-        comprobantes: [comprobante, ...currentComprobantes],
-        lastComprobante: comprobante,
-        facturacionLoading: false 
-      })
-
-      return comprobante
-    } catch (error: any) {
-      set({ 
-        facturacionError: error.message || 'Error al generar comprobante',
-        facturacionLoading: false 
-      })
-      return null
-    }
-  },
-
-  verificarEstadoAFIP: async () => {
-    try {
-      const afipService = getAFIPService()
-      const estado = await afipService.verificarEstado()
-      
-      if (!estado) {
-        set({ facturacionError: 'Error de conexión con AFIP' })
+        // Log de error
+        await AuditLogger.log({
+          action: 'FETCH_FACTURAS_ERROR',
+          entity: 'facturas',
+          entityId: 'multiple',
+          details: { error: handledError.message },
+          userId: get().auth.user?.id,
+          level: 'ERROR'
+        })
       }
-      
-      return estado
-    } catch (error: any) {
-      set({ facturacionError: error.message || 'Error verificando estado AFIP' })
-      return false
+    },
+
+    registrarFactura: async (facturaData: CreateFacturaData) => {
+      const currentUser = get().auth.user
+      if (!currentUser) throw new Error('Usuario no autenticado')
+
+      set((state) => ({ facturacion: { ...state.facturacion, loading: true, error: null } }))
+
+      try {
+        // Validaciones de negocio
+        const businessRules = new BusinessRules()
+        const validationResult = await businessRules.validateFactura(facturaData)
+        
+        if (!validationResult.isValid) {
+          throw createBusinessError(ERROR_CODES.VALIDATION_ERROR, validationResult.errors.join(', '))
+        }
+
+        // Calcular total
+        const total = facturaData.items.reduce((sum, item) => sum + item.subtotal, 0)
+
+        // Generar número de comprobante (esto se implementará con AFIP)
+        const puntoVenta = 1 // Por defecto, se configurará desde AFIP
+        const numeroComprobante = 1 // Se obtendrá del próximo número disponible en AFIP
+
+        // Crear la factura
+        const { data: factura, error: facturaError } = await supabase
+          .from('facturas')
+          .insert([{
+            cliente_id: facturaData.cliente_id,
+            empleado_id: currentUser.id,
+            total,
+            fecha: DateUtils.getCurrentLocalDateTime(),
+            metodo_pago: facturaData.metodo_pago,
+            tipo_precio: facturaData.tipo_precio || 'minorista',
+            tipo_comprobante: facturaData.tipo_comprobante,
+            punto_venta: puntoVenta,
+            numero_comprobante: numeroComprobante,
+            cae: null, // Se obtendrá de AFIP
+            cae_vto: null, // Se obtendrá de AFIP
+            estado_afip: 'pendiente'
+          }])
+          .select()
+          .single()
+
+        if (facturaError) throw facturaError
+
+        // Crear los items de la factura
+        const facturaItems = facturaData.items.map(item => ({
+          factura_id: factura.id,
+          producto_id: item.producto_id,
+          cantidad: item.cantidad,
+          precio_unitario: item.precio_unitario,
+          subtotal: item.subtotal,
+          tipo_precio: item.tipo_precio
+        }))
+
+        const { error: itemsError } = await supabase
+          .from('factura_items')
+          .insert(facturaItems)
+
+        if (itemsError) throw itemsError
+
+        // Actualizar stock de productos
+        for (const item of facturaData.items) {
+          const { data: producto } = await supabase
+            .from('productos')
+            .select('stock')
+            .eq('id', item.producto_id)
+            .single()
+
+          if (producto) {
+            const nuevoStock = producto.stock - item.cantidad
+            await supabase
+              .from('productos')
+              .update({ stock: nuevoStock })
+              .eq('id', item.producto_id)
+          }
+        }
+
+        // TODO: Aquí se implementará la integración con AFIP
+        // - Obtener CAE
+        // - Actualizar estado_afip
+        // - Generar PDF de factura
+
+        // Recargar facturas
+        await get().fetchFacturas()
+
+        // Log de auditoría
+        await AuditLogger.log({
+          action: 'CREATE_FACTURA',
+          entity: 'facturas',
+          entityId: factura.id,
+          details: { 
+            total, 
+            itemsCount: facturaData.items.length,
+            tipoComprobante: facturaData.tipo_comprobante
+          },
+          userId: currentUser.id
+        })
+
+        // Notificación de éxito
+        get().addNotification({
+          id: `factura-${Date.now()}`,
+          type: 'success',
+          title: 'Factura Creada',
+          message: `Factura ${facturaData.tipo_comprobante} registrada exitosamente`,
+          duration: 5000
+        })
+
+        return factura
+
+      } catch (error: any) {
+        const handledError = ErrorHandler.handle(error)
+        
+        set((state) => ({ 
+          facturacion: { 
+            ...state.facturacion, 
+            loading: false, 
+            error: handledError.message 
+          } 
+        }))
+
+        // Log de error
+        await AuditLogger.log({
+          action: 'CREATE_FACTURA_ERROR',
+          entity: 'facturas',
+          entityId: 'new',
+          details: { error: handledError.message },
+          userId: currentUser?.id,
+          level: 'ERROR'
+        })
+
+        // Notificación de error
+        get().addNotification({
+          id: `factura-error-${Date.now()}`,
+          type: 'error',
+          title: 'Error al Crear Factura',
+          message: handledError.message,
+          duration: 8000
+        })
+
+        throw handledError
+      }
+    },
+
+    updateFactura: async (facturaId: string, updates: Partial<CreateFacturaData>) => {
+      const currentUser = get().auth.user
+      if (!currentUser) throw new Error('Usuario no autenticado')
+
+      set((state) => ({ facturacion: { ...state.facturacion, loading: true, error: null } }))
+
+      try {
+        const { data, error } = await supabase
+          .from('facturas')
+          .update(updates)
+          .eq('id', facturaId)
+          .select()
+          .single()
+
+        if (error) throw error
+
+        // Recargar facturas
+        await get().fetchFacturas()
+
+        // Log de auditoría
+        await AuditLogger.log({
+          action: 'UPDATE_FACTURA',
+          entity: 'facturas',
+          entityId: facturaId,
+          details: { updates },
+          userId: currentUser.id
+        })
+
+        return data
+
+      } catch (error: any) {
+        const handledError = ErrorHandler.handle(error)
+        
+        set((state) => ({ 
+          facturacion: { 
+            ...state.facturacion, 
+            loading: false, 
+            error: handledError.message 
+          } 
+        }))
+
+        throw handledError
+      }
     }
-  },
-
-  clearFacturacionError: () => {
-    set({ facturacionError: null })
-  },
-
-  clearLastComprobante: () => {
-    set({ lastComprobante: null })
-  },
-
-  setConfiguracion: (config: ConfiguracionAFIP) => {
-    set({ configuracion: config })
   }
-})
+}

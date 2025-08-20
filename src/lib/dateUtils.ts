@@ -348,4 +348,20 @@ export class DateUtils {
   static getTodayLocal(): string {
     return this.getCurrentLocalDate()
   }
+
+  /**
+   * Formatea una fecha y hora para mostrar en formato DD/MM/YYYY HH:MM
+   */
+  static formatDateTime(date: string | Date): string {
+    const dateObj = typeof date === 'string' ? new Date(date) : date
+    
+    return dateObj.toLocaleString('es-ES', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    })
+  }
 }

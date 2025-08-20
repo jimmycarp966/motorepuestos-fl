@@ -38,6 +38,7 @@ export type ModuloPermitido =
   | 'productos'
   | 'clientes'
   | 'ventas'
+  | 'facturacion'
   | 'caja'
   | 'calendario'
 
@@ -146,6 +147,51 @@ export interface Venta {
   items?: VentaItem[]
 }
 
+export interface FacturaItem {
+  id: string
+  factura_id: string
+  producto_id: string
+  cantidad: number
+  precio_unitario: number
+  subtotal: number
+  tipo_precio: 'minorista' | 'mayorista'
+  producto?: Producto
+}
+
+export interface Factura {
+  id: string
+  cliente_id: string | null
+  empleado_id: string
+  total: number
+  fecha: string
+  metodo_pago: 'efectivo' | 'tarjeta' | 'transferencia' | 'cuenta_corriente'
+  tipo_precio: 'minorista' | 'mayorista'
+  tipo_comprobante: 'A' | 'B' | 'C' // A: Factura A, B: Factura B, C: Factura C
+  punto_venta: number
+  numero_comprobante: number
+  cae: string | null
+  cae_vto: string | null
+  estado_afip: 'pendiente' | 'aprobado' | 'rechazado' | 'error'
+  created_at: string
+  cliente?: Cliente
+  empleado?: Empleado
+  items?: FacturaItem[]
+}
+
+export interface CreateFacturaData {
+  cliente_id?: string | null
+  metodo_pago: 'efectivo' | 'tarjeta' | 'transferencia' | 'cuenta_corriente'
+  tipo_precio?: 'minorista' | 'mayorista'
+  tipo_comprobante: 'A' | 'B' | 'C'
+  items: Array<{
+    producto_id: string
+    cantidad: number
+    precio_unitario: number
+    subtotal: number
+    tipo_precio: 'minorista' | 'mayorista'
+  }>
+}
+
 export interface CreateVentaData {
   cliente_id?: string | null
   metodo_pago: 'efectivo' | 'tarjeta' | 'transferencia' | 'cuenta_corriente'
@@ -167,6 +213,7 @@ export interface MovimientoCaja {
   empleado_id: string
   fecha: string
   metodo_pago: 'efectivo' | 'transferencia' | 'debito' | 'credito' | 'cuenta_corriente'
+  estado?: 'activa' | 'eliminada'
   created_at: string
   empleado?: Empleado
 }
@@ -263,6 +310,12 @@ export interface ClientesState {
 
 export interface VentasState {
   ventas: Venta[]
+  loading: boolean
+  error: string | null
+}
+
+export interface FacturacionState {
+  facturas: Factura[]
   loading: boolean
   error: string | null
 }
@@ -607,4 +660,9 @@ export interface AppStore extends
   FacturacionSlice {
   // Propiedades adicionales para slices que no están en el store principal
   cajaHistorial: CajaHistorialState
+  
+  // Facturación actions
+  fetchFacturas: (page?: number, pageSize?: number) => Promise<void>
+  registrarFactura: (facturaData: CreateFacturaData) => Promise<any>
+  updateFactura: (facturaId: string, updates: Partial<CreateFacturaData>) => Promise<any>
 }

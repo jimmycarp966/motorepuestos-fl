@@ -10,6 +10,7 @@ import { EmpleadosTable } from './components/empleados/EmpleadosTable'
 import { ProductosTable } from './components/productos/ProductosTable'
 import { ClientesTable } from './components/clientes/ClientesTable'
 import { VentasTableModern } from './components/ventas/VentasTableModern'
+import { FacturacionTable } from './components/facturacion/FacturacionTable'
 import { CajaTable } from './components/caja/CajaTable'
 import ReportesTable from './components/reportes/ReportesTable'
 import { NotificationsContainer } from './components/ui/notifications'
@@ -40,6 +41,7 @@ function App() {
   const fetchProductos = useAppStore((state) => state.fetchProductos)
   const fetchClientes = useAppStore((state) => state.fetchClientes)
   const fetchVentas = useAppStore((state) => state.fetchVentas)
+  const fetchFacturas = useAppStore((state) => state.fetchFacturas)
   const fetchMovimientos = useAppStore((state) => state.fetchMovimientos)
 
   useEffect(() => {
@@ -108,6 +110,9 @@ function App() {
           case 'ventas':
             await fetchVentas()
             break
+          case 'facturacion':
+            await fetchFacturas()
+            break
           case 'caja':
             await fetchMovimientos()
             break
@@ -149,6 +154,8 @@ function App() {
         return <ClientesTable />
       case 'ventas':
         return <VentasTableModern />
+      case 'facturacion':
+        return <FacturacionTable />
       case 'caja':
         return <CajaTable />
       case 'reportes':
