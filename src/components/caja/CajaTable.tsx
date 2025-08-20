@@ -249,22 +249,34 @@ export const CajaTable: React.FC = () => {
     .reduce((sum, m) => sum + m.monto, 0)
 
   // Calcular estadísticas de ventas
+  console.log(`🔍 [CajaTable] Total de ventas a procesar: ${(ventas || []).length}`)
+  
   const ventasHoy = (ventas || []).filter(v => {
-    if (v.estado === 'eliminada') return false
+    if (v.estado === 'eliminada') {
+      console.log(`🔍 [CajaTable] Venta eliminada, saltando:`, { id: v.id, fecha: v.fecha })
+      return false
+    }
     
     // Convertir la fecha de la venta a fecha local
     const ventaDate = new Date(v.fecha)
     const ventaFechaLocal = ventaDate.toLocaleDateString('en-CA') // Formato YYYY-MM-DD
+    
+    // Debug adicional para zona horaria
+    const ventaISO = ventaDate.toISOString()
+    const ventaLocalString = ventaDate.toString()
     
     const esHoy = ventaFechaLocal === fechaHoy
     
     console.log(`🔍 [CajaTable] Comparando venta:`, {
       id: v.id,
       fechaOriginal: v.fecha,
+      fechaISO: ventaISO,
+      fechaLocalString: ventaLocalString,
       fechaLocal: ventaFechaLocal,
       fechaHoy: fechaHoy,
       esHoy: esHoy,
-      total: v.total
+      total: v.total,
+      metodoPago: v.metodo_pago
     })
     
     return esHoy
@@ -285,7 +297,13 @@ export const CajaTable: React.FC = () => {
     egresosHoy: egresosHoy,
     saldoHoy: ingresosHoy - egresosHoy,
     ventasHoy: ventasHoy.length,
-    totalVentasHoy: totalVentasHoy
+    totalVentasHoy: totalVentasHoy,
+    ventasDetalladas: ventasHoy.map(v => ({
+      id: v.id,
+      fecha: v.fecha,
+      total: v.total,
+      metodoPago: v.metodo_pago
+    }))
   })
 
   // Obtener icono para método de pago
