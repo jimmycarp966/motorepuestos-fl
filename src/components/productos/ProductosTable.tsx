@@ -188,14 +188,7 @@ export const ProductosTable: React.FC = () => {
 
   console.log('🔍 [ProductosTable] Renderizando con space-y-6 - VERSION FINAL')
   return (
-    <div className="space-y-6" style={{ 
-      border: '20px solid red', 
-      backgroundColor: 'yellow',
-      padding: '50px',
-      margin: '50px',
-      fontSize: '24px',
-      fontWeight: 'bold'
-    }}>
+    <div className="p-6 space-y-6">
       {/* Filtros adicionales */}
       <div className="flex flex-col sm:flex-row gap-4 bg-dark-bg-secondary p-4 rounded-lg border border-dark-border">
         {/* Filtro por Categoría */}

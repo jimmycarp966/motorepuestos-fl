@@ -496,15 +496,7 @@ export const Dashboard: React.FC = () => {
 
   console.log('🔍 [Dashboard] Renderizando dashboard - VERSION FINAL')
   return (
-    <div style={{ 
-      padding: 'clamp(0.75rem, 3vw, 1rem)', 
-      fontFamily: 'Inter, system-ui, sans-serif',
-      minHeight: '100vh',
-      border: '20px solid purple',
-      backgroundColor: 'orange',
-      fontSize: '24px',
-      fontWeight: 'bold'
-    }}>
+    <div className="p-6 space-y-6">
 
       {/* Header del Dashboard */}
       <div style={{ marginBottom: 'clamp(1rem, 3vw, 1.5rem)' }}>
