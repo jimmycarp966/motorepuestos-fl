@@ -7,7 +7,6 @@ export class DateUtils {
   /**
    * Obtiene la fecha actual en formato YYYY-MM-DD
    * Usa la zona horaria local (no UTC)
-   * @deprecated Usar getCurrentLocalDate() en su lugar para mayor claridad
    */
   static getCurrentDate(): string {
     return this.getCurrentLocalDate()
@@ -106,14 +105,6 @@ export class DateUtils {
       const day = String(date.getDate()).padStart(2, '0')
       dateStr = `${year}-${month}-${day}`
     }
-    
-    // LOG DE DEBUGGING
-    console.log(`🔍 [DateUtils.isToday] Comparando:`, {
-      fechaEntrada: date,
-      fechaEntradaFormateada: dateStr,
-      fechaActual: today,
-      esHoy: dateStr === today
-    })
     
     return dateStr === today
   }
@@ -251,19 +242,7 @@ export class DateUtils {
     const year = now.getFullYear()
     const month = String(now.getMonth() + 1).padStart(2, '0')
     const day = String(now.getDate()).padStart(2, '0')
-    const result = `${year}-${month}-${day}`
-    
-    // LOG DE DEBUGGING
-    console.log(`🔍 [DateUtils.getCurrentLocalDate] Fecha actual:`, {
-      fechaCompleta: now.toISOString(),
-      fechaLocal: result,
-      timestamp: now.getTime(),
-      year: year,
-      month: month,
-      day: day
-    })
-    
-    return result
+    return `${year}-${month}-${day}`
   }
 
   /**
@@ -354,18 +333,6 @@ export class DateUtils {
       const fechaParteLocal = `${year}-${month}-${day}`
       
       const hoyLocal = this.getCurrentLocalDate()
-      
-      // LOG DETALLADO PARA DEBUGGING
-      console.log(`🔍 [DateUtils.isSameAsToday] DEBUG DETALLADO:`, {
-        fechaEntrada: dateString,
-        fechaUTC: fechaUTC.toISOString(),
-        fechaLocal: fechaLocal.toISOString(),
-        fechaParteLocal: fechaParteLocal,
-        hoyLocal: hoyLocal,
-        esHoy: fechaParteLocal === hoyLocal,
-        timezoneOffset: fechaUTC.getTimezoneOffset(),
-        timestamp: new Date().getTime()
-      })
       
       return fechaParteLocal === hoyLocal
     } catch (error) {

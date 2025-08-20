@@ -186,7 +186,7 @@ export const ProductosTable: React.FC = () => {
     crudOps.handleRefresh()
   }
 
-  console.log('🔍 [ProductosTable] Renderizando con space-y-6 - VERSION FINAL')
+  
   return (
     <div className="p-6 space-y-6">
       {/* Filtros adicionales */}

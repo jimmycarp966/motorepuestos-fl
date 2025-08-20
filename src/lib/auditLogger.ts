@@ -123,7 +123,7 @@ export class AuditLogger {
 
       // En desarrollo, log en consola
       if (import.meta.env.DEV) {
-        console.log(`🔍 [AUDIT-${success ? 'SUCCESS' : 'ERROR'}] ${module}.${action}:`, logEntry)
+    
       }
 
       // Enviar a Supabase (tabla audit_logs)

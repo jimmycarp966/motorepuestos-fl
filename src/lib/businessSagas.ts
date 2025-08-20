@@ -17,7 +17,7 @@ const registrarVentaSteps: SagaStep[] = [
     name: 'Validar datos de venta',
     retryable: false,
     execute: async (context: SagaContext, payload: any) => {
-      console.log('🔍 [Saga] Validando datos de venta...')
+  
       
       const { items, cliente_id, empleado_id, descuento = 0 } = payload
       
@@ -326,7 +326,7 @@ const arqueoCajaSteps: SagaStep[] = [
     name: 'Validar estado de caja',
     retryable: false,
     execute: async (context: SagaContext, payload: any) => {
-      console.log('🔍 [Saga] Validando estado de caja...')
+  
       
       // Verificar que haya una caja abierta
       const cajaState = context.store.caja

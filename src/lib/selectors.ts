@@ -73,73 +73,11 @@ export const useDashboardKPIs = (): DashboardKPIs => {
       const unaSemanaPasada = DateUtils.subtractDays(fechaHoy, 7)
       const unMesPasado = DateUtils.subtractDays(fechaHoy, 30)
 
-      console.log(`🔍 [Dashboard KPIs] Fechas calculadas:`, {
-        fechaHoy,
-        unaSemanaPasada,
-        unMesPasado,
-        totalVentas: state.ventas.length
-      })
-
       // Filtrar ventas de hoy usando función utilitaria centralizada
       const ventasHoy = state.ventas.filter(v => {
         if (v.estado === 'eliminada') return false
-        
-        const esHoy = DateUtils.isSameAsToday(v.fecha)
-        
-        // Solo log para las ventas que SÍ se están contando como hoy
-        if (esHoy) {
-          console.log(`🚨 [Dashboard KPIs] VENTA CONTADA COMO HOY:`, {
-            id: v.id,
-            fechaOriginal: v.fecha,
-            total: v.total,
-            estado: v.estado
-          })
-        }
-        
-        return esHoy
+        return DateUtils.isSameAsToday(v.fecha)
       })
-      
-      console.log(`🔍 [Dashboard KPIs] Ventas de hoy:`, {
-        cantidad: ventasHoy.length,
-        total: ventasHoy.reduce((sum, v) => sum + v.total, 0),
-        ventas: ventasHoy.map(v => ({ id: v.id, fecha: v.fecha, total: v.total }))
-      })
-
-      // Log de TODAS las ventas para verificar cuáles NO se están contando
-      const hoyLocal = DateUtils.getTodayLocal()
-      console.log(`🔍 [Dashboard KPIs] FECHA HOY: ${hoyLocal}`)
-      
-      // Agrupar ventas por fecha para ver el patrón
-      const ventasPorFecha = state.ventas.reduce((acc, v) => {
-        const fechaParte = v.fecha.split('T')[0]
-        if (!acc[fechaParte]) {
-          acc[fechaParte] = []
-        }
-        acc[fechaParte].push({
-          id: v.id,
-          fecha: v.fecha,
-          total: v.total,
-          estado: v.estado
-        })
-        return acc
-      }, {} as Record<string, any[]>)
-      
-      console.log(`🔍 [Dashboard KPIs] VENTAS POR FECHA:`, ventasPorFecha)
-      
-      // Mostrar solo las ventas que NO son de hoy para comparar
-      const ventasNoHoy = state.ventas.filter(v => {
-        const fechaParte = v.fecha.split('T')[0]
-        return fechaParte !== hoyLocal && v.estado !== 'eliminada'
-      }).slice(0, 5) // Solo las primeras 5 para no saturar el log
-      
-      console.log(`🔍 [Dashboard KPIs] EJEMPLOS DE VENTAS NO HOY (primeras 5):`, ventasNoHoy.map(v => ({
-        id: v.id,
-        fecha: v.fecha,
-        total: v.total,
-        fechaParte: v.fecha.split('T')[0],
-        hoyLocal: hoyLocal,
-        estado: v.estado
-      })))
       
       // Filtrar ventas de la semana (excluyendo eliminadas)
       const ventasSemanaPasada = state.ventas.filter(v => 
@@ -154,18 +92,7 @@ export const useDashboardKPIs = (): DashboardKPIs => {
       // Calcular saldo de caja - solo movimientos del día actual (excluyendo eliminados)
       const movimientosHoy = state.caja.movimientos.filter(m => {
         if (m.estado === 'eliminada') return false
-        
-        const esHoy = DateUtils.isSameAsToday(m.fecha)
-        
-        console.log(`🔍 [Dashboard KPIs] Comparando movimiento:`, {
-          id: m.id,
-          fechaOriginal: m.fecha,
-          esHoy: esHoy,
-          tipo: m.tipo,
-          monto: m.monto
-        })
-        
-        return esHoy
+        return DateUtils.isSameAsToday(m.fecha)
       })
       
       const saldoCaja = movimientosHoy.reduce((sum, m) => {
@@ -177,7 +104,7 @@ export const useDashboardKPIs = (): DashboardKPIs => {
         p.activo && p.stock <= p.stock_minimo && p.stock > 0
       ).length
 
-      const result = {
+      return {
         totalVentasHoy: ventasHoy.reduce((sum, v) => sum + v.total, 0),
         cantidadVentasHoy: ventasHoy.length,
         saldoCaja,
@@ -187,10 +114,6 @@ export const useDashboardKPIs = (): DashboardKPIs => {
         ventasSemanaPasada: ventasSemanaPasada.reduce((sum, v) => sum + v.total, 0),
         ingresosMes: ventasMes.reduce((sum, v) => sum + v.total, 0)
       }
-
-      console.log(`🔍 [Dashboard KPIs] Resultado final:`, result)
-      
-      return result
     }, [calendarSync.currentDate]),
     shallow
   )

@@ -215,23 +215,9 @@ export const CajaTable: React.FC = () => {
   }
 
   // Calcular estadísticas usando comparación robusta de fechas
-  const fechaHoy = DateUtils.getCurrentLocalDate()
-  console.log(`🔍 [CajaTable] Fecha de hoy: ${fechaHoy}`)
-  
   const movimientosHoy = movimientos.filter(m => {
     if (m.estado === 'eliminada') return false
-    
-    const esHoy = DateUtils.isSameAsToday(m.fecha)
-    
-    console.log(`🔍 [CajaTable] Comparando movimiento:`, {
-      id: m.id,
-      fechaOriginal: m.fecha,
-      esHoy: esHoy,
-      tipo: m.tipo,
-      monto: m.monto
-    })
-    
-    return esHoy
+    return DateUtils.isSameAsToday(m.fecha)
   })
 
   const ingresosHoy = movimientosHoy
@@ -243,29 +229,9 @@ export const CajaTable: React.FC = () => {
     .reduce((sum, m) => sum + m.monto, 0)
 
   // Calcular estadísticas de ventas
-  console.log(`🔍 [CajaTable] Total de ventas a procesar: ${(ventas || []).length}`)
-  
   const ventasHoy = (ventas || []).filter(v => {
-    if (v.estado === 'eliminada') {
-      console.log(`🔍 [CajaTable] Venta eliminada, saltando:`, { id: v.id, fecha: v.fecha })
-      return false
-    }
-    
-    const esHoy = DateUtils.isSameAsToday(v.fecha)
-    
-    console.log(`🔍 [CajaTable] Comparando venta:`, {
-      id: v.id,
-      fechaOriginal: v.fecha,
-      esHoy: esHoy,
-      total: v.total,
-      metodoPago: v.metodo_pago
-    })
-    
-    if (esHoy) {
-      console.log(`🚨 [CajaTable] ¡VENTA CONTADA COMO HOY! ID: ${v.id}, Fecha: ${v.fecha}, Total: ${v.total}`)
-    }
-    
-    return esHoy
+    if (v.estado === 'eliminada') return false
+    return DateUtils.isSameAsToday(v.fecha)
   })
 
   const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0)
@@ -274,49 +240,6 @@ export const CajaTable: React.FC = () => {
     acc[metodo] = (acc[metodo] || 0) + (v.total || 0)
     return acc
   }, {} as Record<string, number>)
-
-  // Log final de resultados
-  console.log(`🔍 [CajaTable] RESULTADOS FINALES:`, {
-    fechaHoy: fechaHoy,
-    movimientosHoy: movimientosHoy.length,
-    ingresosHoy: ingresosHoy,
-    egresosHoy: egresosHoy,
-    saldoHoy: ingresosHoy - egresosHoy,
-    ventasHoy: ventasHoy.length,
-    totalVentasHoy: totalVentasHoy,
-    ventasDetalladas: ventasHoy.map(v => ({
-      id: v.id,
-      fecha: v.fecha,
-      total: v.total,
-      metodoPago: v.metodo_pago
-    }))
-  })
-
-  // Log detallado de TODAS las ventas que se están contando como "hoy"
-  console.log(`🔍 [CajaTable] VENTAS CONTADAS COMO HOY (${ventasHoy.length} ventas):`, ventasHoy.map(v => ({
-    id: v.id,
-    fecha: v.fecha,
-    total: v.total,
-    metodoPago: v.metodo_pago,
-    fechaParte: v.fecha.split('T')[0],
-    hoyLocal: DateUtils.getTodayLocal()
-  })))
-
-  // Log de TODAS las ventas para verificar cuáles NO se están contando
-  console.log(`🔍 [CajaTable] TODAS LAS VENTAS (${(ventas || []).length} total):`, (ventas || []).map(v => ({
-    id: v.id,
-    fecha: v.fecha,
-    total: v.total,
-    metodoPago: v.metodo_pago,
-    fechaParte: v.fecha.split('T')[0],
-    hoyLocal: DateUtils.getTodayLocal(),
-    esHoy: DateUtils.isSameAsToday(v.fecha),
-    estado: v.estado
-  })))
-
-  // Suma manual para verificar
-  const sumaManual = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0)
-  console.log(`🔍 [CajaTable] SUMA MANUAL: ${sumaManual} vs totalVentasHoy: ${totalVentasHoy}`)
 
   // Obtener icono para método de pago
   const getMetodoPagoIcon = (metodo: string) => {
