@@ -306,7 +306,7 @@ export const VentasTableModern: React.FC = () => {
         tipo_precio: tipoPrecio,
         metodo_pago: metodoPago,
         total: calculateTotal(),
-        fecha: new Date().toISOString(),
+        fecha: new Date().toISOString().split('T')[0], // Solo la fecha, sin hora
         estado: 'completada',
         items: cartItems.map(item => ({
           producto_id: item.producto.id,

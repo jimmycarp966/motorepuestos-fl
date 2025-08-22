@@ -212,6 +212,7 @@ class SyncManager {
         
         if (error) {
           console.error('Error insertando venta:', error);
+          console.error('Datos de venta que causaron el error:', ventaData);
           throw error;
         }
 
