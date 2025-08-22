@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useAppStore } from '../../store'
+import { useOffline } from '../../hooks/useOffline'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Button } from '../ui/button'
@@ -42,6 +43,9 @@ export const VentasTableModern: React.FC = () => {
   const addNotification = useAppStore((state) => state.addNotification)
   const fetchProductos = useAppStore((state) => state.fetchProductos)
   const fetchClientes = useAppStore((state) => state.fetchClientes)
+
+  // Hook offline
+  const { isOnline, registerOfflineSale } = useOffline()
 
   // Estados locales
   const [searchTerm, setSearchTerm] = useState('')
@@ -299,22 +303,49 @@ export const VentasTableModern: React.FC = () => {
         cliente_id: selectedCliente?.id,
         tipo_precio: tipoPrecio,
         metodo_pago: metodoPago,
+        total: calculateTotal(),
+        fecha: new Date().toISOString(),
+        estado: 'completada',
         items: cartItems.map(item => ({
           producto_id: item.producto.id,
           cantidad: item.cantidad,
           precio_unitario: item.precio_unitario,
-          subtotal: item.subtotal
+          subtotal: item.subtotal,
+          producto: item.producto
         }))
       }
 
-      await registrarVenta(ventaData)
-      
-      addNotification({
-        id: Date.now().toString(),
-        type: 'success',
-        title: 'Venta completada',
-        message: `Venta por $${calculateTotal().toFixed(2)} registrada exitosamente`
-      })
+      if (isOnline) {
+        // Intentar registrar en línea
+        try {
+          await registrarVenta(ventaData)
+          addNotification({
+            id: Date.now().toString(),
+            type: 'success',
+            title: 'Venta completada',
+            message: `Venta por $${calculateTotal().toFixed(2)} registrada exitosamente`
+          })
+        } catch (error) {
+          // Si falla en línea, guardar offline
+          console.log('Error en línea, guardando offline:', error)
+          await registerOfflineSale(ventaData)
+          addNotification({
+            id: Date.now().toString(),
+            type: 'warning',
+            title: 'Venta guardada offline',
+            message: `Venta por $${calculateTotal().toFixed(2)} guardada localmente. Se sincronizará cuando vuelva la conexión.`
+          })
+        }
+      } else {
+        // Guardar offline directamente
+        await registerOfflineSale(ventaData)
+        addNotification({
+          id: Date.now().toString(),
+          type: 'warning',
+          title: 'Venta guardada offline',
+          message: `Venta por $${calculateTotal().toFixed(2)} guardada localmente. Se sincronizará cuando vuelva la conexión.`
+        })
+      }
 
       // Limpiar carrito
       setCartItems([])
@@ -323,6 +354,7 @@ export const VentasTableModern: React.FC = () => {
       searchInputRef.current?.focus()
 
     } catch (error) {
+      console.error('Error en venta:', error)
       addNotification({
         id: Date.now().toString(),
         type: 'error',
