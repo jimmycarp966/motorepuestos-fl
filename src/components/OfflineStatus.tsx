@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useOffline } from '../hooks/useOffline';
-import { Wifi, WifiOff, RefreshCw, CheckCircle, AlertCircle, Database } from 'lucide-react';
+import { Wifi, WifiOff, RefreshCw, CheckCircle, AlertCircle, Database, ChevronUp, ChevronDown } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const OfflineStatus: React.FC = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
   const {
     isOnline,
     isSyncing,
@@ -68,102 +70,136 @@ export const OfflineStatus: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 left-4 z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 min-w-[280px]">
-        {/* Estado de conectividad */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center space-x-2">
-            {isOnline ? (
-              <Wifi className="w-5 h-5 text-green-500" />
-            ) : (
-              <WifiOff className="w-5 h-5 text-red-500" />
-            )}
-            <span className="text-sm font-medium">
-              {isOnline ? 'Conectado' : 'Sin conexión'}
-            </span>
-          </div>
+      {/* Botón flotante principal */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={`bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 p-3 transition-all duration-200 hover:shadow-xl ${
+          isExpanded ? 'rounded-t-lg rounded-b-none' : ''
+        }`}
+        title="Estado de conexión y sincronización"
+      >
+        <div className="flex items-center space-x-2">
+          {isOnline ? (
+            <Wifi className="w-5 h-5 text-green-500" />
+          ) : (
+            <WifiOff className="w-5 h-5 text-red-500" />
+          )}
           
-          {isSyncing && (
-            <div className="flex items-center space-x-1">
-              <RefreshCw className="w-4 h-4 text-blue-500 animate-spin" />
-              <span className="text-xs text-gray-500">Sincronizando...</span>
+          {/* Indicador de cambios pendientes */}
+          {pendingChanges > 0 && (
+            <div className="bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+              {pendingChanges > 9 ? '9+' : pendingChanges}
+            </div>
+          )}
+          
+          {/* Icono de expandir/contraer */}
+          {isExpanded ? (
+            <ChevronDown className="w-4 h-4 text-gray-500" />
+          ) : (
+            <ChevronUp className="w-4 h-4 text-gray-500" />
+          )}
+        </div>
+      </button>
+
+      {/* Panel desplegable */}
+      {isExpanded && (
+        <div className="bg-white dark:bg-gray-800 rounded-b-lg shadow-lg border border-gray-200 dark:border-gray-700 border-t-0 p-4 min-w-[280px]">
+          {/* Estado de conectividad */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-2">
+              {isOnline ? (
+                <Wifi className="w-5 h-5 text-green-500" />
+              ) : (
+                <WifiOff className="w-5 h-5 text-red-500" />
+              )}
+              <span className="text-sm font-medium">
+                {isOnline ? 'Conectado' : 'Sin conexión'}
+              </span>
+            </div>
+            
+            {isSyncing && (
+              <div className="flex items-center space-x-1">
+                <RefreshCw className="w-4 h-4 text-blue-500 animate-spin" />
+                <span className="text-xs text-gray-500">Sincronizando...</span>
+              </div>
+            )}
+          </div>
+
+          {/* Información de sincronización */}
+          <div className="space-y-2 mb-3">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-600 dark:text-gray-400">Última sincronización:</span>
+              <span className="font-medium">{formatLastSync(lastSync)}</span>
+            </div>
+            
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-600 dark:text-gray-400">Cambios pendientes:</span>
+              <div className="flex items-center space-x-1">
+                {pendingChanges > 0 ? (
+                  <AlertCircle className="w-3 h-3 text-orange-500" />
+                ) : (
+                  <CheckCircle className="w-3 h-3 text-green-500" />
+                )}
+                <span className={`font-medium ${pendingChanges > 0 ? 'text-orange-600' : 'text-green-600'}`}>
+                  {pendingChanges}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Botones de acción */}
+          <div className="flex space-x-2">
+            <button
+              onClick={handleSync}
+              disabled={isSyncing || !isOnline}
+              className="flex-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs px-3 py-2 rounded-md transition-colors duration-200 flex items-center justify-center space-x-1"
+            >
+              <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
+              <span>Sincronizar</span>
+            </button>
+            
+            <button
+              onClick={handleForceSync}
+              disabled={isSyncing || !isOnline}
+              className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs px-3 py-2 rounded-md transition-colors duration-200"
+            >
+              Forzar
+            </button>
+            
+            <button
+              onClick={handleShowStats}
+              className="bg-gray-500 hover:bg-gray-600 text-white text-xs px-3 py-2 rounded-md transition-colors duration-200 flex items-center justify-center"
+              title="Ver estadísticas offline"
+            >
+              <Database className="w-3 h-3" />
+            </button>
+          </div>
+
+          {/* Indicador de modo offline */}
+          {!isOnline && (
+            <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+              <div className="flex items-center space-x-2">
+                <AlertCircle className="w-4 h-4 text-yellow-600" />
+                <span className="text-xs text-yellow-800 dark:text-yellow-200">
+                  Trabajando en modo offline
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Indicador de cambios pendientes */}
+          {pendingChanges > 0 && isOnline && (
+            <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+              <div className="flex items-center space-x-2">
+                <AlertCircle className="w-4 h-4 text-blue-600" />
+                <span className="text-xs text-blue-800 dark:text-blue-200">
+                  {pendingChanges} cambio{pendingChanges !== 1 ? 's' : ''} pendiente{pendingChanges !== 1 ? 's' : ''} de sincronización
+                </span>
+              </div>
             </div>
           )}
         </div>
-
-        {/* Información de sincronización */}
-        <div className="space-y-2 mb-3">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-600 dark:text-gray-400">Última sincronización:</span>
-            <span className="font-medium">{formatLastSync(lastSync)}</span>
-          </div>
-          
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-600 dark:text-gray-400">Cambios pendientes:</span>
-            <div className="flex items-center space-x-1">
-              {pendingChanges > 0 ? (
-                <AlertCircle className="w-3 h-3 text-orange-500" />
-              ) : (
-                <CheckCircle className="w-3 h-3 text-green-500" />
-              )}
-              <span className={`font-medium ${pendingChanges > 0 ? 'text-orange-600' : 'text-green-600'}`}>
-                {pendingChanges}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Botones de acción */}
-        <div className="flex space-x-2">
-          <button
-            onClick={handleSync}
-            disabled={isSyncing || !isOnline}
-            className="flex-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs px-3 py-2 rounded-md transition-colors duration-200 flex items-center justify-center space-x-1"
-          >
-            <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
-            <span>Sincronizar</span>
-          </button>
-          
-          <button
-            onClick={handleForceSync}
-            disabled={isSyncing || !isOnline}
-            className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs px-3 py-2 rounded-md transition-colors duration-200"
-          >
-            Forzar
-          </button>
-          
-          <button
-            onClick={handleShowStats}
-            className="bg-gray-500 hover:bg-gray-600 text-white text-xs px-3 py-2 rounded-md transition-colors duration-200 flex items-center justify-center"
-            title="Ver estadísticas offline"
-          >
-            <Database className="w-3 h-3" />
-          </button>
-        </div>
-
-        {/* Indicador de modo offline */}
-        {!isOnline && (
-          <div className="mt-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
-            <div className="flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4 text-yellow-600" />
-              <span className="text-xs text-yellow-800 dark:text-yellow-200">
-                Trabajando en modo offline
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Indicador de cambios pendientes */}
-        {pendingChanges > 0 && isOnline && (
-          <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-            <div className="flex items-center space-x-2">
-              <AlertCircle className="w-4 h-4 text-blue-600" />
-              <span className="text-xs text-blue-800 dark:text-blue-200">
-                {pendingChanges} cambio{pendingChanges !== 1 ? 's' : ''} pendiente{pendingChanges !== 1 ? 's' : ''} de sincronización
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };
