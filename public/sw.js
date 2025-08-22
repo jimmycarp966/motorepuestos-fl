@@ -1,15 +1,14 @@
-const CACHE_NAME = 'motorepuestos-v1.0.0';
-const STATIC_CACHE = 'static-v1.0.0';
-const DYNAMIC_CACHE = 'dynamic-v1.0.0';
+const CACHE_NAME = 'motorepuestos-v1.0.1';
+const STATIC_CACHE = 'static-v1.0.1';
+const DYNAMIC_CACHE = 'dynamic-v1.0.1';
 
-// Archivos estáticos para cachear
 const STATIC_FILES = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/logo-sistemas.png',
+  '/favicon.png',
   '/favicon.ico',
-  '/favicon.png'
+  '/logo-sistemas.png'
 ];
 
 // Estrategia Cache First para archivos estáticos
@@ -61,75 +60,61 @@ async function networkFirst(request) {
   }
 }
 
-// Instalación del Service Worker
 self.addEventListener('install', (event) => {
   console.log('🔧 Service Worker: Instalando...');
-  
   event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then((cache) => {
-        console.log('📦 Service Worker: Cacheando archivos estáticos');
-        return cache.addAll(STATIC_FILES);
-      })
-      .then(() => {
-        console.log('✅ Service Worker: Instalación completada');
-        return self.skipWaiting();
-      })
-      .catch((error) => {
-        console.error('❌ Service Worker: Error en instalación:', error);
-      })
+    caches.open(STATIC_CACHE).then((cache) => {
+      console.log('📦 Service Worker: Cacheando archivos estáticos');
+      return cache.addAll(STATIC_FILES);
+    }).then(() => {
+      console.log('✅ Service Worker: Instalación completada');
+      return self.skipWaiting();
+    }).catch((error) => {
+      console.error('❌ Service Worker: Error en instalación:', error);
+    })
   );
 });
 
-// Activación del Service Worker
 self.addEventListener('activate', (event) => {
   console.log('🚀 Service Worker: Activando...');
-  
   event.waitUntil(
-    caches.keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-              console.log('🗑️ Service Worker: Eliminando cache antiguo:', cacheName);
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      })
-      .then(() => {
-        console.log('✅ Service Worker: Activación completada');
-        return self.clients.claim();
-      })
-      .catch((error) => {
-        console.error('❌ Service Worker: Error en activación:', error);
-      })
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+            console.log('🗑️ Service Worker: Eliminando cache antiguo:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => {
+      console.log('✅ Service Worker: Activación completada');
+      return self.clients.claim();
+    }).catch((error) => {
+      console.error('❌ Service Worker: Error en activación:', error);
+    })
   );
 });
 
-// Interceptar fetch requests
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Ignorar requests de analytics o tracking
+  // Ignorar requests de analytics
   if (url.pathname.includes('analytics') || url.pathname.includes('tracking')) {
     return;
   }
 
   // Cache First para archivos estáticos
-  if (request.method === 'GET' && 
-      (url.pathname.endsWith('.js') || 
-       url.pathname.endsWith('.css') || 
-       url.pathname.endsWith('.png') || 
-       url.pathname.endsWith('.jpg') || 
-       url.pathname.endsWith('.ico') ||
-       url.pathname.endsWith('.svg'))) {
+  if (request.method === 'GET' &&
+      (url.pathname.endsWith('.js') || url.pathname.endsWith('.css') ||
+       url.pathname.endsWith('.png') || url.pathname.endsWith('.jpg') ||
+       url.pathname.endsWith('.ico') || url.pathname.endsWith('.svg'))) {
     event.respondWith(cacheFirst(request));
     return;
   }
 
-  // Network First para API calls
+  // Network First para APIs
   if (url.pathname.includes('/api/') || url.hostname.includes('supabase')) {
     event.respondWith(networkFirst(request));
     return;
@@ -141,73 +126,52 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Para otros requests, usar Network First
+  // Network First para todo lo demás
   event.respondWith(networkFirst(request));
 });
 
-// Background Sync para sincronización offline
 self.addEventListener('sync', (event) => {
   console.log('🔄 Service Worker: Background sync iniciado:', event.tag);
-  
   if (event.tag === 'background-sync') {
     event.waitUntil(
-      syncData()
-        .then(() => {
-          console.log('✅ Service Worker: Background sync completado');
-          // Notificar a todos los clientes
-          self.clients.matchAll().then((clients) => {
-            clients.forEach((client) => {
-              client.postMessage({
-                type: 'SYNC_COMPLETED',
-                timestamp: new Date().toISOString()
-              });
-            });
+      syncData().then(() => {
+        console.log('✅ Service Worker: Background sync completado');
+        self.clients.matchAll().then((clients) => {
+          clients.forEach((client) => {
+            client.postMessage({ type: 'SYNC_COMPLETED', timestamp: new Date().toISOString() });
           });
-        })
-        .catch((error) => {
-          console.error('❌ Service Worker: Error en background sync:', error);
-        })
+        });
+      }).catch((error) => {
+        console.error('❌ Service Worker: Error en background sync:', error);
+      })
     );
   }
 });
 
-// Función para sincronizar datos
 async function syncData() {
-  try {
-    // Aquí iría la lógica de sincronización con Supabase
-    console.log('📡 Service Worker: Sincronizando datos...');
-    
-    // Simular sincronización
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return true;
-  } catch (error) {
-    console.error('❌ Service Worker: Error sincronizando:', error);
-    throw error;
-  }
+  console.log('📡 Service Worker: Sincronizando datos...');
+  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulación
+  return true;
 }
 
-// Manejar mensajes del cliente
 self.addEventListener('message', (event) => {
   console.log('📨 Service Worker: Mensaje recibido:', event.data);
-  
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
-  
   if (event.data && event.data.type === 'GET_VERSION') {
     event.ports[0].postMessage({ version: CACHE_NAME });
   }
 });
 
-// Push notifications (opcional)
+// Manejo de notificaciones push (opcional)
 self.addEventListener('push', (event) => {
-  console.log('🔔 Service Worker: Push notification recibida');
+  console.log('🔔 Service Worker: Notificación push recibida');
   
   const options = {
-    body: event.data ? event.data.text() : 'Nueva notificación del sistema',
-    icon: '/logo-sistemas.png',
-    badge: '/logo-sistemas.png',
+    body: event.data ? event.data.text() : 'Nueva notificación',
+    icon: '/favicon.png',
+    badge: '/favicon.png',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -217,22 +181,21 @@ self.addEventListener('push', (event) => {
       {
         action: 'explore',
         title: 'Ver',
-        icon: '/logo-sistemas.png'
+        icon: '/favicon.png'
       },
       {
         action: 'close',
         title: 'Cerrar',
-        icon: '/logo-sistemas.png'
+        icon: '/favicon.png'
       }
     ]
   };
 
   event.waitUntil(
-    self.registration.showNotification('Sistema Motorepuestos', options)
+    self.registration.showNotification('Motorepuestos FL', options)
   );
 });
 
-// Manejar clics en notificaciones
 self.addEventListener('notificationclick', (event) => {
   console.log('👆 Service Worker: Notificación clickeada');
   
