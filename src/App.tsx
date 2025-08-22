@@ -21,6 +21,7 @@ import { AccessDenied } from './components/ui/AccessDenied'
 import { Footer } from './components/ui/Footer'
 import { OfflineStatus } from './components/OfflineStatus'
 import { PWAInstallBanner } from './components/PWAInstallBanner'
+import { ManualInstallButton } from './components/ManualInstallButton'
 
 function App() {
   const user = useAppStore((state) => state.auth.user)
@@ -289,6 +290,8 @@ function App() {
 
        {/* Componente de estado offline */}
        <OfflineStatus />
+       {/* Botón de instalación manual */}
+       <ManualInstallButton />
      </div>
   )
 }
