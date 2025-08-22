@@ -392,3 +392,6 @@ class OfflineDatabase {
 
 // Instancia singleton
 export const offlineDB = new OfflineDatabase();
+
+// Exportar tipos
+export type { OfflineData, OfflineProduct, OfflineSale, OfflineCustomer, OfflineEmployee }

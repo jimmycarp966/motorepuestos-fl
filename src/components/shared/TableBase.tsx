@@ -504,3 +504,4 @@ function TableBase<T>({
 }
 
 export default TableBase
+export type { TableColumn, TableAction, PaginationInfo, TableBaseProps }

@@ -426,3 +426,6 @@ class SyncManager {
 
 // Instancia singleton
 export const syncManager = new SyncManager();
+
+// Exportar tipos
+export type { SyncStatus, SyncResult }

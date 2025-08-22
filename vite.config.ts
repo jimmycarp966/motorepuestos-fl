@@ -25,7 +25,6 @@ export default defineConfig({
                   router: ['react-router-dom'],
                   ui: ['lucide-react'],
                   charts: ['recharts'],
-                  offline: ['src/lib/offlineDB', 'src/lib/syncManager'],
                 },
               },
             },

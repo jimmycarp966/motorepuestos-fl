@@ -642,3 +642,4 @@ function sortResults(results: SearchResult[]): SearchResult[] {
 }
 
 export default useGlobalSearch
+export type { SearchResult, SearchableItem, SearchAction, SearchFilters, SearchOptions }
