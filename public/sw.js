@@ -12,42 +12,52 @@ const STATIC_FILES = [
   '/favicon.png'
 ];
 
-// Estrategia: Cache First para archivos estáticos
+// Estrategia Cache First para archivos estáticos
 async function cacheFirst(request) {
-  const cachedResponse = await caches.match(request);
+  const cache = await caches.open(STATIC_CACHE);
+  const cachedResponse = await cache.match(request);
+  
   if (cachedResponse) {
     return cachedResponse;
   }
-
+  
   try {
     const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
-      const cache = await caches.open(DYNAMIC_CACHE);
+    
+    // Solo cachear respuestas exitosas y completas
+    if (networkResponse.ok && networkResponse.status !== 206) {
       cache.put(request, networkResponse.clone());
     }
+    
     return networkResponse;
   } catch (error) {
-    console.log('Error en cacheFirst:', error);
+    console.error('❌ Service Worker: Error en cacheFirst:', error);
     return new Response('Error de red', { status: 503 });
   }
 }
 
-// Estrategia: Network First para API calls
+// Estrategia Network First para APIs
 async function networkFirst(request) {
   try {
     const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
+    
+    // Solo cachear respuestas exitosas y completas
+    if (networkResponse.ok && networkResponse.status !== 206) {
       const cache = await caches.open(DYNAMIC_CACHE);
       cache.put(request, networkResponse.clone());
     }
+    
     return networkResponse;
   } catch (error) {
-    console.log('Error en networkFirst, usando cache:', error);
-    const cachedResponse = await caches.match(request);
+    console.log('📡 Service Worker: Red no disponible, usando cache');
+    const cache = await caches.open(DYNAMIC_CACHE);
+    const cachedResponse = await cache.match(request);
+    
     if (cachedResponse) {
       return cachedResponse;
     }
-    return new Response('Error de red', { status: 503 });
+    
+    return new Response('Sin conexión', { status: 503 });
   }
 }
 
