@@ -16,14 +16,16 @@ export interface SyncResult {
 }
 
 class SyncManager {
-  private isOnline = navigator.onLine;
+  private isOnline = typeof window !== 'undefined' ? navigator.onLine : true;
   private isSyncing = false;
   private lastSync: Date | null = null;
   private syncInterval: NodeJS.Timeout | null = null;
 
   constructor() {
-    this.setupEventListeners();
-    this.startAutoSync();
+    if (typeof window !== 'undefined') {
+      this.setupEventListeners();
+      this.startAutoSync();
+    }
   }
 
   private setupEventListeners() {

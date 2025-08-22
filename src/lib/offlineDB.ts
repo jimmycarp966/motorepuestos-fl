@@ -59,6 +59,11 @@ class OfflineDatabase {
   private readonly DB_VERSION = 1;
 
   async init(): Promise<void> {
+    if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
+      console.log('IndexedDB no disponible en este entorno');
+      return;
+    }
+
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
 

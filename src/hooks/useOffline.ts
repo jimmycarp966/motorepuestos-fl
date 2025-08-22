@@ -26,7 +26,7 @@ export interface UseOfflineReturn {
 
 export function useOffline(): UseOfflineReturn {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
-    isOnline: navigator.onLine,
+    isOnline: typeof window !== 'undefined' ? navigator.onLine : true,
     lastSync: null,
     pendingChanges: 0,
     isSyncing: false
