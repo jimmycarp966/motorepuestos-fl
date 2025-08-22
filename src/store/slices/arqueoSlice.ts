@@ -55,8 +55,7 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
           venta_items (
             cantidad,
             precio_unitario,
-            subtotal,
-            tipo_precio
+            subtotal
           )
         `)
         .eq('fecha', fechaHoy)
