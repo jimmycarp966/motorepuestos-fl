@@ -1,5 +1,4 @@
 {
-  "version": 2,
   "builds": [
     {
       "src": "package.json",
@@ -7,25 +6,6 @@
       "config": {
         "distDir": "dist"
       }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/sw.js",
-      "headers": {
-        "Content-Type": "application/javascript",
-        "Service-Worker-Allowed": "/"
-      }
-    },
-    {
-      "src": "/manifest.json",
-      "headers": {
-        "Content-Type": "application/manifest+json"
-      }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
     }
   ],
   "headers": [
@@ -52,11 +32,45 @@
       ]
     }
   ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
   "env": {
     "VITE_APP_NAME": "Motorepuestos F.L.",
-    "VITE_APP_VERSION": "1.0.1",
-    "VITE_SUPABASE_URL": "https://hsajhnxtlgfpkpzcrjyb.supabase.co",
-    "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhzYWpobnh0bGdmcGtwemNyanliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyNTc2NDUsImV4cCI6MjA3MDgzMzY0NX0.QAe7NTVEervkqmq2zFvCsABFulvEM2Q0UgZ4EntMoj4"
+    "VITE_APP_VERSION": "1.0.0",
+    "VITE_APP_DESCRIPTION": "Sistema de gestión para taller de motorepuestos",
+    "VITE_APP_AUTHOR": "Sistemas FL",
+    "VITE_APP_WEBSITE": "https://sistemasfl.com",
+    "VITE_APP_EMAIL": "info@sistemasfl.com",
+    "VITE_APP_PHONE": "+54 9 11 1234-5678",
+    "VITE_APP_ADDRESS": "Av. Principal 123, Ciudad, Provincia",
+    "VITE_APP_CUIT": "20-12345678-9",
+    "VITE_APP_IIBB": "123-456789",
+    "VITE_APP_CONDITION": "Responsable Inscripto",
+    "VITE_APP_CATEGORY": "IVA",
+    "VITE_APP_ACTIVITY": "Comercio de repuestos automotrices",
+    "VITE_APP_START_DATE": "2024-01-01",
+    "VITE_APP_LOGO_URL": "/logo-sistemas.png",
+    "VITE_APP_FAVICON_URL": "/favicon.ico",
+    "VITE_APP_THEME_COLOR": "#1f2937",
+    "VITE_APP_BACKGROUND_COLOR": "#ffffff",
+    "VITE_APP_DISPLAY_MODE": "standalone",
+    "VITE_APP_ORIENTATION": "portrait-primary",
+    "VITE_APP_SCOPE": "/",
+    "VITE_APP_START_URL": "/",
+    "VITE_APP_CATEGORIES": "business,productivity,utilities",
+    "VITE_APP_LANG": "es",
+    "VITE_APP_DIR": "ltr",
+    "VITE_APP_PREFER_RELATED_APPLICATIONS": "false",
+    "VITE_APP_RELATED_APPLICATIONS": "[]",
+    "VITE_APP_SCREENSHOTS": "[{\"src\":\"/logo-sistemas.png\",\"sizes\":\"1280x720\",\"type\":\"image/png\",\"form_factor\":\"wide\"}]",
+    "VITE_APP_ICONS": "[{\"src\":\"/logo-sistemas.png\",\"sizes\":\"192x192\",\"type\":\"image/png\",\"purpose\":\"any maskable\"},{\"src\":\"/logo-sistemas.png\",\"sizes\":\"512x512\",\"type\":\"image/png\",\"purpose\":\"any maskable\"}]",
+    "VITE_APP_SHORT_NAME": "Motorepuestos",
+    "VITE_APP_NAME": "Sistema Motorepuestos FL",
+    "VITE_APP_DESCRIPTION": "Sistema de gestión para taller de motorepuestos - Funciona offline"
   },
   "regions": ["iad1"]
 }
