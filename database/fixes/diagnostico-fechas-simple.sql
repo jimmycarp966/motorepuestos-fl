@@ -110,3 +110,5 @@ SELECT
     'La columna fecha es de tipo DATE, no TIMESTAMP' as problema,
     'Por eso no se pueden extraer las horas' as explicacion,
     'Necesitamos cambiar el tipo de dato o usar otra estrategia' as solucion;
+
+

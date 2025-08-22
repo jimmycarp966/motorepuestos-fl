@@ -92,3 +92,5 @@ BEGIN
     RAISE NOTICE '📅 Las fechas de movimientos de caja han sido ajustadas a la zona horaria local';
     RAISE NOTICE '🕐 Las horas ahora deberían mostrar correctamente en lugar de las 21:00';
 END $$;
+
+

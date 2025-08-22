@@ -132,7 +132,7 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
                tipo_precio: ventaData.tipo_precio,
                metodo_pago: ventaData.metodo_pago,
                total: Number(total), // Asegurar que sea número
-               fecha: fechaHoy,
+               fecha: null, // El trigger asignará automáticamente la fecha correcta
                estado: 'completada',
                empleado_id: empleadoId,
              }
@@ -214,7 +214,7 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
                        monto: total,
                        concepto,
                        empleado_id: empleadoId,
-                       fecha: fechaHoy,
+                       fecha: null, // El trigger asignará automáticamente la fecha correcta
                        metodo_pago: ventaData.metodo_pago
                      }])
 

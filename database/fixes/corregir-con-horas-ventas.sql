@@ -133,3 +133,5 @@ SELECT
     'RESUMEN_CORRECCION' as seccion,
     'Movimientos de caja corregidos con horas exactas de ventas' as descripcion,
     'Los movimientos de ventas ahora tienen la misma hora que las ventas reales' as resultado;
+
+

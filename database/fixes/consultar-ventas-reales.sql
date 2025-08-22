@@ -114,3 +114,5 @@ SELECT
     'RESUMEN_CORRECCION' as seccion,
     'Usar las horas exactas de las ventas para corregir los movimientos de caja' as instruccion,
     'Las ventas tienen la hora real, los movimientos deben coincidir' as explicacion;
+
+

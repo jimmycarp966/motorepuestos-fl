@@ -3,14 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/assets/sirius-logo.png" />
+    <link rel="apple-touch-icon" href="/logo-sistemas.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Sirius - Sistema de Gestión Inteligente - Todos los derechos reservados" />
-    <meta name="theme-color" content="#667eea" />
-    <title>Sirius - Sistema de Gestión Inteligente</title>
+    <meta name="description" content="Sistema de Gestión para Taller de Motorepuestos - Funciona offline" />
+    <meta name="theme-color" content="#1f2937" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Sistema Motorepuestos FL</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Registrar Service Worker para PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('Service Worker registrado:', registration);
+            })
+            .catch((error) => {
+              console.error('Error registrando Service Worker:', error);
+            });
+        });
+      }
+
+      // Detectar instalación de PWA
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        console.log('PWA puede ser instalada');
+      });
+
+      window.addEventListener('appinstalled', () => {
+        console.log('PWA instalada exitosamente');
+        deferredPrompt = null;
+      });
+    </script>
   </body>
 </html>

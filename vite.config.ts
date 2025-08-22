@@ -25,11 +25,16 @@ export default defineConfig({
           router: ['react-router-dom'],
           ui: ['lucide-react'],
           charts: ['recharts'],
+          offline: ['../lib/offlineDB', '../lib/syncManager'],
         },
       },
     },
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
+  },
+  // Configuración para PWA
+  define: {
+    __PWA_ENABLED__: true,
   },
 })

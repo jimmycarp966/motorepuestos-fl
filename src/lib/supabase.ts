@@ -26,12 +26,23 @@ export const supabase = createClient(config.supabaseUrl, config.supabaseKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true
+  },
+  global: {
+    headers: {
+      'X-Client-Timezone': 'America/Argentina/Buenos_Aires'
+    }
   }
 })
 
 // Cliente con service role key para operaciones de administrador
 export const supabaseAdmin = config.supabaseServiceKey 
-  ? createClient(config.supabaseUrl, config.supabaseServiceKey)
+  ? createClient(config.supabaseUrl, config.supabaseServiceKey, {
+      global: {
+        headers: {
+          'X-Client-Timezone': 'America/Argentina/Buenos_Aires'
+        }
+      }
+    })
   : null
 
 // Warning si no hay service key

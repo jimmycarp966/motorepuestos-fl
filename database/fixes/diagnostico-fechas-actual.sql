@@ -1,145 +1,201 @@
--- Script de diagnóstico para ver el estado actual de fechas y horas
--- Este script nos mostrará exactamente qué datos tenemos
+-- Script de diagnóstico para entender el problema actual de fechas
+-- Ejecutar para ver el estado exacto de las fechas
 
 -- ========================================
--- 1. DIAGNÓSTICO COMPLETO DE FECHAS
+-- 1. DIAGNÓSTICO GENERAL DEL SISTEMA
 -- ========================================
 
--- Ver todas las fechas únicas en movimientos_caja
+-- Verificar configuración actual
 SELECT 
-    'FECHAS_UNICAS_MOVIMIENTOS' as seccion,
-    fecha::date as fecha,
-    COUNT(*) as total_registros,
-    MIN(fecha) as hora_mas_antigua,
-    MAX(fecha) as hora_mas_reciente
-FROM movimientos_caja 
-GROUP BY fecha::date
-ORDER BY fecha::date DESC
-LIMIT 10;
+    'CONFIGURACIÓN_ACTUAL' as seccion,
+    current_setting('timezone') as zona_horaria_servidor,
+    now() as hora_actual_servidor,
+    now() AT TIME ZONE 'America/Argentina/Buenos_Aires' as hora_argentina,
+    CURRENT_DATE as fecha_actual_servidor,
+    (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date as fecha_argentina;
 
--- Ver todas las fechas únicas en ventas
+-- ========================================
+-- 2. ANÁLISIS DETALLADO DE VENTAS RECIENTES
+-- ========================================
+
+-- Ver todas las ventas de los últimos 3 días con detalles
 SELECT 
-    'FECHAS_UNICAS_VENTAS' as seccion,
-    fecha::date as fecha,
-    COUNT(*) as total_registros,
-    MIN(fecha) as hora_mas_antigua,
-    MAX(fecha) as hora_mas_reciente
+    'VENTAS_ULTIMOS_3_DIAS' as seccion,
+    id,
+    total,
+    fecha,
+    to_char(fecha, 'YYYY-MM-DD HH24:MI:SS') as fecha_formateada,
+    fecha::date as solo_fecha,
+    fecha::time as solo_hora,
+    EXTRACT(hour FROM fecha) as hora_numerica,
+    EXTRACT(minute FROM fecha) as minuto_numerico,
+    CASE 
+        WHEN fecha::date = CURRENT_DATE THEN 'HOY'
+        WHEN fecha::date = CURRENT_DATE - INTERVAL '1 day' THEN 'AYER'
+        WHEN fecha::date = CURRENT_DATE - INTERVAL '2 days' THEN 'ANTEAYER'
+        ELSE 'MÁS ANTIGUO'
+    END as cuando
 FROM ventas 
-GROUP BY fecha::date
-ORDER BY fecha::date DESC
-LIMIT 10;
+WHERE fecha >= CURRENT_DATE - INTERVAL '3 days'
+ORDER BY fecha DESC;
 
 -- ========================================
--- 2. DIAGNÓSTICO DE HORAS ESPECÍFICAS
+-- 3. ANÁLISIS DE MOVIMIENTOS DE CAJA
 -- ========================================
 
--- Ver movimientos con horas específicas (21:00, madrugada, etc.)
+-- Ver todos los movimientos de los últimos 3 días
 SELECT 
-    'HORAS_ESPECIFICAS_MOVIMIENTOS' as seccion,
-    to_char(fecha, 'HH24:MI') as hora,
-    COUNT(*) as total_registros,
-    fecha::date as fecha_ejemplo
-FROM movimientos_caja 
-WHERE fecha::date IN ('2025-08-18', '2025-08-19', '2025-08-20')
-GROUP BY to_char(fecha, 'HH24:MI'), fecha::date
-ORDER BY fecha::date, to_char(fecha, 'HH24:MI');
-
--- Ver ventas con horas específicas
-SELECT 
-    'HORAS_ESPECIFICAS_VENTAS' as seccion,
-    to_char(fecha, 'HH24:MI') as hora,
-    COUNT(*) as total_registros,
-    fecha::date as fecha_ejemplo
-FROM ventas 
-WHERE fecha::date IN ('2025-08-18', '2025-08-19', '2025-08-20')
-GROUP BY to_char(fecha, 'HH24:MI'), fecha::date
-ORDER BY fecha::date, to_char(fecha, 'HH24:MI');
-
--- ========================================
--- 3. EJEMPLOS DETALLADOS
--- ========================================
-
--- Mostrar ejemplos de movimientos del 18, 19 y 20 de agosto
-SELECT 
-    'EJEMPLOS_MOVIMIENTOS' as seccion,
+    'MOVIMIENTOS_ULTIMOS_3_DIAS' as seccion,
     id,
     tipo,
     monto,
     concepto,
-    fecha as fecha_completa,
-    to_char(fecha, 'YYYY-MM-DD HH24:MI:SS') as fecha_formateada
+    fecha,
+    to_char(fecha, 'YYYY-MM-DD HH24:MI:SS') as fecha_formateada,
+    fecha::date as solo_fecha,
+    fecha::time as solo_hora,
+    EXTRACT(hour FROM fecha) as hora_numerica,
+    EXTRACT(minute FROM fecha) as minuto_numerico,
+    CASE 
+        WHEN fecha::date = CURRENT_DATE THEN 'HOY'
+        WHEN fecha::date = CURRENT_DATE - INTERVAL '1 day' THEN 'AYER'
+        WHEN fecha::date = CURRENT_DATE - INTERVAL '2 days' THEN 'ANTEAYER'
+        ELSE 'MÁS ANTIGUO'
+    END as cuando
 FROM movimientos_caja 
-WHERE fecha::date IN ('2025-08-18', '2025-08-19', '2025-08-20')
-ORDER BY fecha DESC
-LIMIT 10;
+WHERE fecha >= CURRENT_DATE - INTERVAL '3 days'
+ORDER BY fecha DESC;
 
--- Mostrar ejemplos de ventas del 18, 19 y 20 de agosto
+-- ========================================
+-- 4. ESTADÍSTICAS POR HORA
+-- ========================================
+
+-- Ver cuántas ventas hay por hora
 SELECT 
-    'EJEMPLOS_VENTAS' as seccion,
-    id,
-    total,
-    fecha as fecha_completa,
-    to_char(fecha, 'YYYY-MM-DD HH24:MI:SS') as fecha_formateada
+    'ESTADISTICAS_VENTAS_POR_HORA' as seccion,
+    fecha::time as hora,
+    COUNT(*) as cantidad_ventas,
+    MIN(fecha) as primera_venta_hora,
+    MAX(fecha) as ultima_venta_hora
 FROM ventas 
-WHERE fecha::date IN ('2025-08-18', '2025-08-19', '2025-08-20')
-ORDER BY fecha DESC
-LIMIT 10;
+WHERE fecha >= CURRENT_DATE - INTERVAL '7 days'
+GROUP BY fecha::time
+ORDER BY fecha::time;
 
--- ========================================
--- 4. ANÁLISIS DE PROBLEMAS
--- ========================================
-
--- Verificar si hay registros con horas de madrugada (00:00 - 05:59)
+-- Ver cuántos movimientos hay por hora
 SELECT 
-    'HORAS_MADRUGADA' as seccion,
-    'movimientos_caja' as tabla,
-    COUNT(*) as total_registros,
-    MIN(fecha) as ejemplo_mas_antiguo,
-    MAX(fecha) as ejemplo_mas_reciente
+    'ESTADISTICAS_MOVIMIENTOS_POR_HORA' as seccion,
+    fecha::time as hora,
+    COUNT(*) as cantidad_movimientos,
+    MIN(fecha) as primer_movimiento_hora,
+    MAX(fecha) as ultimo_movimiento_hora
 FROM movimientos_caja 
-WHERE EXTRACT(hour FROM fecha) BETWEEN 0 AND 5
-AND fecha::date IN ('2025-08-18', '2025-08-19', '2025-08-20')
+WHERE fecha >= CURRENT_DATE - INTERVAL '7 days'
+GROUP BY fecha::time
+ORDER BY fecha::time;
+
+-- ========================================
+-- 5. VERIFICAR SI HAY PATRÓN DE FECHAS
+-- ========================================
+
+-- Verificar si todas las fechas son iguales
+SELECT 
+    'ANÁLISIS_PATRÓN_FECHAS' as seccion,
+    fecha::date as fecha,
+    COUNT(*) as cantidad_registros,
+    MIN(fecha::time) as hora_mas_temprana,
+    MAX(fecha::time) as hora_mas_tardia,
+    COUNT(DISTINCT fecha::time) as horas_diferentes
+FROM ventas 
+WHERE fecha >= CURRENT_DATE - INTERVAL '7 days'
+GROUP BY fecha::date
+ORDER BY fecha::date DESC;
+
+-- ========================================
+-- 6. VERIFICAR CONFIGURACIÓN DE TRIGGERS
+-- ========================================
+
+-- Verificar si los triggers están funcionando
+SELECT 
+    'VERIFICACIÓN_TRIGGERS' as seccion,
+    trigger_name,
+    event_manipulation,
+    event_object_table,
+    action_statement,
+    CASE 
+        WHEN trigger_name IS NOT NULL THEN '✅ TRIGGER ACTIVO'
+        ELSE '❌ TRIGGER FALTANTE'
+    END as estado
+FROM information_schema.triggers 
+WHERE trigger_name LIKE '%timezone%'
+ORDER BY trigger_name;
+
+-- ========================================
+-- 7. SIMULAR FECHA ACTUAL
+-- ========================================
+
+-- Ver qué fecha y hora debería ser ahora
+SELECT 
+    'SIMULACIÓN_FECHA_ACTUAL' as seccion,
+    'Servidor' as origen,
+    now() as fecha_hora_servidor,
+    now() AT TIME ZONE 'America/Argentina/Buenos_Aires' as fecha_hora_argentina,
+    (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date as fecha_argentina,
+    (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::time as hora_argentina
 
 UNION ALL
 
 SELECT 
-    'HORAS_MADRUGADA' as seccion,
-    'ventas' as tabla,
-    COUNT(*) as total_registros,
-    MIN(fecha) as ejemplo_mas_antiguo,
-    MAX(fecha) as ejemplo_mas_reciente
-FROM ventas 
-WHERE EXTRACT(hour FROM fecha) BETWEEN 0 AND 5
-AND fecha::date IN ('2025-08-18', '2025-08-19', '2025-08-20');
-
--- Verificar si hay registros con hora fija 21:00
-SELECT 
-    'HORA_FIJA_21' as seccion,
-    'movimientos_caja' as tabla,
-    COUNT(*) as total_registros,
-    MIN(fecha) as ejemplo_mas_antiguo,
-    MAX(fecha) as ejemplo_mas_reciente
-FROM movimientos_caja 
-WHERE to_char(fecha, 'HH24:MI') = '21:00'
-AND fecha::date IN ('2025-08-18', '2025-08-19', '2025-08-20')
-
-UNION ALL
-
-SELECT 
-    'HORA_FIJA_21' as seccion,
-    'ventas' as tabla,
-    COUNT(*) as total_registros,
-    MIN(fecha) as ejemplo_mas_antiguo,
-    MAX(fecha) as ejemplo_mas_reciente
-FROM ventas 
-WHERE to_char(fecha, 'HH24:MI') = '21:00'
-AND fecha::date IN ('2025-08-18', '2025-08-19', '2025-08-20');
+    'SIMULACIÓN_FECHA_ACTUAL' as seccion,
+    'UTC' as origen,
+    now() AT TIME ZONE 'UTC' as fecha_hora_servidor,
+    now() AT TIME ZONE 'America/Argentina/Buenos_Aires' as fecha_hora_argentina,
+    (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::date as fecha_argentina,
+    (now() AT TIME ZONE 'America/Argentina/Buenos_Aires')::time as hora_argentina;
 
 -- ========================================
--- 5. RESUMEN DEL DIAGNÓSTICO
+-- 8. RESUMEN DEL PROBLEMA
 -- ========================================
 
+WITH resumen AS (
+    SELECT 
+        'VENTAS' as tabla,
+        COUNT(*) as total_registros,
+        COUNT(CASE WHEN fecha::date = CURRENT_DATE THEN 1 END) as registros_hoy,
+        COUNT(CASE WHEN fecha::time = '18:00:00' THEN 1 END) as registros_18hs,
+        COUNT(CASE WHEN fecha::time = '21:00:00' THEN 1 END) as registros_21hs,
+        MIN(fecha) as fecha_mas_antigua,
+        MAX(fecha) as fecha_mas_reciente
+    FROM ventas 
+    WHERE fecha >= CURRENT_DATE - INTERVAL '7 days'
+    
+    UNION ALL
+    
+    SELECT 
+        'MOVIMIENTOS_CAJA' as tabla,
+        COUNT(*) as total_registros,
+        COUNT(CASE WHEN fecha::date = CURRENT_DATE THEN 1 END) as registros_hoy,
+        COUNT(CASE WHEN fecha::time = '18:00:00' THEN 1 END) as registros_18hs,
+        COUNT(CASE WHEN fecha::time = '21:00:00' THEN 1 END) as registros_21hs,
+        MIN(fecha) as fecha_mas_antigua,
+        MAX(fecha) as fecha_mas_reciente
+    FROM movimientos_caja 
+    WHERE fecha >= CURRENT_DATE - INTERVAL '7 days'
+)
 SELECT 
-    'RESUMEN_DIAGNOSTICO' as seccion,
-    'Ejecuta este script para ver el estado real de las fechas y horas en la base de datos' as instruccion,
-    'Después de ver los resultados, podremos crear un script de corrección específico' as siguiente_paso;
+    'RESUMEN_DIAGNÓSTICO' as seccion,
+    tabla,
+    total_registros,
+    registros_hoy,
+    registros_18hs,
+    registros_21hs,
+    fecha_mas_antigua,
+    fecha_mas_reciente,
+    CASE 
+        WHEN registros_18hs > 0 AND registros_21hs = 0 THEN '✅ CORREGIDO A 18:00'
+        WHEN registros_21hs > 0 THEN '❌ AÚN HAY 21:00'
+        WHEN registros_18hs = 0 AND registros_21hs = 0 THEN '⚠️ SIN PATRÓN CLARO'
+        ELSE '❓ ESTADO INDEFINIDO'
+    END as estado
+FROM resumen
+ORDER BY tabla;

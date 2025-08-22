@@ -66,3 +66,5 @@ SELECT
     COUNT(*) as total_corregidas
 FROM ventas 
 WHERE fecha::date = '2025-08-19';
+
+
