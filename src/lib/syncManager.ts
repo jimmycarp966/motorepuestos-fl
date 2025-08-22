@@ -222,8 +222,8 @@ class SyncManager {
             producto_id: item.producto_id,
             cantidad: item.cantidad,
             precio_unitario: item.precio_unitario,
-            subtotal: item.subtotal,
-            tipo_precio: item.tipo_precio || data.tipo_precio
+            subtotal: item.subtotal
+            // Removido tipo_precio ya que no está en la tabla venta_items
           }));
 
           const { error: itemsError } = await supabase

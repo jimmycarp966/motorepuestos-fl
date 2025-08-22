@@ -225,7 +225,7 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
 
       const { data: arqueoHoy, error } = await supabase
         .from('arqueos_caja')
-        .select('*')
+        .select('id, fecha, empleado_id, completado, monto_esperado, monto_real, diferencia, observaciones, estado, created_at, updated_at')
         .eq('fecha', fechaHoy)
         .eq('empleado_id', empleadoId)
         .single()
@@ -271,7 +271,7 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
     try {
       const { data, error } = await supabase
         .from('arqueos_caja')
-        .select('*')
+        .select('id, fecha, empleado_id, completado, monto_esperado, monto_real, diferencia, observaciones, estado, created_at, updated_at')
         .order('created_at', { ascending: false })
         .limit(50)
 
