@@ -39,6 +39,7 @@ export const VentasTableModern: React.FC = () => {
   // Estados del store
   const productos = useAppStore((state) => state.productos)
   const clientes = useAppStore((state) => state.clientes.clientes)
+  const user = useAppStore((state) => state.auth.user)
   const registrarVenta = useAppStore((state) => state.registrarVenta)
   const addNotification = useAppStore((state) => state.addNotification)
   const fetchProductos = useAppStore((state) => state.fetchProductos)
@@ -301,6 +302,7 @@ export const VentasTableModern: React.FC = () => {
     try {
       const ventaData = {
         cliente_id: selectedCliente?.id,
+        empleado_id: user?.id, // Agregar el ID del empleado actual
         tipo_precio: tipoPrecio,
         metodo_pago: metodoPago,
         total: calculateTotal(),

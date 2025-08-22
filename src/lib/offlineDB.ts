@@ -327,22 +327,23 @@ class OfflineDatabase {
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(['offlineData'], 'readwrite');
       const store = transaction.objectStore('offlineData');
-      const index = store.index('synced');
       
-      // Usar getAllKeys para obtener solo los IDs de los elementos sincronizados
-      const request = index.getAllKeys(IDBKeyRange.only(true));
+      // Obtener todos los datos y filtrar los sincronizados
+      const request = store.getAll();
 
       request.onsuccess = () => {
-        const keys = request.result;
-        if (keys.length === 0) {
+        const allData = request.result;
+        const syncedData = allData.filter(item => item.synced);
+        
+        if (syncedData.length === 0) {
           resolve();
           return;
         }
 
         // Eliminar cada elemento sincronizado
-        const deletePromises = keys.map((key) => {
+        const deletePromises = syncedData.map((item) => {
           return new Promise<void>((resolveDelete, rejectDelete) => {
-            const deleteRequest = store.delete(key);
+            const deleteRequest = store.delete(item.id);
             deleteRequest.onsuccess = () => resolveDelete();
             deleteRequest.onerror = () => rejectDelete(deleteRequest.error);
           });
