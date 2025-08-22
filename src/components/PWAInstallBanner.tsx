@@ -9,6 +9,10 @@ export const PWAInstallBanner: React.FC = () => {
   useEffect(() => {
     console.log('🔍 PWAInstallBanner: Iniciando verificación...');
 
+    // Limpiar localStorage descartado para forzar mostrar banner
+    localStorage.removeItem('pwa-banner-dismissed');
+    console.log('🧹 PWAInstallBanner: localStorage limpiado');
+
     // Verificar si ya está instalada
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
                        (window.navigator as any).standalone === true;
@@ -44,37 +48,14 @@ export const PWAInstallBanner: React.FC = () => {
       setDeferredPrompt(null);
     };
 
-    // Verificar si el banner fue descartado recientemente
-    const dismissed = localStorage.getItem('pwa-banner-dismissed');
-    if (dismissed) {
-      const dismissedTime = parseInt(dismissed);
-      const now = Date.now();
-      const oneDay = 24 * 60 * 60 * 1000; // 24 horas
-
-      if (now - dismissedTime < oneDay) {
-        console.log('⏰ PWAInstallBanner: Banner descartado recientemente');
-        setShowBanner(false);
-      } else {
-        localStorage.removeItem('pwa-banner-dismissed');
-        console.log('🔄 PWAInstallBanner: Banner descartado expirado, mostrar de nuevo');
-        // Mostrar banner manual después de un delay
-        setTimeout(() => {
-          if (!isInstalled && supportsPWA) {
-            setShowManualInstall(true);
-            setShowBanner(true);
-          }
-        }, 3000);
+    // Mostrar banner manual después de un delay más corto
+    setTimeout(() => {
+      if (!isInstalled && supportsPWA) {
+        console.log('📢 PWAInstallBanner: Mostrando banner manual');
+        setShowManualInstall(true);
+        setShowBanner(true);
       }
-    } else {
-      // Si no hay registro de descarte, mostrar banner manual después de un delay
-      setTimeout(() => {
-        if (!isInstalled && supportsPWA) {
-          console.log('📢 PWAInstallBanner: Mostrando banner manual');
-          setShowManualInstall(true);
-          setShowBanner(true);
-        }
-      }, 5000);
-    }
+    }, 2000); // Reducido a 2 segundos
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
