@@ -1,21 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { Download, X, Smartphone } from 'lucide-react';
+import { Download, X, Smartphone, Info } from 'lucide-react';
 
 export const PWAInstallBanner: React.FC = () => {
   const [showBanner, setShowBanner] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showManualInstall, setShowManualInstall] = useState(false);
 
   useEffect(() => {
+    console.log('🔍 PWAInstallBanner: Iniciando verificación...');
+
     // Verificar si ya está instalada
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
                        (window.navigator as any).standalone === true;
 
+    console.log('📱 PWAInstallBanner: ¿Ya instalada?', isInstalled);
+
     if (isInstalled) {
+      console.log('✅ PWAInstallBanner: PWA ya instalada, no mostrar banner');
+      return;
+    }
+
+    // Verificar si el navegador soporta PWA
+    const supportsPWA = 'serviceWorker' in navigator && 'PushManager' in window;
+    console.log('🌐 PWAInstallBanner: ¿Soporta PWA?', supportsPWA);
+
+    if (!supportsPWA) {
+      console.log('❌ PWAInstallBanner: Navegador no soporta PWA');
       return;
     }
 
     // Escuchar el evento beforeinstallprompt
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('🎯 PWAInstallBanner: beforeinstallprompt disparado');
       e.preventDefault();
       setDeferredPrompt(e);
       setShowBanner(true);
@@ -23,9 +39,42 @@ export const PWAInstallBanner: React.FC = () => {
 
     // Escuchar si ya fue instalada
     const handleAppInstalled = () => {
+      console.log('✅ PWAInstallBanner: PWA instalada exitosamente');
       setShowBanner(false);
       setDeferredPrompt(null);
     };
+
+    // Verificar si el banner fue descartado recientemente
+    const dismissed = localStorage.getItem('pwa-banner-dismissed');
+    if (dismissed) {
+      const dismissedTime = parseInt(dismissed);
+      const now = Date.now();
+      const oneDay = 24 * 60 * 60 * 1000; // 24 horas
+
+      if (now - dismissedTime < oneDay) {
+        console.log('⏰ PWAInstallBanner: Banner descartado recientemente');
+        setShowBanner(false);
+      } else {
+        localStorage.removeItem('pwa-banner-dismissed');
+        console.log('🔄 PWAInstallBanner: Banner descartado expirado, mostrar de nuevo');
+        // Mostrar banner manual después de un delay
+        setTimeout(() => {
+          if (!isInstalled && supportsPWA) {
+            setShowManualInstall(true);
+            setShowBanner(true);
+          }
+        }, 3000);
+      }
+    } else {
+      // Si no hay registro de descarte, mostrar banner manual después de un delay
+      setTimeout(() => {
+        if (!isInstalled && supportsPWA) {
+          console.log('📢 PWAInstallBanner: Mostrando banner manual');
+          setShowManualInstall(true);
+          setShowBanner(true);
+        }
+      }, 5000);
+    }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
@@ -37,49 +86,44 @@ export const PWAInstallBanner: React.FC = () => {
   }, []);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
+    if (deferredPrompt) {
+      try {
+        console.log('🚀 PWAInstallBanner: Iniciando instalación automática...');
+        // Mostrar el prompt de instalación
+        deferredPrompt.prompt();
 
-    try {
-      // Mostrar el prompt de instalación
-      deferredPrompt.prompt();
+        // Esperar la respuesta del usuario
+        const { outcome } = await deferredPrompt.userChoice;
 
-      // Esperar la respuesta del usuario
-      const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          console.log('✅ PWAInstallBanner: Usuario aceptó instalar la PWA');
+          setShowBanner(false);
+        } else {
+          console.log('❌ PWAInstallBanner: Usuario rechazó instalar la PWA');
+        }
 
-      if (outcome === 'accepted') {
-        console.log('Usuario aceptó instalar la PWA');
-        setShowBanner(false);
-      } else {
-        console.log('Usuario rechazó instalar la PWA');
+        setDeferredPrompt(null);
+      } catch (error) {
+        console.error('❌ PWAInstallBanner: Error durante la instalación:', error);
+        // Si falla la instalación automática, mostrar instrucciones manuales
+        setShowManualInstall(true);
       }
-
-      setDeferredPrompt(null);
-    } catch (error) {
-      console.error('Error durante la instalación:', error);
+    } else if (showManualInstall) {
+      // Mostrar instrucciones manuales
+      setShowManualInstall(true);
     }
   };
 
   const handleDismiss = () => {
+    console.log('❌ PWAInstallBanner: Banner descartado por el usuario');
     setShowBanner(false);
     // Guardar en localStorage para no mostrar de nuevo por un tiempo
     localStorage.setItem('pwa-banner-dismissed', Date.now().toString());
   };
 
-  // Verificar si el banner fue descartado recientemente
-  useEffect(() => {
-    const dismissed = localStorage.getItem('pwa-banner-dismissed');
-    if (dismissed) {
-      const dismissedTime = parseInt(dismissed);
-      const now = Date.now();
-      const oneDay = 24 * 60 * 60 * 1000; // 24 horas
-
-      if (now - dismissedTime < oneDay) {
-        setShowBanner(false);
-      } else {
-        localStorage.removeItem('pwa-banner-dismissed');
-      }
-    }
-  }, []);
+  const showManualInstructions = () => {
+    setShowManualInstall(true);
+  };
 
   if (!showBanner) return null;
 
@@ -89,21 +133,36 @@ export const PWAInstallBanner: React.FC = () => {
         <div className="flex items-center space-x-3">
           <Smartphone className="w-6 h-6" />
           <div>
-            <h3 className="font-semibold text-sm">Instalar aplicación</h3>
+            <h3 className="font-semibold text-sm">
+              {showManualInstall ? 'Instalar aplicación manualmente' : 'Instalar aplicación'}
+            </h3>
             <p className="text-xs opacity-90">
-              Instala esta app para acceder más rápido y trabajar sin internet
+              {showManualInstall 
+                ? 'Instala esta app para acceder más rápido y trabajar sin internet'
+                : 'Instala esta app para acceder más rápido y trabajar sin internet'
+              }
             </p>
           </div>
         </div>
         
         <div className="flex items-center space-x-2">
-          <button
-            onClick={handleInstall}
-            className="bg-white text-blue-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors duration-200 flex items-center space-x-1"
-          >
-            <Download className="w-4 h-4" />
-            <span>Instalar</span>
-          </button>
+          {showManualInstall ? (
+            <button
+              onClick={showManualInstructions}
+              className="bg-white text-blue-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors duration-200 flex items-center space-x-1"
+            >
+              <Info className="w-4 h-4" />
+              <span>Ver instrucciones</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleInstall}
+              className="bg-white text-blue-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors duration-200 flex items-center space-x-1"
+            >
+              <Download className="w-4 h-4" />
+              <span>Instalar</span>
+            </button>
+          )}
           
           <button
             onClick={handleDismiss}
@@ -114,6 +173,19 @@ export const PWAInstallBanner: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Instrucciones manuales */}
+      {showManualInstall && (
+        <div className="max-w-4xl mx-auto mt-4 p-4 bg-white/10 rounded-lg">
+          <h4 className="font-semibold text-sm mb-2">📱 Instrucciones de instalación:</h4>
+          <div className="text-xs space-y-1">
+            <p><strong>Chrome/Edge:</strong> Haz clic en el ícono de instalación en la barra de direcciones</p>
+            <p><strong>Safari (iOS):</strong> Toca el botón "Compartir" y selecciona "Añadir a pantalla de inicio"</p>
+            <p><strong>Firefox:</strong> Haz clic en el ícono de instalación en la barra de direcciones</p>
+            <p><strong>Android:</strong> Aparecerá un banner de instalación automáticamente</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
