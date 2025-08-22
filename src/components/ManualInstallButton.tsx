@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Smartphone, X, CheckCircle, Info, AlertCircle } from 'lucide-react';
+import { Download, Smartphone, X, CheckCircle, Info, AlertCircle, Monitor } from 'lucide-react';
 import { Button } from './ui/button';
 
 export const ManualInstallButton: React.FC = () => {
@@ -72,6 +72,26 @@ export const ManualInstallButton: React.FC = () => {
     };
   }, [deferredPrompt]);
 
+  const forceInstall = () => {
+    console.log('🚀 ManualInstallButton: Forzando instalación...');
+    
+    // Intentar múltiples métodos de instalación
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+    } else {
+      // Método alternativo: abrir en nueva ventana
+      const url = window.location.href;
+      const width = 1200;
+      const height = 800;
+      const left = (screen.width - width) / 2;
+      const top = (screen.height - height) / 2;
+      
+      window.open(url, 'motorepuestos', 
+        `width=${width},height=${height},left=${left},top=${top},toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes`
+      );
+    }
+  };
+
   const handleInstall = async () => {
     console.log('🚀 ManualInstallButton: Intentando instalación...');
     console.log('📊 ManualInstallButton: Estado actual:', { deferredPrompt: !!deferredPrompt, debugInfo });
@@ -119,19 +139,19 @@ export const ManualInstallButton: React.FC = () => {
           size="lg"
         >
           <Download className="w-6 h-6" />
-          <span className="hidden sm:inline">📱 Instalar App</span>
-          <span className="sm:hidden">📱 Instalar</span>
+          <span className="hidden sm:inline">🖥️ Instalar en PC</span>
+          <span className="sm:hidden">🖥️ Instalar</span>
         </Button>
       </div>
 
       {/* Modal de instrucciones manuales */}
       {showInstallModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-dark-bg-secondary border border-dark-border rounded-lg max-w-lg w-full p-6 shadow-xl">
+          <div className="bg-dark-bg-secondary border border-dark-border rounded-lg max-w-2xl w-full p-6 shadow-xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-semibold text-dark-text-primary flex items-center gap-2">
-                <Smartphone className="w-6 h-6 text-primary-500" />
-                Instalar Aplicación
+                <Monitor className="w-6 h-6 text-primary-500" />
+                Instalar en PC - Chrome
               </h3>
               <Button
                 variant="ghost"
@@ -145,7 +165,7 @@ export const ManualInstallButton: React.FC = () => {
 
             <div className="space-y-4">
               <p className="text-sm text-dark-text-secondary">
-                Instala esta aplicación para acceder más rápido y trabajar sin internet.
+                Instala esta aplicación en tu PC para acceder más rápido y trabajar sin internet.
               </p>
 
               {/* Debug info */}
@@ -167,63 +187,80 @@ export const ManualInstallButton: React.FC = () => {
                 </div>
               )}
 
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Método 1: Ícono en barra de direcciones */}
                 <div className="bg-dark-bg-tertiary p-4 rounded-lg">
-                  <h4 className="font-medium text-dark-text-primary mb-2 flex items-center gap-2">
+                  <h4 className="font-medium text-dark-text-primary mb-3 flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-success-500" />
-                    Chrome / Edge (PC)
+                    Método 1: Ícono en barra
                   </h4>
-                  <p className="text-sm text-dark-text-secondary mb-2">
+                  <p className="text-sm text-dark-text-secondary mb-3">
                     Busca el ícono de instalación en la barra de direcciones:
                   </p>
-                  <div className="bg-gray-800 p-2 rounded text-xs font-mono text-gray-300">
-                    🌐 [URL] <span className="text-blue-400">⬇️</span>
+                  <div className="bg-gray-800 p-3 rounded text-xs font-mono text-gray-300 border border-gray-600">
+                    🌐 <span className="text-blue-400">motorepuestos-fl.vercel.app</span> <span className="text-green-400">⬇️</span>
                   </div>
-                </div>
-
-                <div className="bg-dark-bg-tertiary p-4 rounded-lg">
-                  <h4 className="font-medium text-dark-text-primary mb-2 flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-success-500" />
-                    Firefox (PC)
-                  </h4>
-                  <p className="text-sm text-dark-text-secondary mb-2">
-                    Haz clic en el ícono de instalación en la barra de direcciones
+                  <p className="text-xs text-gray-400 mt-2">
+                    Haz clic en el ícono ⬇️ para instalar
                   </p>
                 </div>
 
+                {/* Método 2: Menú de Chrome */}
                 <div className="bg-dark-bg-tertiary p-4 rounded-lg">
-                  <h4 className="font-medium text-dark-text-primary mb-2 flex items-center gap-2">
+                  <h4 className="font-medium text-dark-text-primary mb-3 flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-success-500" />
-                    Safari (iOS)
+                    Método 2: Menú de Chrome
                   </h4>
-                  <p className="text-sm text-dark-text-secondary">
-                    Toca el botón "Compartir" y selecciona "Añadir a pantalla de inicio"
+                  <p className="text-sm text-dark-text-secondary mb-3">
+                    Usa el menú de Chrome:
                   </p>
-                </div>
-
-                <div className="bg-dark-bg-tertiary p-4 rounded-lg">
-                  <h4 className="font-medium text-dark-text-primary mb-2 flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-success-500" />
-                    Android
-                  </h4>
-                  <p className="text-sm text-dark-text-secondary">
-                    Aparecerá un banner de instalación automáticamente
-                  </p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-400">1.</span>
+                      <span>Haz clic en los 3 puntos ⋮</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-400">2.</span>
+                      <span>Busca "Instalar Motorepuestos"</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-400">3.</span>
+                      <span>Haz clic en "Instalar"</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
+              {/* Método 3: Forzar instalación */}
               <div className="bg-primary-500/10 border border-primary-500/20 p-4 rounded-lg">
+                <h4 className="font-medium text-primary-500 mb-2 flex items-center gap-2">
+                  <Info className="w-4 h-4" />
+                  Método 3: Forzar Instalación
+                </h4>
+                <p className="text-sm text-primary-400 mb-3">
+                  Si los métodos anteriores no funcionan, intenta esto:
+                </p>
+                <Button
+                  onClick={forceInstall}
+                  className="w-full bg-primary-500 hover:bg-primary-600 text-white"
+                >
+                  🚀 Forzar Instalación Automática
+                </Button>
+              </div>
+
+              <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-lg">
                 <div className="flex items-start gap-2">
-                  <Info className="w-5 h-5 text-primary-500 mt-0.5 flex-shrink-0" />
+                  <Info className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-primary-500 font-medium mb-2">
-                      Beneficios de instalar:
+                    <p className="text-sm text-green-500 font-medium mb-2">
+                      ✅ Beneficios de instalar en PC:
                     </p>
-                    <ul className="text-sm text-primary-400 space-y-1">
+                    <ul className="text-sm text-green-400 space-y-1">
                       <li>• 🚀 Acceso rápido desde el escritorio</li>
                       <li>• 📱 Funciona sin internet</li>
                       <li>• 🎯 Experiencia como app nativa</li>
                       <li>• 🔔 Notificaciones push</li>
+                      <li>• 💻 Ventana independiente</li>
                     </ul>
                   </div>
                 </div>
