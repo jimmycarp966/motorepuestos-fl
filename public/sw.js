@@ -100,8 +100,12 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Ignorar requests de analytics
-  if (url.pathname.includes('analytics') || url.pathname.includes('tracking')) {
+  // Ignorar requests de analytics y extensiones de Chrome
+  if (url.pathname.includes('analytics') || 
+      url.pathname.includes('tracking') ||
+      url.protocol === 'chrome-extension:' ||
+      url.protocol === 'moz-extension:' ||
+      url.protocol === 'ms-browser-extension:') {
     return;
   }
 

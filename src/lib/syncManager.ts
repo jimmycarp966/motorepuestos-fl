@@ -193,13 +193,48 @@ class SyncManager {
   private async syncSale(data: any, action: string): Promise<void> {
     switch (action) {
       case 'INSERT':
+        // Preparar datos de venta para Supabase
+        const ventaData = {
+          cliente_id: data.cliente_id || null,
+          empleado_id: data.empleado_id,
+          total: data.total,
+          fecha: data.fecha,
+          estado: data.estado || 'completada',
+          metodo_pago: data.metodo_pago,
+          tipo_precio: data.tipo_precio
+        };
+
         const { data: newSale, error } = await supabase
           .from('ventas')
-          .insert([data])
+          .insert([ventaData])
           .select()
           .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error('Error insertando venta:', error);
+          throw error;
+        }
+
+        // Si hay items, insertarlos también
+        if (data.items && Array.isArray(data.items)) {
+          const itemsData = data.items.map((item: any) => ({
+            venta_id: newSale.id,
+            producto_id: item.producto_id,
+            cantidad: item.cantidad,
+            precio_unitario: item.precio_unitario,
+            subtotal: item.subtotal,
+            tipo_precio: item.tipo_precio || data.tipo_precio
+          }));
+
+          const { error: itemsError } = await supabase
+            .from('venta_items')
+            .insert(itemsData);
+
+          if (itemsError) {
+            console.error('Error insertando items de venta:', itemsError);
+            throw itemsError;
+          }
+        }
         break;
 
       case 'UPDATE':
