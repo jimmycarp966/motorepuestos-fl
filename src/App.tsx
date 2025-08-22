@@ -19,8 +19,6 @@ import { AccessDenied } from './components/ui/AccessDenied'
 
 
 import { Footer } from './components/ui/Footer'
-import { OfflineStatus } from './components/OfflineStatus'
-import { PWAInstallBanner } from './components/PWAInstallBanner'
 
 function App() {
   const user = useAppStore((state) => state.auth.user)
@@ -234,12 +232,11 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg-primary font-sans">
-      <NotificationsContainer />
-      <PWAInstallBanner />
-      
-      {/* Sidebar */}
-      <Sidebar />
+                    <div className="min-h-screen bg-dark-bg-primary font-sans">
+                  <NotificationsContainer />
+
+                  {/* Sidebar */}
+                  <Sidebar />
       
       {/* Contenido principal */}
       <main className="flex flex-col lg:ml-[280px] min-h-screen">
@@ -286,9 +283,6 @@ function App() {
         {/* Footer */}
         <Footer />
       </main>
-
-      {/* Componente de estado offline */}
-      <OfflineStatus />
 
     </div>
   )
