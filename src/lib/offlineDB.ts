@@ -132,6 +132,19 @@ class OfflineDatabase {
 
   // Métodos para productos
   async saveProduct(product: OfflineProduct): Promise<void> {
+    // Generar ID único si no existe
+    if (!product.id) {
+      product.id = `product_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    // Asegurar que tenga timestamps
+    if (!product.created_at) {
+      product.created_at = new Date().toISOString();
+    }
+    if (!product.updated_at) {
+      product.updated_at = new Date().toISOString();
+    }
+    
     await this.addOfflineData('products', product, 'INSERT');
     await this.saveToStore('products', product);
   }
@@ -165,6 +178,19 @@ class OfflineDatabase {
 
   // Métodos para ventas
   async saveSale(sale: OfflineSale): Promise<void> {
+    // Generar ID único si no existe
+    if (!sale.id) {
+      sale.id = `sale_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    // Asegurar que tenga timestamps
+    if (!sale.created_at) {
+      sale.created_at = new Date().toISOString();
+    }
+    if (!sale.updated_at) {
+      sale.updated_at = new Date().toISOString();
+    }
+    
     await this.addOfflineData('sales', sale, 'INSERT');
     await this.saveToStore('sales', sale);
   }
@@ -179,6 +205,19 @@ class OfflineDatabase {
 
   // Métodos para clientes
   async saveCustomer(customer: OfflineCustomer): Promise<void> {
+    // Generar ID único si no existe
+    if (!customer.id) {
+      customer.id = `customer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    // Asegurar que tenga timestamps
+    if (!customer.created_at) {
+      customer.created_at = new Date().toISOString();
+    }
+    if (!customer.updated_at) {
+      customer.updated_at = new Date().toISOString();
+    }
+    
     await this.addOfflineData('customers', customer, 'INSERT');
     await this.saveToStore('customers', customer);
   }
@@ -198,6 +237,19 @@ class OfflineDatabase {
 
   // Métodos para empleados
   async saveEmployee(employee: OfflineEmployee): Promise<void> {
+    // Generar ID único si no existe
+    if (!employee.id) {
+      employee.id = `employee_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    // Asegurar que tenga timestamps
+    if (!employee.created_at) {
+      employee.created_at = new Date().toISOString();
+    }
+    if (!employee.updated_at) {
+      employee.updated_at = new Date().toISOString();
+    }
+    
     await this.addOfflineData('employees', employee, 'INSERT');
     await this.saveToStore('employees', employee);
   }
