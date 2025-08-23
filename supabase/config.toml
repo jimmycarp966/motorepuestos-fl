@@ -117,7 +117,7 @@ template = "Your confirmation code is {{ .Code }}"
 # Configure the Deno runtime for Edge Functions.
 # The version should match the Deno version used by the Supabase CLI.
 # You can check the current version by running `supabase --version`
-deno_version = "1.40.2"
+deno_version = 1
 
 [analytics]
 # Configure the analytics backend for the dashboard.
@@ -132,7 +132,7 @@ backend = "postgres"
 # # Configure the dataset for analytics.
 # dataset = ""
 
-[experimental]
+# [experimental]
 # Enable experimental features. Please note that experimental features may be unstable and may cause
 # issues with your local development setup.
-enable_realtime = false
+# enable_realtime = false

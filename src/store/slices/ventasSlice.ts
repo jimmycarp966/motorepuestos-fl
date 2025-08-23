@@ -156,8 +156,11 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
 
                // Crear items de venta
                const itemsConVentaId = ventaData.items.map(item => ({
-                 ...item,
                  venta_id: venta.id,
+                 producto_id: item.producto_id,
+                 cantidad: item.cantidad,
+                 precio_unitario: item.precio_unitario,
+                 subtotal: item.cantidad * item.precio_unitario
                }))
 
                const { error: errorItems } = await supabase
@@ -340,8 +343,7 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
              producto_id: item.producto_id,
              cantidad: item.cantidad,
              precio_unitario: item.precio_unitario,
-             subtotal: item.subtotal,
-             tipo_precio: item.tipo_precio
+             subtotal: item.subtotal
            }))
 
            const { error: errorInsertItems } = await supabase
