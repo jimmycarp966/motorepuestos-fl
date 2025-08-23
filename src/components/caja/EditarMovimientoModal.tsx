@@ -50,13 +50,25 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
       
       // Buscar si es una venta relacionada
       const concepto = movimiento.concepto.toLowerCase()
+      console.log('🔍 Buscando venta relacionada para:', concepto)
+      
       if (concepto.includes('venta #') || concepto.includes('venta#')) {
         const ventaMatch = concepto.match(/venta\s*#?([a-f0-9-]+)/i)
         if (ventaMatch) {
           const ventaId = ventaMatch[1]
-          const venta = ventas.find(v => v.id === ventaId)
+          console.log('🔍 ID de venta encontrado:', ventaId)
+          console.log('🔍 Ventas disponibles:', ventas.map(v => ({ id: v.id, estado: v.estado })))
+          
+          // Buscar venta por ID completo o por los primeros 8 caracteres
+          const venta = ventas.find(v => v.id === ventaId || v.id.startsWith(ventaId))
+          console.log('🔍 Venta encontrada:', venta ? `Venta #${venta.id} (${venta.estado})` : 'No encontrada')
+          
           setVentaRelacionada(venta || null)
+        } else {
+          console.log('❌ No se pudo extraer ID de venta del concepto:', concepto)
         }
+      } else {
+        console.log('❌ Concepto no contiene "venta":', concepto)
       }
     }
   }, [movimiento, ventas])

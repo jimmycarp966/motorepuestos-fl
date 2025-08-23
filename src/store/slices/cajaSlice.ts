@@ -436,17 +436,51 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
 
       if (error) throw error
 
-      // Actualizar estado local
-      set((state) => ({
-        caja: {
-          ...state.caja,
-          movimientos: state.caja.movimientos.map(mov => 
-            mov.id === movimientoId 
-              ? { ...mov, estado: 'eliminada' }
-              : mov
-          )
-        }
-      }))
+      // Recargar movimientos desde la base de datos para asegurar consistencia
+      const { data: movimientosActualizados, error: errorRecarga } = await supabase
+        .from('movimientos_caja')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (errorRecarga) {
+        console.warn('Error al recargar movimientos:', errorRecarga)
+        // Fallback: actualizar estado local
+        set((state) => ({
+          caja: {
+            ...state.caja,
+            movimientos: state.caja.movimientos.map(mov => 
+              mov.id === movimientoId 
+                ? { ...mov, estado: 'eliminada' }
+                : mov
+            )
+          }
+        }))
+      } else {
+        // Calcular saldo actualizado (excluyendo movimientos eliminados)
+        const saldo = movimientosActualizados?.reduce((acc, mov) => {
+          if (mov.estado === 'eliminada') return acc
+          return mov.tipo === 'ingreso' ? acc + mov.monto : acc - mov.monto
+        }, 0) || 0
+
+        // Determinar si la caja está abierta
+        const fechaHoy = DateUtils.getCurrentLocalDate()
+        const movimientosHoy = movimientosActualizados?.filter(m => {
+          if (m.estado === 'eliminada') return false
+          const movimientoFecha = typeof m.fecha === 'string' ? m.fecha.split('T')[0] : m.fecha
+          return movimientoFecha === fechaHoy
+        }) || []
+
+        const cajaAbierta = movimientosHoy.length > 0
+
+        set((state) => ({ 
+          caja: { 
+            ...state.caja, 
+            movimientos: movimientosActualizados || [], 
+            saldo,
+            cajaAbierta
+          } 
+        }))
+      }
 
       // Si es una venta, también marcar la venta como eliminada (el trigger restaurará el stock automáticamente)
       const movimiento = get().caja.movimientos.find(m => m.id === movimientoId)
@@ -468,14 +502,27 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
             if (ventaError) {
               console.warn('Error al marcar venta como eliminada en BD:', ventaError)
             } else {
-              // Actualizar el estado local de las ventas
-              set((state) => ({
-                ventas: state.ventas.map(v => 
-                  v.id === ventaId 
-                    ? { ...v, estado: 'eliminada' }
-                    : v
-                )
-              }))
+              // Recargar ventas desde la base de datos para asegurar consistencia
+              const { data: ventasActualizadas, error: errorVentas } = await supabase
+                .from('ventas')
+                .select('*')
+                .order('created_at', { ascending: false })
+
+              if (errorVentas) {
+                console.warn('Error al recargar ventas:', errorVentas)
+                // Fallback: actualizar estado local
+                set((state) => ({
+                  ventas: state.ventas.map(v => 
+                    v.id === ventaId 
+                      ? { ...v, estado: 'eliminada' }
+                      : v
+                  )
+                }))
+              } else {
+                set((state) => ({
+                  ventas: ventasActualizadas || []
+                }))
+              }
 
               // Recargar productos para actualizar stock en la UI
               get().fetchProductos?.()
