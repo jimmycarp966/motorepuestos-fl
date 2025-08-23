@@ -448,22 +448,42 @@ export const cajaSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'caja' | '
         }
       }))
 
-      // Si es una venta, también marcar la venta como eliminada
+      // Si es una venta, también marcar la venta como eliminada (el trigger restaurará el stock automáticamente)
       const movimiento = get().caja.movimientos.find(m => m.id === movimientoId)
       if (movimiento && movimiento.concepto.toLowerCase().includes('venta')) {
         const ventaMatch = movimiento.concepto.match(/venta\s*#?([a-f0-9-]+)/i)
         if (ventaMatch) {
           const ventaId = ventaMatch[1]
           try {
-            await supabase
+            // Marcar venta como eliminada en la base de datos
+            // El trigger automáticamente restaurará el stock de todos los productos
+            const { error: ventaError } = await supabase
               .from('ventas')
               .update({
                 estado: 'eliminada',
                 updated_at: DateUtils.getCurrentLocalDateTime()
               })
               .eq('id', ventaId)
+
+            if (ventaError) {
+              console.warn('Error al marcar venta como eliminada en BD:', ventaError)
+            } else {
+              // Actualizar el estado local de las ventas
+              set((state) => ({
+                ventas: state.ventas.map(v => 
+                  v.id === ventaId 
+                    ? { ...v, estado: 'eliminada' }
+                    : v
+                )
+              }))
+
+              // Recargar productos para actualizar stock en la UI
+              get().fetchProductos?.()
+              
+              console.log(`✅ Venta #${ventaId} eliminada - Stock restaurado automáticamente`)
+            }
           } catch (ventaError) {
-            console.warn('Error al marcar venta como eliminada:', ventaError)
+            console.warn('Error al procesar eliminación de venta:', ventaError)
           }
         }
       }

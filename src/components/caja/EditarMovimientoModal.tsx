@@ -12,10 +12,12 @@ import {
   CreditCard,
   Receipt,
   Package,
-  Edit
+  Edit,
+  RotateCcw
 } from 'lucide-react'
 import type { MovimientoCaja, Venta } from '../../store/types'
 import { EditarProductosVentaModal } from './EditarProductosVentaModal'
+import { DevolverProductosModal } from './DevolverProductosModal'
 
 interface EditarMovimientoModalProps {
   movimiento: MovimientoCaja | null
@@ -36,6 +38,7 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
   const [metodoPago, setMetodoPago] = useState('efectivo')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showProductosModal, setShowProductosModal] = useState(false)
+  const [showDevolverModal, setShowDevolverModal] = useState(false)
   const [ventaRelacionada, setVentaRelacionada] = useState<Venta | null>(null)
 
   // Actualizar estado cuando cambia el movimiento
@@ -100,6 +103,10 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
     setShowProductosModal(true)
   }
 
+  const handleDevolverProductos = () => {
+    setShowDevolverModal(true)
+  }
+
   const handleGuardarProductos = async (ventaActualizada: Venta) => {
     try {
       // Actualizar la venta en el store
@@ -119,6 +126,28 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
       setShowProductosModal(false)
     } catch (error) {
       console.error('Error al actualizar productos:', error)
+    }
+  }
+
+  const handleGuardarDevolucion = async (ventaActualizada: Venta) => {
+    try {
+      // Actualizar la venta en el store
+      const updateVenta = useAppStore.getState().updateVenta
+      if (updateVenta) {
+        await updateVenta(ventaActualizada.id, ventaActualizada)
+      }
+      
+      // Actualizar el monto del movimiento
+      const nuevoMonto = ventaActualizada.total
+      const datosActualizados = {
+        monto: nuevoMonto,
+        concepto: `Venta #${ventaActualizada.id.slice(0, 8)} - ${ventaActualizada.total.toFixed(2)}`
+      }
+      
+      await onSave(datosActualizados)
+      setShowDevolverModal(false)
+    } catch (error) {
+      console.error('Error al procesar devolución:', error)
     }
   }
 
@@ -190,12 +219,12 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
             </div>
           </div>
 
-          {/* Botón para editar productos si es una venta */}
+          {/* Botones para productos si es una venta */}
           {ventaRelacionada && (
             <div>
               <Label>Productos de la Venta</Label>
               <div className="mt-2 p-3 border border-gray-300 rounded-lg bg-gray-50">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="text-sm font-medium text-dark-text-primary">
                       Venta #{ventaRelacionada.id.slice(0, 8)}
@@ -204,15 +233,27 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
                       {ventaRelacionada.items?.length || 0} productos
                     </p>
                   </div>
+                </div>
+                <div className="flex gap-2">
                   <Button
                     type="button"
                     onClick={handleEditarProductos}
                     variant="outline"
                     size="sm"
-                    className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                    className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 flex-1"
                   >
                     <Package className="w-4 h-4 mr-2" />
                     Editar Productos
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleDevolverProductos}
+                    variant="outline"
+                    size="sm"
+                    className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100 flex-1"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Devolver Productos
                   </Button>
                 </div>
               </div>
@@ -279,6 +320,14 @@ export const EditarMovimientoModal: React.FC<EditarMovimientoModalProps> = ({
         isOpen={showProductosModal}
         onClose={() => setShowProductosModal(false)}
         onSave={handleGuardarProductos}
+      />
+
+      {/* Modal para devolver productos */}
+      <DevolverProductosModal
+        venta={ventaRelacionada}
+        isOpen={showDevolverModal}
+        onClose={() => setShowDevolverModal(false)}
+        onSave={handleGuardarDevolucion}
       />
     </div>
   )

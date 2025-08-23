@@ -141,6 +141,7 @@ export interface Venta {
   fecha: string
   metodo_pago: 'efectivo' | 'tarjeta' | 'transferencia' | 'cuenta_corriente'
   tipo_precio: 'minorista' | 'mayorista'
+  estado?: 'activa' | 'eliminada'
   created_at: string
   cliente?: Cliente
   empleado?: Empleado
