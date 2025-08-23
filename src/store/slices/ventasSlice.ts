@@ -40,7 +40,7 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
                cantidad,
                precio_unitario,
                subtotal,
-               producto:productos(id, nombre, codigo_sku, categoria)
+               producto_id
              )
            `, { count: 'exact' })
            .order('created_at', { ascending: false })

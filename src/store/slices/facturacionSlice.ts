@@ -41,7 +41,7 @@ export const facturacionSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'fa
             empleado:empleados(*),
             items:factura_items(
               *,
-              producto:productos(*)
+              producto_id
             )
           `)
           .order('created_at', { ascending: false })

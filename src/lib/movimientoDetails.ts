@@ -40,7 +40,7 @@ export async function obtenerDetallesMovimiento(movimiento: MovimientoCaja): Pro
               cantidad,
               precio_unitario,
               subtotal,
-              producto:productos(nombre, codigo_sku, categoria)
+              producto_id
             )
           `)
           .eq('id', ventaId)
@@ -52,10 +52,10 @@ export async function obtenerDetallesMovimiento(movimiento: MovimientoCaja): Pro
             detalles: {
               tipo: 'venta',
               items: venta.items?.map(item => ({
-                nombre: item.producto?.nombre || 'Producto desconocido',
+                nombre: 'Producto', // Simplificado sin join anidado
                 cantidad: item.cantidad,
                 precio: item.precio_unitario,
-                codigo_sku: item.producto?.codigo_sku
+                codigo_sku: 'N/A'
               })) || [],
               descripcion: formatearProductosVenta(venta.items || [])
             }
