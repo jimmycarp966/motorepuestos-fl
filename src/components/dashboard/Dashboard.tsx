@@ -42,7 +42,7 @@ const formatearVentaParaMostrar = (venta: any) => {
   }
   
   const productos = venta.items.map((item: any) => {
-    const nombreProducto = item.producto?.nombre || 'Producto desconocido'
+    const nombreProducto = 'Producto' // Simplificado sin join anidado
     return `${nombreProducto} x${item.cantidad}`
   })
   

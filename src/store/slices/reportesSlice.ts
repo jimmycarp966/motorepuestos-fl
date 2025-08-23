@@ -188,8 +188,8 @@ export const reportesSlice: StateCreator<AppStore> = (set, get) => {
         } : undefined,
         items: venta.venta_items?.map(item => ({
           producto: {
-            nombre: item.productos?.nombre || 'N/A',
-            codigo: item.productos?.codigo_sku || 'N/A',
+            nombre: 'Producto', // Simplificado sin join anidado
+            codigo: 'N/A',
           },
           cantidad: item.cantidad,
           precioUnitario: item.precio_unitario,
