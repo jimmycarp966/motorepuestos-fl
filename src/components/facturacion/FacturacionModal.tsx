@@ -80,10 +80,7 @@ export const FacturacionModal: React.FC<FacturacionModalProps> = ({
           cantidad,
           precio_unitario,
           subtotal,
-          producto:productos (
-            nombre,
-            precio_minorista
-          )
+          producto_id
         `)
         .eq('venta_id', ventaId);
 
@@ -123,7 +120,7 @@ export const FacturacionModal: React.FC<FacturacionModalProps> = ({
         impIVA,
         impTrib: 0,
         items: items.map(item => ({
-          descripcion: item.producto.nombre,
+          descripcion: 'Producto', // Simplificado sin join anidado
           cantidad: item.cantidad,
           precioUnitario: item.precio_unitario,
           bonif: 0,
@@ -270,7 +267,7 @@ export const FacturacionModal: React.FC<FacturacionModalProps> = ({
               {items.map((item, index) => (
                 <div key={index} className="flex justify-between items-center p-2 bg-dark-bg-tertiary rounded">
                   <div>
-                    <p className="font-medium">{item.producto.nombre}</p>
+                    <p className="font-medium">Producto</p>
                     <p className="text-sm text-dark-text-secondary">
                       {item.cantidad} x ${item.precio_unitario.toFixed(2)}
                     </p>
