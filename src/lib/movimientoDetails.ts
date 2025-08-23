@@ -163,7 +163,7 @@ function formatearProductosVenta(items: any[]): string {
   }
   
   const productos = items.map(item => {
-    const nombreProducto = item.producto?.nombre || 'Producto desconocido'
+    const nombreProducto = 'Producto' // Simplificado sin join anidado
     return `${nombreProducto} x${item.cantidad}`
   })
   

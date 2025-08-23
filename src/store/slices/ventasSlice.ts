@@ -337,7 +337,7 @@ export const ventasSlice: StateCreator<AppStore, [], [], Pick<AppStore, 'ventas'
          if (ventaActualizada.items && ventaActualizada.items.length > 0) {
            const itemsToInsert = ventaActualizada.items.map((item: any) => ({
              venta_id: ventaId,
-             producto_id: item.producto.id,
+             producto_id: item.producto_id,
              cantidad: item.cantidad,
              precio_unitario: item.precio_unitario,
              subtotal: item.subtotal,
