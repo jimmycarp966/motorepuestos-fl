@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useAppStore } from '../../store'
 import { useOffline } from '../../hooks/useOffline'
 import { Input } from '../ui/input'
@@ -25,7 +25,7 @@ import {
   Car,
   X
 } from 'lucide-react'
-import { useSearchFilter } from '../../hooks/useSearchFilter'
+import { useOptimizedProductSearch } from '../../hooks/useOptimizedProductSearch'
 
 interface CartItem {
   producto: any
@@ -102,88 +102,46 @@ export const VentasTableModern: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [cartItems.length])
 
-  // Filtrar productos con priorización de códigos exactos
-  const filteredProductos = useMemo(() => {
-    if (!productos || !searchTerm.trim()) {
-      return productos.filter(p => selectedCategory === 'todas' || p.categoria === selectedCategory).slice(0, 6)
-    }
+  // Hook optimizado para búsqueda de productos
+  const {
+    filteredProducts: filteredProductos,
+    searchResults,
+    categories: categorias,
+    isSearching,
+    hasResults,
+    resultCount
+  } = useOptimizedProductSearch({
+    products: productos || [],
+    searchTerm,
+    selectedCategory,
+    maxResults: 50
+  })
 
-    const term = searchTerm.toLowerCase().trim()
-    
-    // Filtrar productos que coincidan con el término de búsqueda y categoría
-    const matchingProductos = productos.filter(producto => {
-      const matchesSearch = 
-        producto.nombre.toLowerCase().includes(term) ||
-        producto.codigo_sku.toLowerCase().includes(term) ||
-        producto.categoria.toLowerCase().includes(term) ||
-        (producto.descripcion && producto.descripcion.toLowerCase().includes(term))
-      
-      const matchesCategory = selectedCategory === 'todas' || producto.categoria === selectedCategory
-      
-      return matchesSearch && matchesCategory
-    })
-
-    // Ordenar por prioridad: códigos exactos primero, luego coincidencias parciales
-    const sortedProductos = matchingProductos.sort((a, b) => {
-      const aCodeExact = a.codigo_sku.toLowerCase() === term
-      const bCodeExact = b.codigo_sku.toLowerCase() === term
-      
-      // Si ambos son códigos exactos, mantener orden original
-      if (aCodeExact && bCodeExact) return 0
-      
-      // Si solo uno es código exacto, priorizarlo
-      if (aCodeExact && !bCodeExact) return -1
-      if (!aCodeExact && bCodeExact) return 1
-      
-      // Si ninguno es código exacto, priorizar coincidencias en código sobre nombre
-      const aCodeStarts = a.codigo_sku.toLowerCase().startsWith(term)
-      const bCodeStarts = b.codigo_sku.toLowerCase().startsWith(term)
-      
-      if (aCodeStarts && !bCodeStarts) return -1
-      if (!aCodeStarts && bCodeStarts) return 1
-      
-      // Si ambos empiezan con el código, mantener orden original
-      if (aCodeStarts && bCodeStarts) return 0
-      
-      // Para el resto, priorizar coincidencias en nombre
-      const aNameStarts = a.nombre.toLowerCase().startsWith(term)
-      const bNameStarts = b.nombre.toLowerCase().startsWith(term)
-      
-      if (aNameStarts && !bNameStarts) return -1
-      if (!aNameStarts && bNameStarts) return 1
-      
-      return 0
-    })
-
-    return sortedProductos // Mostrar TODOS los resultados que coincidan
-  }, [productos, searchTerm, selectedCategory])
-
-  // Obtener categorías únicas
-  const categorias = ['todas', ...Array.from(new Set(productos?.map(p => p.categoria) || []))]
-
-  // Funciones del carrito
-  const handleProductSelect = (producto: any, cantidad: number = 1) => {
+  // Funciones del carrito (optimizadas)
+  const handleProductSelect = useCallback((producto: any, cantidad: number = 1) => {
     const precio = tipoPrecio === 'mayorista' ? producto.precio_mayorista : producto.precio_minorista
     const subtotal = precio * cantidad
 
-    const existingItemIndex = cartItems.findIndex(item => item.producto.id === producto.id)
-    
-    if (existingItemIndex !== -1) {
-      const updatedItems = [...cartItems]
-      const newCantidad = updatedItems[existingItemIndex].cantidad + cantidad
-      updatedItems[existingItemIndex].cantidad = newCantidad
-      updatedItems[existingItemIndex].subtotal = precio * newCantidad
-      setCartItems(updatedItems)
-    } else {
-      const newItem: CartItem = {
-        producto,
-        cantidad,
-        precio_unitario: precio,
-        subtotal,
-        tipo_precio: tipoPrecio
+    setCartItems(prevItems => {
+      const existingItemIndex = prevItems.findIndex(item => item.producto.id === producto.id)
+      
+      if (existingItemIndex !== -1) {
+        const updatedItems = [...prevItems]
+        const newCantidad = updatedItems[existingItemIndex].cantidad + cantidad
+        updatedItems[existingItemIndex].cantidad = newCantidad
+        updatedItems[existingItemIndex].subtotal = precio * newCantidad
+        return updatedItems
+      } else {
+        const newItem: CartItem = {
+          producto,
+          cantidad,
+          precio_unitario: precio,
+          subtotal,
+          tipo_precio: tipoPrecio
+        }
+        return [...prevItems, newItem]
       }
-      setCartItems([...cartItems, newItem])
-    }
+    })
 
     // Limpiar búsqueda y ocultar sugerencias
     setSearchTerm('')
@@ -203,7 +161,7 @@ export const VentasTableModern: React.FC = () => {
     setTimeout(() => {
       searchInputRef.current?.focus()
     }, 100)
-  }
+  }, [tipoPrecio, addNotification])
 
   // Función para hacer scroll al elemento seleccionado
   const scrollToSelected = (index: number) => {
@@ -229,8 +187,8 @@ export const VentasTableModern: React.FC = () => {
     }
   }
 
-  // Manejar teclas en el buscador
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  // Manejar teclas en el buscador (optimizado)
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault()
       if (selectedSuggestionIndex >= 0 && filteredProductos[selectedSuggestionIndex]) {
@@ -257,7 +215,7 @@ export const VentasTableModern: React.FC = () => {
       setSelectedSuggestionIndex(-1)
       setSearchTerm('')
     }
-  }
+  }, [selectedSuggestionIndex, filteredProductos, handleProductSelect])
 
   const handleUpdateQuantity = (index: number, newCantidad: number) => {
     if (newCantidad <= 0) {
@@ -412,8 +370,9 @@ export const VentasTableModern: React.FC = () => {
                   setSelectedSuggestionIndex(-1)
                 }}
                 onKeyDown={handleKeyDown}
-                placeholder="Ingrese el código de barras o el nombre del producto"
+                placeholder={isSearching ? "Buscando..." : "Ingrese el código de barras o el nombre del producto"}
                 className="pl-10"
+                disabled={isSearching}
                 style={{
                   borderColor: '#2C2C2C',
                   fontSize: '0.95rem'
@@ -434,12 +393,35 @@ export const VentasTableModern: React.FC = () => {
               />
               
               {/* Dropdown de sugerencias */}
-              {showSuggestions && searchTerm.length > 0 && filteredProductos.length > 0 && (
+              {showSuggestions && searchTerm.length > 0 && (
                 <div 
                   ref={suggestionsContainerRef}
                   className="absolute top-full left-0 right-0 bg-dark-bg-tertiary border border-dark-border rounded-lg shadow-dark-lg z-50 max-h-64 overflow-y-auto mt-1"
                 >
-                  {filteredProductos.map((producto, index) => {
+                  {/* Header con contador de resultados */}
+                  <div className="px-3 py-2 border-b border-dark-border bg-dark-bg-secondary">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-dark-text-secondary">
+                        {isSearching ? (
+                          <span className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                            Buscando...
+                          </span>
+                        ) : (
+                          `${resultCount} resultado${resultCount !== 1 ? 's' : ''} encontrado${resultCount !== 1 ? 's' : ''}`
+                        )}
+                      </span>
+                      {!isSearching && resultCount > 0 && (
+                        <span className="text-xs text-green-500 font-medium">
+                          ✓ Optimizado
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Lista de productos */}
+                  {filteredProductos.length > 0 ? (
+                    filteredProductos.map((producto, index) => {
                     const precio = tipoPrecio === 'mayorista' ? producto.precio_mayorista : producto.precio_minorista
                     const enCarrito = cartItems.find(item => item.producto.id === producto.id)
                     
@@ -490,7 +472,14 @@ export const VentasTableModern: React.FC = () => {
                         </div>
                       </div>
                     )
-                  })}
+                    })
+                  ) : (
+                    <div className="px-3 py-4 text-center text-dark-text-secondary">
+                      <Package className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p>No se encontraron productos</p>
+                      <p className="text-xs mt-1">Intenta con otro término de búsqueda</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
