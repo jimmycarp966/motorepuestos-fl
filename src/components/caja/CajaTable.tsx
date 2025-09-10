@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useAppStore } from '../../store'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
@@ -59,6 +59,8 @@ export const CajaTable: React.FC = () => {
   const [selectedMovimiento, setSelectedMovimiento] = useState<MovimientoCaja | null>(null)
   const [movimientosDetallados, setMovimientosDetallados] = useState<MovimientoDetalle[]>([])
   const [loadingDetails, setLoadingDetails] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0)
+  const itemsPerPage = 20
 
   // Hook de permisos
   const { isAdmin } = usePermissionGuard()
@@ -214,32 +216,58 @@ export const CajaTable: React.FC = () => {
     verificarArqueoCompletado()
   }
 
-  // Calcular estadísticas usando comparación robusta de fechas
-  const movimientosHoy = movimientos.filter(m => {
-    if (m.estado === 'eliminada') return false
-    return DateUtils.isSameAsToday(m.fecha)
-  })
+  // Estadísticas memoizadas para mejor performance
+  const estadisticasMemoizadas = useMemo(() => {
+    const movimientosHoy = movimientos.filter(m => {
+      if (m.estado === 'eliminada') return false
+      return DateUtils.isSameAsToday(m.fecha)
+    })
 
-  const ingresosHoy = movimientosHoy
-    .filter(m => m.tipo === 'ingreso')
-    .reduce((sum, m) => sum + m.monto, 0)
+    const ingresosHoy = movimientosHoy
+      .filter(m => m.tipo === 'ingreso')
+      .reduce((sum, m) => sum + m.monto, 0)
 
-  const egresosHoy = movimientosHoy
-    .filter(m => m.tipo === 'egreso')
-    .reduce((sum, m) => sum + m.monto, 0)
+    const egresosHoy = movimientosHoy
+      .filter(m => m.tipo === 'egreso')
+      .reduce((sum, m) => sum + m.monto, 0)
 
-  // Calcular estadísticas de ventas
-  const ventasHoy = (ventas || []).filter(v => {
-    if (v.estado === 'eliminada') return false
-    return DateUtils.isSameAsToday(v.fecha)
-  })
+    // Calcular estadísticas de ventas
+    const ventasHoy = (ventas || []).filter(v => {
+      if (v.estado === 'eliminada') return false
+      return DateUtils.isSameAsToday(v.fecha)
+    })
 
-  const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0)
-  const ventasPorMetodo = ventasHoy.reduce((acc, v) => {
-    const metodo = v.metodo_pago || 'efectivo'
-    acc[metodo] = (acc[metodo] || 0) + (v.total || 0)
-    return acc
-  }, {} as Record<string, number>)
+    const totalVentasHoy = ventasHoy.reduce((sum, v) => sum + (v.total || 0), 0)
+    const ventasPorMetodo = ventasHoy.reduce((acc, v) => {
+      const metodo = v.metodo_pago || 'efectivo'
+      acc[metodo] = (acc[metodo] || 0) + (v.total || 0)
+      return acc
+    }, {} as Record<string, number>)
+
+    return {
+      movimientosHoy,
+      ingresosHoy,
+      egresosHoy,
+      ventasHoy,
+      totalVentasHoy,
+      ventasPorMetodo
+    }
+  }, [movimientos, ventas])
+
+  // Extraer valores para uso fácil
+  const { movimientosHoy, ingresosHoy, egresosHoy, ventasHoy, totalVentasHoy, ventasPorMetodo } = estadisticasMemoizadas
+
+  // Movimientos paginados para mejor performance
+  const movimientosPaginados = useMemo(() => {
+    const startIndex = currentPage * itemsPerPage
+    return movimientos.slice(startIndex, startIndex + itemsPerPage)
+  }, [movimientos, currentPage, itemsPerPage])
+
+  // Detalles de movimientos paginados
+  const detallesPaginados = useMemo(() => {
+    const startIndex = currentPage * itemsPerPage
+    return movimientosDetallados.slice(startIndex, startIndex + itemsPerPage)
+  }, [movimientosDetallados, currentPage, itemsPerPage])
 
   // Obtener icono para método de pago
   const getMetodoPagoIcon = (metodo: string) => {
@@ -606,6 +634,33 @@ export const CajaTable: React.FC = () => {
         </Card>
       )}
 
+      {/* Paginación para movimientos */}
+      {movimientos.length > itemsPerPage && (
+        <div className="flex justify-between items-center">
+          <div className="text-sm text-dark-text-secondary">
+            Mostrando {currentPage * itemsPerPage + 1}-{Math.min((currentPage + 1) * itemsPerPage, movimientos.length)} de {movimientos.length} movimientos
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+              disabled={currentPage === 0}
+              variant="outline"
+              size="sm"
+            >
+              Anterior
+            </Button>
+            <Button
+              onClick={() => setCurrentPage(Math.min(Math.ceil(movimientos.length / itemsPerPage) - 1, currentPage + 1))}
+              disabled={currentPage >= Math.ceil(movimientos.length / itemsPerPage) - 1}
+              variant="outline"
+              size="sm"
+            >
+              Siguiente
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Tabla de movimientos */}
       <Card className="overflow-hidden">
         <div className="px-6 py-4 border-b border-dark-border">
@@ -640,22 +695,22 @@ export const CajaTable: React.FC = () => {
             <tbody className="bg-dark-bg-secondary divide-y divide-dark-border">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-dark-text-secondary">
+                  <td colSpan={isAdmin ? 6 : 5} className="px-6 py-4 text-center text-dark-text-secondary">
                     <div className="flex items-center justify-center">
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                       Cargando movimientos...
                     </div>
                   </td>
                 </tr>
-              ) : movimientos.length === 0 ? (
+              ) : movimientosPaginados.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-dark-text-secondary">
+                  <td colSpan={isAdmin ? 6 : 5} className="px-6 py-4 text-center text-dark-text-secondary">
                     No hay movimientos registrados
                   </td>
                 </tr>
               ) : (
-                movimientos.map((movimiento, index) => {
-                  const detalles = movimientosDetallados[index]
+                movimientosPaginados.map((movimiento, index) => {
+                  const detalles = detallesPaginados[index]
                   const detallesFormateados = detalles ? formatearDetallesMovimiento(detalles) : movimiento.concepto
                   const icono = detalles ? obtenerIconoMovimiento(detalles) : '💰'
                   

@@ -1,25 +1,34 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense, lazy } from 'react'
 import { useAppStore } from './store'
 import { initializeCalendarSync } from './lib/calendarSync'
 import { LoginForm } from './components/auth/LoginForm'
 import { Sidebar } from './components/layout/Sidebar'
 import { usePermissionGuard } from './hooks/usePermissionGuard'
 
-import { Dashboard } from './components/dashboard/Dashboard'
-import { EmpleadosTable } from './components/empleados/EmpleadosTable'
-import { ProductosTable } from './components/productos/ProductosTable'
-import { ClientesTable } from './components/clientes/ClientesTable'
-import { VentasTableModern } from './components/ventas/VentasTableModern'
-import { FacturacionTable } from './components/facturacion/FacturacionTable'
-import { CajaTable } from './components/caja/CajaTable'
-import ReportesTable from './components/reportes/ReportesTable'
+// Lazy loading de componentes para mejor performance
+const Dashboard = lazy(() => import('./components/dashboard/Dashboard').then(module => ({ default: module.Dashboard })))
+const EmpleadosTable = lazy(() => import('./components/empleados/EmpleadosTable').then(module => ({ default: module.EmpleadosTable })))
+const ProductosTable = lazy(() => import('./components/productos/ProductosTable').then(module => ({ default: module.ProductosTable })))
+const ClientesTable = lazy(() => import('./components/clientes/ClientesTable').then(module => ({ default: module.ClientesTable })))
+const VentasTableModern = lazy(() => import('./components/ventas/VentasTableModern').then(module => ({ default: module.VentasTableModern })))
+const FacturacionTable = lazy(() => import('./components/facturacion/FacturacionTable').then(module => ({ default: module.FacturacionTable })))
+const CajaTable = lazy(() => import('./components/caja/CajaTable').then(module => ({ default: module.CajaTable })))
+const ReportesTable = lazy(() => import('./components/reportes/ReportesTable'))
+
 import { NotificationsContainer } from './components/ui/notifications'
 import { ConnectionError } from './components/ui/ConnectionError'
 import { AccessDenied } from './components/ui/AccessDenied'
 
-
 import { Footer } from './components/ui/Footer'
 import { OfflineStatus } from './components/OfflineStatus'
+
+// Componente de loading simple para lazy loading
+const LoadingComponent = () => (
+  <div className="flex items-center justify-center p-8">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+    <span className="ml-3 text-dark-text-secondary">Cargando...</span>
+  </div>
+)
 
 function App() {
   const user = useAppStore((state) => state.auth.user)
@@ -137,33 +146,32 @@ function App() {
     loadModuleData()
   }, [currentModule, user, fetchEmpleados, fetchProductos, fetchClientes, fetchVentas, fetchMovimientos])
 
-  // Renderizar módulo correspondiente
+  // Renderizar módulo correspondiente con lazy loading
   const renderModule = () => {
     // Verificar si el usuario tiene permisos para el módulo actual
     if (!permissions.canAccess(currentModule as any)) {
       return <AccessDenied module={currentModule} />
     }
 
-    switch (currentModule) {
-      case 'dashboard':
-        return <Dashboard />
-      case 'empleados':
-        return <EmpleadosTable />
-      case 'productos':
-        return <ProductosTable />
-      case 'clientes':
-        return <ClientesTable />
-      case 'ventas':
-        return <VentasTableModern />
-      case 'facturacion':
-        return <FacturacionTable />
-      case 'caja':
-        return <CajaTable />
-      case 'reportes':
-        return <ReportesTable />
-      default:
-        return <Dashboard />
-    }
+    const ModuleComponent = (() => {
+      switch (currentModule) {
+        case 'dashboard': return Dashboard
+        case 'empleados': return EmpleadosTable
+        case 'productos': return ProductosTable
+        case 'clientes': return ClientesTable
+        case 'ventas': return VentasTableModern
+        case 'facturacion': return FacturacionTable
+        case 'caja': return CajaTable
+        case 'reportes': return ReportesTable
+        default: return Dashboard
+      }
+    })()
+
+    return (
+      <Suspense fallback={<LoadingComponent />}>
+        <ModuleComponent />
+      </Suspense>
+    )
   }
 
 
