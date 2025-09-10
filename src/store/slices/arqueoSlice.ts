@@ -58,7 +58,8 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
             subtotal
           )
         `)
-        .eq('fecha', fechaHoy)
+        .gte('fecha', `${fechaHoy}T00:00:00`)
+        .lt('fecha', `${fechaHoy}T23:59:59`)
         .eq('estado', 'completada')
 
       if (errorVentas) {
@@ -71,7 +72,17 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
       let tarjetaEsperado = 0
       let transferenciaEsperado = 0
 
+      console.log('🔍 [arqueoSlice] Ventas del día encontradas:', ventasDelDia?.length || 0)
+      console.log('🔍 [arqueoSlice] Fecha de búsqueda:', fechaHoy)
+
       ventasDelDia?.forEach(venta => {
+        console.log('🔍 [arqueoSlice] Procesando venta:', {
+          id: venta.id,
+          metodo_pago: venta.metodo_pago,
+          total: venta.total,
+          fecha: venta.fecha
+        })
+        
         switch (venta.metodo_pago) {
           case 'efectivo':
             efectivoEsperado += venta.total
@@ -83,6 +94,12 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
             transferenciaEsperado += venta.total
             break
         }
+      })
+
+      console.log('🔍 [arqueoSlice] Montos calculados:', {
+        efectivoEsperado,
+        tarjetaEsperado,
+        transferenciaEsperado
       })
 
       const totalEsperado = efectivoEsperado + tarjetaEsperado + transferenciaEsperado
@@ -224,7 +241,7 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
 
       const { data: arqueoHoy, error } = await supabase
         .from('arqueos_caja')
-        .select('id, fecha, empleado_id, completado, monto_esperado, monto_real, diferencia, observaciones, estado, created_at, updated_at')
+        .select('id, fecha, empleado_id, completado, efectivo_esperado, tarjeta_esperado, transferencia_esperado, efectivo_real, tarjeta_real, transferencia_real, efectivo_diferencia, tarjeta_diferencia, transferencia_diferencia, total_esperado, total_real, total_diferencia, observaciones, created_at, updated_at')
         .eq('fecha', fechaHoy)
         .eq('empleado_id', empleadoId)
         .single()
@@ -270,7 +287,7 @@ export const arqueoSlice: StateCreator<AppStore, [], [], Pick<AppStore,
     try {
       const { data, error } = await supabase
         .from('arqueos_caja')
-        .select('id, fecha, empleado_id, completado, monto_esperado, monto_real, diferencia, observaciones, estado, created_at, updated_at')
+        .select('id, fecha, empleado_id, completado, efectivo_esperado, tarjeta_esperado, transferencia_esperado, efectivo_real, tarjeta_real, transferencia_real, efectivo_diferencia, tarjeta_diferencia, transferencia_diferencia, total_esperado, total_real, total_diferencia, observaciones, created_at, updated_at')
         .order('created_at', { ascending: false })
         .limit(50)
 
