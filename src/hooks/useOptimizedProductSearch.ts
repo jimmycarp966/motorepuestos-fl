@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 
 interface Product {
   id: string
@@ -34,6 +34,14 @@ export function useOptimizedProductSearch({
 }: UseOptimizedProductSearchOptions) {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [isSearching, setIsSearching] = useState(false)
+  
+  // Usar refs para evitar re-renders innecesarios
+  const productsRef = useRef(products)
+  const maxResultsRef = useRef(maxResults)
+  
+  // Actualizar refs cuando cambien los valores
+  productsRef.current = products
+  maxResultsRef.current = maxResults
 
   // Debounce search term para evitar búsquedas excesivas
   useEffect(() => {
@@ -41,7 +49,7 @@ export function useOptimizedProductSearch({
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm)
       setIsSearching(false)
-    }, 150) // Reducido de 300ms a 150ms para mejor respuesta
+    }, 150)
 
     return () => {
       clearTimeout(timer)
@@ -60,15 +68,18 @@ export function useOptimizedProductSearch({
     return ['todas', ...Array.from(uniqueCategories)]
   }, [products])
 
-  // Función optimizada de búsqueda con scoring (memoizada)
-  const searchProducts = useCallback((term: string, category: string): SearchResult[] => {
+  // Función de búsqueda optimizada sin useCallback para evitar dependencias
+  const searchProducts = (term: string, category: string): SearchResult[] => {
+    const currentProducts = productsRef.current
+    const currentMaxResults = maxResultsRef.current
+    
     if (!term.trim()) {
       // Sin término de búsqueda, mostrar productos por categoría
       const filtered = category === 'todas' 
-        ? products 
-        : products.filter(p => p.categoria === category)
+        ? currentProducts 
+        : currentProducts.filter(p => p.categoria === category)
       
-      return filtered.slice(0, maxResults).map(product => ({
+      return filtered.slice(0, currentMaxResults).map(product => ({
         product,
         score: 0,
         exactCodeMatch: false,
@@ -80,10 +91,7 @@ export function useOptimizedProductSearch({
     const termLower = term.toLowerCase().trim()
     const results: SearchResult[] = []
 
-    // Pre-calcular términos para optimizar
-    const termLength = termLower.length
-
-    for (const product of products) {
+    for (const product of currentProducts) {
       // Verificar categoría primero (más rápido)
       if (category !== 'todas' && product.categoria !== category) {
         continue
@@ -142,13 +150,13 @@ export function useOptimizedProductSearch({
     // Ordenar por score (descendente) y limitar resultados
     return results
       .sort((a, b) => b.score - a.score)
-      .slice(0, maxResults)
-  }, [products, maxResults])
+      .slice(0, currentMaxResults)
+  }
 
-  // Resultados memoizados
+  // Resultados memoizados con dependencias estables
   const searchResults = useMemo(() => {
     return searchProducts(debouncedSearchTerm, selectedCategory)
-  }, [searchProducts, debouncedSearchTerm, selectedCategory])
+  }, [debouncedSearchTerm, selectedCategory]) // Removido searchProducts de las dependencias
 
   // Productos filtrados (solo los productos, sin metadata de búsqueda)
   const filteredProducts = useMemo(() => {
