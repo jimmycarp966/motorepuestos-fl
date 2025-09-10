@@ -60,7 +60,7 @@ export function useOptimizedProductSearch({
     return ['todas', ...Array.from(uniqueCategories)]
   }, [products])
 
-  // Función optimizada de búsqueda con scoring
+  // Función optimizada de búsqueda con scoring (memoizada)
   const searchProducts = useCallback((term: string, category: string): SearchResult[] => {
     if (!term.trim()) {
       // Sin término de búsqueda, mostrar productos por categoría

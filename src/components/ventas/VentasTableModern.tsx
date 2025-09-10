@@ -60,9 +60,11 @@ export const VentasTableModern: React.FC = () => {
   const [clientSearchTerm, setClientSearchTerm] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1)
+  const [isInputFocused, setIsInputFocused] = useState(false)
 
   const searchInputRef = useRef<HTMLInputElement>(null)
   const suggestionsContainerRef = useRef<HTMLDivElement>(null)
+  const focusTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Cargar datos
   useEffect(() => {
@@ -73,6 +75,15 @@ export const VentasTableModern: React.FC = () => {
   // Enfocar búsqueda al cargar
   useEffect(() => {
     searchInputRef.current?.focus()
+  }, [])
+
+  // Cleanup del timeout de foco
+  useEffect(() => {
+    return () => {
+      if (focusTimeoutRef.current) {
+        clearTimeout(focusTimeoutRef.current)
+      }
+    }
   }, [])
 
   // Atajos de teclado
@@ -365,9 +376,20 @@ export const VentasTableModern: React.FC = () => {
                 ref={searchInputRef}
                 value={searchTerm}
                 onChange={(e) => {
-                  setSearchTerm(e.target.value)
-                  setShowSuggestions(e.target.value.length > 0)
+                  const value = e.target.value
+                  setSearchTerm(value)
+                  setShowSuggestions(value.length > 0)
                   setSelectedSuggestionIndex(-1)
+                  
+                  // Mantener el foco en el input después de un re-render
+                  if (focusTimeoutRef.current) {
+                    clearTimeout(focusTimeoutRef.current)
+                  }
+                  focusTimeoutRef.current = setTimeout(() => {
+                    if (searchInputRef.current && document.activeElement !== searchInputRef.current) {
+                      searchInputRef.current.focus()
+                    }
+                  }, 0)
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder={isSearching ? "Buscando..." : "Ingrese el código de barras o el nombre del producto"}
@@ -380,6 +402,7 @@ export const VentasTableModern: React.FC = () => {
                 onFocus={(e) => {
                   e.target.style.borderColor = '#2979FF'
                   e.target.style.boxShadow = '0 0 0 3px rgba(41, 121, 255, 0.1)'
+                  setIsInputFocused(true)
                   if (searchTerm.length > 0) {
                     setShowSuggestions(true)
                   }
@@ -387,8 +410,12 @@ export const VentasTableModern: React.FC = () => {
                 onBlur={(e) => {
                   e.target.style.borderColor = '#2C2C2C'
                   e.target.style.boxShadow = 'none'
-                  // Delay para permitir clicks en sugerencias
-                  setTimeout(() => setShowSuggestions(false), 200)
+                  setIsInputFocused(false)
+                  // Solo ocultar sugerencias si no se está haciendo click en una sugerencia
+                  const relatedTarget = e.relatedTarget as HTMLElement
+                  if (!relatedTarget || !relatedTarget.closest('[data-suggestion-index]')) {
+                    setTimeout(() => setShowSuggestions(false), 200)
+                  }
                 }}
               />
               
